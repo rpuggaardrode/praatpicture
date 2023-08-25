@@ -1,0 +1,82 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 1.439637 
+tiers? <exists> 
+size = 4 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "ORT-MAU" 
+        xmin = 0 
+        xmax = 1.439637 
+        intervals: size = 3 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.66 
+            text = "" 
+        intervals [2]:
+            xmin = 0.66 
+            xmax = 1.04 
+            text = "ɓɑh" 
+        intervals [3]:
+            xmin = 1.04 
+            xmax = 1.439637 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "KAN-MAU" 
+        xmin = 0 
+        xmax = 1.439637 
+        intervals: size = 3 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.66 
+            text = "" 
+        intervals [2]:
+            xmin = 0.66 
+            xmax = 1.04 
+            text = "b_<Ah" 
+        intervals [3]:
+            xmin = 1.04 
+            xmax = 1.439637 
+            text = "" 
+    item [3]:
+        class = "IntervalTier" 
+        name = "MAU" 
+        xmin = 0 
+        xmax = 1.439637 
+        intervals: size = 5 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.66 
+            text = "<p:>" 
+        intervals [2]:
+            xmin = 0.66 
+            xmax = 0.72 
+            text = "b_<" 
+        intervals [3]:
+            xmin = 0.72 
+            xmax = 0.87 
+            text = "A" 
+        intervals [4]:
+            xmin = 0.87 
+            xmax = 1.04 
+            text = "h" 
+        intervals [5]:
+            xmin = 1.04 
+            xmax = 1.439637 
+            text = "<p:>" 
+    item [4]:
+        class = "TextTier" 
+        name = "point" 
+        xmin = 0 
+        xmax = 1.439637 
+        points: size = 2 
+        points [1]:
+            number = 0.6513912882419759 
+            mark = "vo" 
+        points [2]:
+            number = 0.7201810734867619 
+            mark = "burst" 
