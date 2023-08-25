@@ -18,3 +18,5 @@ Imports:
     rPraat,
     soundgen,
     utils
+URL: https://github.com/rpuggaardrode/praatpicture
+BugReports: https://github.com/rpuggaardrode/praatpicture/issues
