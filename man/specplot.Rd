@@ -16,6 +16,10 @@ specplot(
   dynamicrange = 60,
   timestep = 1000,
   windowshape = "Gaussian",
+  formants_on_spec = FALSE,
+  fm = NULL,
+  formanttype = "draw",
+  formant_dynrange = 30,
   tgbool = FALSE,
   lines = NULL,
   ind = NULL,
@@ -53,6 +57,20 @@ plotting parameters it is a good idea to choose a smaller value.}
 \item{windowshape}{String giving the name of the window shape to be applied
 to the signal when generating spectrograms. Default is \code{Gaussian}; other
 options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
+
+\item{formants_on_spec}{Boolean; should formants be plotted on top of
+spectrogram? Default is \code{FALSE}.}
+
+\item{fm}{Formant object loaded using \link[rPraat:formant.read]{rPraat::formant.read}}
+
+\item{formanttype}{String giving the type of formant plot to produce;
+default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
+plot).}
+
+\item{formant_dynrange}{Dynamic range in dB for producing formant plots.
+When a formant plot of \code{formanttype='speckle'} is drawn, no formants are
+shown in frames with intensity level \code{formant_dynrange} below the maximum
+intensity. Default is \code{30}. If set to \code{0}, all formants are shown.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}

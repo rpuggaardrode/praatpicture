@@ -72,6 +72,8 @@
 #' @param formanttype String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
 #' plot).
+#' @param formants_on_spec Boolean; should formants be plotted on top of
+#' spectrogram? Default is `FALSE`.
 #' @param intensityrange Vector of two integers giving the intensity range to be
 #' used for producing intensity plots. Default is `NULL`, in which case the
 #' range is simply the minimum and maximum levels in the curve.
@@ -92,7 +94,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          pitchtype='draw', pitchscale='hz', pitchrange=c(50,500),
                          semitones_re=100, formant_dynrange=30,
                          formantrange=c(50, 5500), formanttype='speckle',
-                         intensityrange=NULL, ...) {
+                         formants_on_spec=FALSE, intensityrange=NULL, ...) {
 
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')
@@ -151,9 +153,11 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     pt <- rPraat::pt.read(ptfn)
   }
 
-  if ('formant' %in% frames) {
+  if ('formant' %in% frames | formants_on_spec) {
     fmfn <- paste0(fn, '.Formant')
     fm <- rPraat::formant.read(fmfn)
+  } else {
+    fm <- NULL
   }
 
   if ('intensity' %in% frames) {
@@ -196,8 +200,9 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig, sr, t, start, max(snd$t)-start, tfrom0, freqrange, windowlength,
-               dynamicrange, timestep,
-               windowshape, tgbool, focus_linevec, ind, nframe)
+               dynamicrange, timestep, windowshape, formants_on_spec, fm,
+               formanttype, formant_dynrange,
+               tgbool, focus_linevec, ind, nframe)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tiers, tfrom0, tier_names, ind, nframe)

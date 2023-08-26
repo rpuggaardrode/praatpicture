@@ -24,6 +24,16 @@
 #' @param windowshape String giving the name of the window shape to be applied
 #' to the signal when generating spectrograms. Default is `Gaussian`; other
 #' options are `square`, `Hamming`, `Bartlett`, or `Hanning`.
+#' @param formants_on_spec Boolean; should formants be plotted on top of
+#' spectrogram? Default is `FALSE`.
+#' @param fm Formant object loaded using [rPraat::formant.read]
+#' @param formanttype String giving the type of formant plot to produce;
+#' default is `speckle` (a point plot), the only other option is `draw` (a line
+#' plot).
+#' @param formant_dynrange Dynamic range in dB for producing formant plots.
+#' When a formant plot of `formanttype='speckle'` is drawn, no formants are
+#' shown in frames with intensity level `formant_dynrange` below the maximum
+#' intensity. Default is `30`. If set to `0`, all formants are shown.
 #' @param tgbool Logical; should dotted lines be plotted corresponding to
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
@@ -40,8 +50,9 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='spectrogram')
 specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
                      windowlength=0.005, dynamicrange=60, timestep=1000,
-                     windowshape='Gaussian', tgbool=FALSE,
-                     lines=NULL, ind=NULL, nframe=NULL) {
+                     windowshape='Gaussian', formants_on_spec=FALSE, fm=NULL,
+                     formanttype='draw', formant_dynrange=30,
+                     tgbool=FALSE, lines=NULL, ind=NULL, nframe=NULL) {
 
   wl <- windowlength*1000
   ts <- -timestep
@@ -53,6 +64,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
   }
 
   if (tfrom0) {
+    org_start <- start
     start <- 0
   }
 
@@ -89,4 +101,29 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
   graphics::mtext('Frequency (Hz)', side=2, line=3, cex=0.8)
   plot(spec, add=T)
   if (tgbool) graphics::abline(v=lines, lty='dotted')
+  if (formants_on_spec) {
+    nf <- fm$maxnFormants
+    fm <- rPraat::formant.toArray(fm)
+
+    if (tfrom0) fm$t <- fm$t - org_start
+    db <- ifultools::decibel(fm$intensityVector)
+    if (formant_dynrange != 0) {
+      subdr <- which(db < max(db)-formant_dynrange)
+      if (length(subdr) == 0) subdr <- 1
+    } else {
+      subdr <- 1
+    }
+    if (formanttype == 'draw') {
+      graphics::lines(fm$t, fm$frequencyArray[1,])
+      for (i in 2:nf) {
+        graphics::lines(fm$t, fm$frequencyArray[i,])
+      }
+    }
+    if (formanttype == 'speckle') {
+      graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20)
+      for (i in 2:nf) {
+        graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20)
+      }
+    }
+  }
 }

@@ -26,6 +26,7 @@ praatpicture(
   formant_dynrange = 30,
   formantrange = c(50, 5500),
   formanttype = "speckle",
+  formants_on_spec = FALSE,
   intensityrange = NULL,
   ...
 )
@@ -118,6 +119,9 @@ used for producing formant plots. Default is \code{c(0,5500)}.}
 \item{formanttype}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
 plot).}
+
+\item{formants_on_spec}{Boolean; should formants be plotted on top of
+spectrogram? Default is \code{FALSE}.}
 
 \item{intensityrange}{Vector of two integers giving the intensity range to be
 used for producing intensity plots. Default is \code{NULL}, in which case the
