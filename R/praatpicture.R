@@ -77,6 +77,10 @@
 #' @param intensityrange Vector of two integers giving the intensity range to be
 #' used for producing intensity plots. Default is `NULL`, in which case the
 #' range is simply the minimum and maximum levels in the curve.
+#' @param draw_rectangle Use for drawing rectangles on plot components. A
+#' vector containing a) a string giving the plot component to draw a rectangle
+#' on, and b) arguments to pass on to [graphics::rect]. Alternatively a list
+#' of such vectors, if more rectangle should be drawn.
 #' @param ... Further global plotting arguments passed on to `par()`.
 #'
 #' @seealso Functions from `rPraat` are used to load in files created with
@@ -94,7 +98,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          pitchtype='draw', pitchscale='hz', pitchrange=c(50,500),
                          semitones_re=100, formant_dynrange=30,
                          formantrange=c(50, 5500), formanttype='speckle',
-                         formants_on_spec=FALSE, intensityrange=NULL, ...) {
+                         formants_on_spec=FALSE, intensityrange=NULL,
+                         draw_rectangle=NULL, ...) {
 
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')
@@ -111,6 +116,9 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   if (nframe != 3 & length(proportion) != nframe) {
     proportion <- rep(round(100/nframe), nframe)
   }
+
+  if (class(draw_rectangle) != 'list') draw_rectangle <- list(draw_rectangle)
+  rect_comp <- sapply(p, '[[', 1)
 
   snd <- rPraat::snd.read(sound, from=start, to=end, units='seconds')
   sig <- snd$sig[,1]
@@ -197,28 +205,34 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     if (frames[i] == 'sound') {
       ind <- which(frames == 'sound')
       waveplot(sig, t, tgbool, focus_linevec, ind, nframe)
+      if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig, sr, t, start, max(snd$t)-start, tfrom0, freqrange, windowlength,
                dynamicrange, timestep, windowshape, formants_on_spec, fm,
                formanttype, formant_dynrange,
                tgbool, focus_linevec, ind, nframe)
+      if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram', draw_rectangle)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tiers, tfrom0, tier_names, ind, nframe)
+      if ('TextGrid' %in% rect_comp) draw_rectangle('TextGrid', draw_rectangle)
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
                 pitchtype, pitchscale, pitchrange,
                 semitones_re, ind, nframe)
+      if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
                   formant_dynrange, formantrange, formanttype, ind, nframe)
+      if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
                     intensityrange, ind, nframe)
+      if ('intensity' %in% rect_comp) draw_rectangle('intensity', draw_rectangle)
     }
   }
 

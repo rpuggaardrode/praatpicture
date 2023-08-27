@@ -28,6 +28,7 @@ praatpicture(
   formanttype = "speckle",
   formants_on_spec = FALSE,
   intensityrange = NULL,
+  draw_rectangle = NULL,
   ...
 )
 }
@@ -126,6 +127,11 @@ spectrogram? Default is \code{FALSE}.}
 \item{intensityrange}{Vector of two integers giving the intensity range to be
 used for producing intensity plots. Default is \code{NULL}, in which case the
 range is simply the minimum and maximum levels in the curve.}
+
+\item{draw_rectangle}{Use for drawing rectangles on plot components. A
+vector containing a) a string giving the plot component to draw a rectangle
+on, and b) arguments to pass on to \link[graphics:rect]{graphics::rect}. Alternatively a list
+of such vectors, if more rectangle should be drawn.}
 
 \item{...}{Further global plotting arguments passed on to \code{par()}.}
 }
