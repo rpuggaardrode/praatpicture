@@ -81,6 +81,10 @@
 #' vector containing a) a string giving the plot component to draw a rectangle
 #' on, and b) arguments to pass on to [graphics::rect]. Alternatively a list
 #' of such vectors, if more rectangle should be drawn.
+#' @param draw_arrow Use for drawing arrows on plot components. A vector
+#' containing a) a string giving the plot component to draw an arrow on, and
+#' b) arguments to pass on to [graphics::arrows]. Alternatively a list of
+#' such vectors, if more arrows should be drawn.
 #' @param ... Further global plotting arguments passed on to `par()`.
 #'
 #' @seealso Functions from `rPraat` are used to load in files created with
@@ -99,7 +103,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          semitones_re=100, formant_dynrange=30,
                          formantrange=c(50, 5500), formanttype='speckle',
                          formants_on_spec=FALSE, intensityrange=NULL,
-                         draw_rectangle=NULL, ...) {
+                         draw_rectangle=NULL, draw_arrow=NULL, ...) {
 
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')
@@ -118,7 +122,9 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   }
 
   if (class(draw_rectangle) != 'list') draw_rectangle <- list(draw_rectangle)
-  rect_comp <- sapply(p, '[[', 1)
+  rect_comp <- sapply(draw_rectangle, '[[', 1)
+  if (class(draw_arrow) != 'list') draw_arrow <- list(draw_arrow)
+  arr_comp <- sapply(draw_arrow, '[[', 1)
 
   snd <- rPraat::snd.read(sound, from=start, to=end, units='seconds')
   sig <- snd$sig[,1]
@@ -206,6 +212,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
       ind <- which(frames == 'sound')
       waveplot(sig, t, tgbool, focus_linevec, ind, nframe)
       if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)
+      if ('sound' %in% arr_comp) draw_arrow('sound', draw_arrow)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig, sr, t, start, max(snd$t)-start, tfrom0, freqrange, windowlength,
@@ -213,26 +220,31 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                formanttype, formant_dynrange,
                tgbool, focus_linevec, ind, nframe)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram', draw_rectangle)
+      if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tiers, tfrom0, tier_names, ind, nframe)
       if ('TextGrid' %in% rect_comp) draw_rectangle('TextGrid', draw_rectangle)
+      if ('TextGrid' %in% arr_comp) draw_arrow('TextGrid', draw_arrow)
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
                 pitchtype, pitchscale, pitchrange,
                 semitones_re, ind, nframe)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
+      if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
                   formant_dynrange, formantrange, formanttype, ind, nframe)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
+      if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
                     intensityrange, ind, nframe)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity', draw_rectangle)
+      if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
     }
   }
 
