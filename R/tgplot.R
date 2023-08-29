@@ -18,6 +18,9 @@
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
+#' @param tg_alignment String giving the desired alignment of text in the
+#' TextGrids. Default is `central`; other options are `left` and `right`.
+#' Alternatively, a vector of strings if different alignments are needed.
 #'
 #' @export
 #'
@@ -26,7 +29,12 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='TextGrid')
 tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tier_names=TRUE,
-                   ind=NULL, nframe=NULL) {
+                   ind=NULL, nframe=NULL, tg_alignment='central') {
+
+  if (length(tg_alignment) != length(tiers)) {
+    tg_alignment <- rep(tg_alignment, length(tiers))
+  }
+
   for (tier in tiers) {
     lab <- tg[[tier]]$label
     tname <- tg[[tier]]$name
@@ -69,7 +77,9 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tier_names=TRUE,
          ylim=c(0,10), yaxt='n', yaxs='i')
     if (tg[[tier]]$type == 'interval') {
       graphics::abline(v=line_vec)
-      graphics::text(t1+(t2-t1)/2, 5, lab)
+      if (tg_alignment[[tier]]=='central') graphics::text(t1+(t2-t1)/2, 5, lab)
+      if (tg_alignment[[tier]]=='left') graphics::text(t1, 5, lab, pos=4)
+      if (tg_alignment[[tier]]=='right') graphics::text(t2, 5, lab, pos=2)
     } else {
       graphics::segments(x0=line_vec, x1=line_vec, y0=0, y1=2)
       graphics::segments(x0=line_vec, x1=line_vec, y0=8, y1=10)

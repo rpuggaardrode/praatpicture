@@ -85,6 +85,9 @@
 #' containing a) a string giving the plot component to draw an arrow on, and
 #' b) arguments to pass on to [graphics::arrows]. Alternatively a list of
 #' such vectors, if more arrows should be drawn.
+#' @param tg_alignment String giving the desired alignment of text in the
+#' TextGrids. Default is `central`; other options are `left` and `right`.
+#' Alternatively, a vector of strings if different alignments are needed.
 #' @param ... Further global plotting arguments passed on to `par()`.
 #'
 #' @seealso Functions from `rPraat` are used to load in files created with
@@ -103,7 +106,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          semitones_re=100, formant_dynrange=30,
                          formantrange=c(50, 5500), formanttype='speckle',
                          formants_on_spec=FALSE, intensityrange=NULL,
-                         draw_rectangle=NULL, draw_arrow=NULL, ...) {
+                         draw_rectangle=NULL, draw_arrow=NULL,
+                         tg_alignment='central', ...) {
 
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')
@@ -223,7 +227,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
-      tgplot(tg, t, sr, start, tiers, tfrom0, tier_names, ind, nframe)
+      tgplot(tg, t, sr, start, tiers, tfrom0, tier_names, ind, nframe,
+             tg_alignment)
       if ('TextGrid' %in% rect_comp) draw_rectangle('TextGrid', draw_rectangle)
       if ('TextGrid' %in% arr_comp) draw_arrow('TextGrid', draw_arrow)
     } else if (frames[i] == 'pitch') {
