@@ -30,6 +30,7 @@ praatpicture(
   intensityrange = NULL,
   draw_rectangle = NULL,
   draw_arrow = NULL,
+  tg_alignment = "central",
   ...
 )
 }
@@ -138,6 +139,10 @@ of such vectors, if more rectangle should be drawn.}
 containing a) a string giving the plot component to draw an arrow on, and
 b) arguments to pass on to \link[graphics:arrows]{graphics::arrows}. Alternatively a list of
 such vectors, if more arrows should be drawn.}
+
+\item{tg_alignment}{String giving the desired alignment of text in the
+TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
+Alternatively, a vector of strings if different alignments are needed.}
 
 \item{...}{Further global plotting arguments passed on to \code{par()}.}
 }

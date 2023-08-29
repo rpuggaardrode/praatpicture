@@ -13,7 +13,8 @@ tgplot(
   tfrom0 = TRUE,
   tier_names = TRUE,
   ind = NULL,
-  nframe = NULL
+  nframe = NULL,
+  tg_alignment = "central"
 )
 }
 \arguments{
@@ -39,6 +40,10 @@ y-axis? Default is \code{TRUE}.}
 Default is \code{NULL}.}
 
 \item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
+
+\item{tg_alignment}{String giving the desired alignment of text in the
+TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
+Alternatively, a vector of strings if different alignments are needed.}
 }
 \description{
 Function for plotting TextGrids called by \link{praatpicture}. Instead of using
