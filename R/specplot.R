@@ -106,7 +106,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
     fm <- rPraat::formant.toArray(fm)
 
     if (tfrom0) fm$t <- fm$t - org_start
-    db <- ifultools::decibel(fm$intensityVector)
+    db <- gsignal::pow2db(fm$intensityVector)
     if (formant_dynrange != 0) {
       subdr <- which(db < max(db)-formant_dynrange)
       if (length(subdr) == 0) subdr <- 1

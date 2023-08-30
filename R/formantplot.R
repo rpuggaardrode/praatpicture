@@ -62,7 +62,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
-  db <- ifultools::decibel(fm$intensityVector)
+  db <- gsignal::pow2db(fm$intensityVector)
   if (dynamicrange != 0) {
     subdr <- which(db < max(db)-dynamicrange)
     if (length(subdr) == 0) subdr <- 1
