@@ -21,6 +21,10 @@
 #' @param tg_alignment String giving the desired alignment of text in the
 #' TextGrids. Default is `central`; other options are `left` and `right`.
 #' Alternatively, a vector of strings if different alignments are needed.
+#' @param tg_specialchar Logical; should Praat typesetting for special font types
+#' such as italic, bold, and small caps be converted into corresponding
+#' R-readable special font types. Default is `TRUE`.
+#' See [https://www.fon.hum.uva.nl/praat/manual/Text_styles.html].
 #'
 #' @export
 #'
@@ -29,13 +33,16 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='TextGrid')
 tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tier_names=TRUE,
-                   ind=NULL, nframe=NULL, tg_alignment='central') {
+                   ind=NULL, nframe=NULL, tg_alignment='central',
+                   tg_specialchar=TRUE) {
 
   if (length(tg_alignment) != length(tiers)) {
     tg_alignment <- rep(tg_alignment, length(tiers))
   }
 
+  i <- 0
   for (tier in tiers) {
+    i <- i+1
     lab <- tg[[tier]]$label
     tname <- tg[[tier]]$name
 
@@ -71,19 +78,23 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tier_names=TRUE,
       xax <- 'n'
     }
 
+    if (tg_specialchar) lab <- tg_stylize(lab)
 
     plot(1, type='n', ylab='',
          xlim=c(x1, x2), xaxt=xax,
          ylim=c(0,10), yaxt='n', yaxs='i')
     if (tg[[tier]]$type == 'interval') {
       graphics::abline(v=line_vec)
-      if (tg_alignment[[tier]]=='central') graphics::text(t1+(t2-t1)/2, 5, lab)
-      if (tg_alignment[[tier]]=='left') graphics::text(t1, 5, lab, pos=4)
-      if (tg_alignment[[tier]]=='right') graphics::text(t2, 5, lab, pos=2)
+      if (tg_alignment[[i]]=='central') graphics::text(
+        t1+(t2-t1)/2, 5, as.expression(lab))
+      if (tg_alignment[[i]]=='left') graphics::text(
+        t1, 5, as.expression(lab), pos=4)
+      if (tg_alignment[[i]]=='right') graphics::text(
+        t2, 5, as.expression(lab), pos=2)
     } else {
       graphics::segments(x0=line_vec, x1=line_vec, y0=0, y1=2)
       graphics::segments(x0=line_vec, x1=line_vec, y0=8, y1=10)
-      graphics::text(t0, 5, lab)
+      graphics::text(t0, 5, as.expression(lab), adj=0.5)
     }
     if (tier_names) graphics::mtext(tname, side=2, las=2, line=0.6, cex=0.8)
   }

@@ -31,6 +31,7 @@ praatpicture(
   draw_rectangle = NULL,
   draw_arrow = NULL,
   tg_alignment = "central",
+  tg_specialchar = TRUE,
   ...
 )
 }
@@ -143,6 +144,11 @@ such vectors, if more arrows should be drawn.}
 \item{tg_alignment}{String giving the desired alignment of text in the
 TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
 Alternatively, a vector of strings if different alignments are needed.}
+
+\item{tg_specialchar}{Logical; should Praat typesetting for special font types
+such as italic, bold, and small caps be converted into corresponding
+R-readable special font types. Default is \code{TRUE}.
+See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
 
 \item{...}{Further global plotting arguments passed on to \code{par()}.}
 }

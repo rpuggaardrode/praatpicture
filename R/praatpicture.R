@@ -88,6 +88,10 @@
 #' @param tg_alignment String giving the desired alignment of text in the
 #' TextGrids. Default is `central`; other options are `left` and `right`.
 #' Alternatively, a vector of strings if different alignments are needed.
+#' @param tg_specialchar Logical; should Praat typesetting for special font types
+#' such as italic, bold, and small caps be converted into corresponding
+#' R-readable special font types. Default is `TRUE`.
+#' See [https://www.fon.hum.uva.nl/praat/manual/Text_styles.html].
 #' @param ... Further global plotting arguments passed on to `par()`.
 #'
 #' @seealso Functions from `rPraat` are used to load in files created with
@@ -107,7 +111,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          formantrange=c(50, 5500), formanttype='speckle',
                          formants_on_spec=FALSE, intensityrange=NULL,
                          draw_rectangle=NULL, draw_arrow=NULL,
-                         tg_alignment='central', ...) {
+                         tg_alignment='central', tg_specialchar=TRUE, ...) {
 
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')
@@ -228,7 +232,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tiers, tfrom0, tier_names, ind, nframe,
-             tg_alignment)
+             tg_alignment, tg_specialchar)
       if ('TextGrid' %in% rect_comp) draw_rectangle('TextGrid', draw_rectangle)
       if ('TextGrid' %in% arr_comp) draw_arrow('TextGrid', draw_arrow)
     } else if (frames[i] == 'pitch') {

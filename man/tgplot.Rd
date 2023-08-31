@@ -14,7 +14,8 @@ tgplot(
   tier_names = TRUE,
   ind = NULL,
   nframe = NULL,
-  tg_alignment = "central"
+  tg_alignment = "central",
+  tg_specialchar = TRUE
 )
 }
 \arguments{
@@ -44,6 +45,11 @@ Default is \code{NULL}.}
 \item{tg_alignment}{String giving the desired alignment of text in the
 TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
 Alternatively, a vector of strings if different alignments are needed.}
+
+\item{tg_specialchar}{Logical; should Praat typesetting for special font types
+such as italic, bold, and small caps be converted into corresponding
+R-readable special font types. Default is \code{TRUE}.
+See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
 }
 \description{
 Function for plotting TextGrids called by \link{praatpicture}. Instead of using
