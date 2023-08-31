@@ -30,6 +30,7 @@ tg_stylize <- function(lab) {
           tmp[1] <- sub('{', '', tmp[1], perl=T)
           s <- c(s, paste(tmp, collapse=''))
         }
+        s <- paste(s, collapse='')
         lab[l] <- paste(splsc[1], s, collapse='', sep='')
       }
 
