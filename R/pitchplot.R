@@ -28,6 +28,8 @@
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
+#' @param start_end_only Logical; should there only be ticks on the x-axis
+#' for start and end times? Default is `TRUE`.
 #'
 #' @export
 #'
@@ -37,7 +39,8 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='pitch')
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       type='draw', scale='hz', pitchrange=c(50,500),
-                      semitones_re=100, ind=NULL, nframe=NULL) {
+                      semitones_re=100, ind=NULL, nframe=NULL,
+                      start_end_only=TRUE) {
 
   if (!type %in% c('draw', 'speckle')) {
     stop('Please select either draw or speckle as the pitch plot type')
@@ -46,12 +49,6 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   legal_scales <- c('hz', 'logarithmic', 'semitones', 'erb', 'mel')
   if (!scale %in% legal_scales) {
     stop('Possible pitch scales are hz, logarithmic, semitones, erb, and mel')
-  }
-
-  if (ind==nframe) {
-    xax <- 's'
-  } else {
-    xax <- 'n'
   }
 
   axlab <- 'Frequency (Hz)'
@@ -92,6 +89,17 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
+  if (ind==nframe) {
+    if (!start_end_only) {
+      xax <- 's'
+    } else {
+      xax <- 'n'
+      xtix <- c(round(start, 3), round(end, 3), 0)
+    }
+  } else {
+    xax <- 'n'
+  }
+
   if (type == 'draw') {
     diffs <- diff(pt$t) - min(diff(pt$t))
     gaps <- which(diffs > min(diff(pt$t)))
@@ -108,6 +116,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     plot(sep_lines_t[[1]], sep_lines_f[[1]], xlim=c(start, end+start), xaxt=xax,
          ylim=pitchrange, yaxt=yax, type='l', log=logsc)
     if (ind != 1 & scale != 'logarithmic') graphics::axis(2, at=ytix)
+    if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (length(sep_lines_t) > 1) {
       for (i in 2:length(sep_lines_t)) {
         graphics::lines(sep_lines_t[[i]], sep_lines_f[[i]])
@@ -121,6 +130,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     plot(pt$t, pt$f, xlim=c(start, end+start), xaxt=xax, ylim=pitchrange,
          yaxt=yax, type='p', pch=20, log=logsc)
     if (ind != 1 & scale != 'logarithmic') graphics::axis(2, at=ytix)
+    if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (tgbool) graphics::abline(v=lines, lty='dotted')
     graphics::mtext(axlab, side=2, line=3, cex=0.8)
   }

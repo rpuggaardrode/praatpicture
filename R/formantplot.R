@@ -25,6 +25,8 @@
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
+#' @param start_end_only Logical; should there only be ticks on the x-axis
+#' for start and end times? Default is `TRUE`.
 #'
 #' @export
 #'
@@ -34,16 +36,11 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='formant')
 formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         dynamicrange=30, formantrange=c(0,5500),
-                        type='speckle', ind=NULL, nframe=NULL) {
+                        type='speckle', ind=NULL, nframe=NULL,
+                        start_end_only=TRUE) {
 
   if (!type %in% c('draw', 'speckle')) {
     stop('Please select either draw or speckle as the formant plot type')
-  }
-
-  if (ind==nframe) {
-    xax <- 's'
-  } else {
-    xax <- 'n'
   }
 
   if (ind != 1) {
@@ -60,6 +57,17 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   if (tfrom0) {
     fm$t <- fm$t - start
     start <- 0
+  }
+
+  if (ind==nframe) {
+    if (!start_end_only) {
+      xax <- 's'
+    } else {
+      xax <- 'n'
+      xtix <- c(round(start, 3), round(end, 3), 0)
+    }
+  } else {
+    xax <- 'n'
   }
 
   db <- gsignal::pow2db(fm$intensityVector)
@@ -80,6 +88,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       graphics::lines(fm$t, fm$frequencyArray[i,])
     }
     if (ind != 1) graphics::axis(2, at=ytix)
+    if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     graphics::abline(h=freql, lty='dotted')
     if (tgbool) graphics::abline(v=lines, lty='dotted')
     graphics::mtext('Frequency (Hz)', side=2, line=3, cex=0.8)
@@ -93,6 +102,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20)
     }
     if (ind != 1) graphics::axis(2, at=ytix)
+    if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     graphics::abline(h=freql, lty='dotted')
     if (tgbool) graphics::abline(v=lines, lty='dotted')
     graphics::mtext('Frequency (Hz)', side=2, line=3, cex=0.8)

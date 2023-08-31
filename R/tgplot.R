@@ -25,6 +25,8 @@
 #' such as italic, bold, and small caps be converted into corresponding
 #' R-readable special font types. Default is `TRUE`.
 #' See [https://www.fon.hum.uva.nl/praat/manual/Text_styles.html].
+#' @param start_end_only Logical; should there only be ticks on the x-axis
+#' for start and end times? Default is `TRUE`.
 #'
 #' @export
 #'
@@ -34,7 +36,7 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='TextGrid')
 tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tier_names=TRUE,
                    ind=NULL, nframe=NULL, tg_alignment='central',
-                   tg_specialchar=TRUE) {
+                   tg_specialchar=TRUE, start_end_only=TRUE) {
 
   if (length(tg_alignment) != length(tiers)) {
     tg_alignment <- rep(tg_alignment, length(tiers))
@@ -70,7 +72,12 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tier_names=TRUE,
 
     if (ind == nframe) {
       if (tier == utils::tail(tiers, n=1)) {
-        xax <- 's'
+        if (!start_end_only) {
+          xax <- 's'
+        } else {
+          xax <- 'n'
+          xtix <- c(round(min(t), 3), round(max(t), 3), 0)
+        }
       } else {
         xax <- 'n'
       }
@@ -95,6 +102,9 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tier_names=TRUE,
       graphics::segments(x0=line_vec, x1=line_vec, y0=0, y1=2)
       graphics::segments(x0=line_vec, x1=line_vec, y0=8, y1=10)
       graphics::text(t0, 5, as.expression(lab), adj=0.5)
+    }
+    if (ind == nframe & start_end_only & tier == utils::tail(tiers, n=1)) {
+      graphics::axis(1, at=xtix)
     }
     if (tier_names) graphics::mtext(tname, side=2, las=2, line=0.6, cex=0.8)
   }

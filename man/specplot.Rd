@@ -23,7 +23,8 @@ specplot(
   tgbool = FALSE,
   lines = NULL,
   ind = NULL,
-  nframe = NULL
+  nframe = NULL,
+  start_end_only = TRUE
 )
 }
 \arguments{
@@ -82,6 +83,9 @@ a TextGrid to be plotted with dotted lines. Default is \code{NULL}.}
 Default is \code{NULL}.}
 
 \item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
+
+\item{start_end_only}{Logical; should there only be ticks on the x-axis
+for start and end times? Default is \code{TRUE}.}
 }
 \description{
 Function for plotting spectrograms called by \link{praatpicture}. Instead of using

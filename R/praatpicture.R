@@ -92,6 +92,8 @@
 #' such as italic, bold, and small caps be converted into corresponding
 #' R-readable special font types. Default is `TRUE`.
 #' See [https://www.fon.hum.uva.nl/praat/manual/Text_styles.html].
+#' @param start_end_only Logical; should there only be ticks on the x-axis
+#' for start and end times? Default is `TRUE`.
 #' @param ... Further global plotting arguments passed on to `par()`.
 #'
 #' @seealso Functions from `rPraat` are used to load in files created with
@@ -111,7 +113,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          formantrange=c(50, 5500), formanttype='speckle',
                          formants_on_spec=FALSE, intensityrange=NULL,
                          draw_rectangle=NULL, draw_arrow=NULL,
-                         tg_alignment='central', tg_specialchar=TRUE, ...) {
+                         tg_alignment='central', tg_specialchar=TRUE,
+                         start_end_only=TRUE, ...) {
 
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')
@@ -218,7 +221,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
 
     if (frames[i] == 'sound') {
       ind <- which(frames == 'sound')
-      waveplot(sig, t, tgbool, focus_linevec, ind, nframe)
+      waveplot(sig, t, tgbool, focus_linevec, ind, nframe, start_end_only)
       if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)
       if ('sound' %in% arr_comp) draw_arrow('sound', draw_arrow)
     } else if (frames[i] == 'spectrogram') {
@@ -226,32 +229,33 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
       specplot(sig, sr, t, start, max(snd$t)-start, tfrom0, freqrange, windowlength,
                dynamicrange, timestep, windowshape, formants_on_spec, fm,
                formanttype, formant_dynrange,
-               tgbool, focus_linevec, ind, nframe)
+               tgbool, focus_linevec, ind, nframe, start_end_only)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram', draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tiers, tfrom0, tier_names, ind, nframe,
-             tg_alignment, tg_specialchar)
+             tg_alignment, tg_specialchar, start_end_only)
       if ('TextGrid' %in% rect_comp) draw_rectangle('TextGrid', draw_rectangle)
       if ('TextGrid' %in% arr_comp) draw_arrow('TextGrid', draw_arrow)
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
                 pitchtype, pitchscale, pitchrange,
-                semitones_re, ind, nframe)
+                semitones_re, ind, nframe, start_end_only)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
-                  formant_dynrange, formantrange, formanttype, ind, nframe)
+                  formant_dynrange, formantrange, formanttype, ind, nframe,
+                  start_end_only)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(snd$t)-start, tfrom0, tgbool, focus_linevec,
-                    intensityrange, ind, nframe)
+                    intensityrange, ind, nframe, start_end_only)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity', draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
     }

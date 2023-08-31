@@ -16,7 +16,8 @@ pitchplot(
   pitchrange = c(50, 500),
   semitones_re = 100,
   ind = NULL,
-  nframe = NULL
+  nframe = NULL,
+  start_end_only = TRUE
 )
 }
 \arguments{
@@ -55,6 +56,9 @@ pitch frequency to semitones. Default is \code{100}.}
 Default is \code{NULL}.}
 
 \item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
+
+\item{start_end_only}{Logical; should there only be ticks on the x-axis
+for start and end times? Default is \code{TRUE}.}
 }
 \description{
 Function for plotting pitch objects called by \link{praatpicture}. Instead of

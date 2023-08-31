@@ -19,6 +19,8 @@
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
+#' @param start_end_only Logical; should there only be ticks on the x-axis
+#' for start and end times? Default is `TRUE`.
 #'
 #' @export
 #'
@@ -27,13 +29,8 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='intensity')
 intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
-                          intensityrange=NULL, ind=NULL, nframe=NULL) {
-
-  if (ind==nframe) {
-    xax <- 's'
-  } else {
-    xax <- 'n'
-  }
+                          intensityrange=NULL, ind=NULL, nframe=NULL,
+                          start_end_only=TRUE) {
 
   if (is.null(intensityrange)) {
     intensityrange <- c(min(it$i), max(it$i))
@@ -52,8 +49,20 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
+  if (ind==nframe) {
+    if (!start_end_only) {
+      xax <- 's'
+    } else {
+      xax <- 'n'
+      xtix <- c(round(start, 3), round(end, 3), 0)
+    }
+  } else {
+    xax <- 'n'
+  }
+
   plot(it$t, it$i, xlim=c(start, end+start), xaxt=xax,
        ylim=intensityrange, yaxt=yax, type='l')
+  if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
   if (ind != 1) graphics::axis(2, at=ytix)
   if (tgbool) graphics::abline(v=lines, lty='dotted')
   graphics::mtext('Intensity (dB)', side=2, line=3, cex=0.8)

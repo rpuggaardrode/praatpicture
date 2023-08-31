@@ -41,6 +41,8 @@
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
+#' @param start_end_only Logical; should there only be ticks on the x-axis
+#' for start and end times? Default is `TRUE`.
 #'
 #' @export
 #'
@@ -52,7 +54,8 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
                      windowlength=0.005, dynamicrange=60, timestep=1000,
                      windowshape='Gaussian', formants_on_spec=FALSE, fm=NULL,
                      formanttype='draw', formant_dynrange=30,
-                     tgbool=FALSE, lines=NULL, ind=NULL, nframe=NULL) {
+                     tgbool=FALSE, lines=NULL, ind=NULL, nframe=NULL,
+                     start_end_only=TRUE) {
 
   wl <- windowlength*1000
   ts <- -timestep
@@ -75,7 +78,12 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
   if (windowshape == 'Gaussian') ws <- 'gaussian'
 
   if (ind==nframe) {
-    xax <- 's'
+    if (!start_end_only) {
+      xax <- 's'
+    } else {
+      xax <- 'n'
+      xtix <- c(round(min(t), 3), round(max(t), 3), 0)
+    }
   } else {
     xax <- 'n'
   }
@@ -97,6 +105,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
 
   plot(NULL, xaxt=xax, xlim=c(start, end+start),
        ylim=freqrange, yaxs='i', yaxt=yax)
+  if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
   if (ind != 1) graphics::axis(2, at=ytix)
   graphics::mtext('Frequency (Hz)', side=2, line=3, cex=0.8)
   plot(spec, add=T)

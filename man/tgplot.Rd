@@ -15,7 +15,8 @@ tgplot(
   ind = NULL,
   nframe = NULL,
   tg_alignment = "central",
-  tg_specialchar = TRUE
+  tg_specialchar = TRUE,
+  start_end_only = TRUE
 )
 }
 \arguments{
@@ -50,6 +51,9 @@ Alternatively, a vector of strings if different alignments are needed.}
 such as italic, bold, and small caps be converted into corresponding
 R-readable special font types. Default is \code{TRUE}.
 See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
+
+\item{start_end_only}{Logical; should there only be ticks on the x-axis
+for start and end times? Default is \code{TRUE}.}
 }
 \description{
 Function for plotting TextGrids called by \link{praatpicture}. Instead of using
