@@ -2,7 +2,7 @@
 #'
 #' Hacky helper function to convert capital letters into Unicode small caps.
 #' May not work for all font families. Note that there's no Unicode small cap
-#' 'X'.
+#' 'X', so 'X' will just be converted to 'x'.
 #'
 #' @param x A string where all capital letters should be converted to small
 #' caps.
@@ -37,6 +37,7 @@ conv2sc <- function(x) {
   x <- gsub('U', 'ᴜ', x)
   x <- gsub('V', 'ᴠ', x)
   x <- gsub('W', 'ᴡ', x)
+  x <- gsub('X', 'x', x)
   x <- gsub('Y', 'ʏ', x)
   x <- gsub('Z', 'ᴢ', x)
   return(x)
