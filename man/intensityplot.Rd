@@ -14,7 +14,8 @@ intensityplot(
   intensityrange = NULL,
   ind = NULL,
   nframe = NULL,
-  start_end_only = TRUE
+  start_end_only = TRUE,
+  min_max_only = TRUE
 )
 }
 \arguments{
@@ -44,6 +45,11 @@ Default is \code{NULL}.}
 
 \item{start_end_only}{Logical; should there only be ticks on the x-axis
 for start and end times? Default is \code{TRUE}.}
+
+\item{min_max_only}{Logical; should only minimum and maximum values be given
+on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
+not all plot components should have minimum and maximum values on the y-axis.
+Ignored for TextGrid component.}
 }
 \description{
 Function for plotting intensity objects called by \link{praatpicture}. Instead of
