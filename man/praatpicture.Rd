@@ -11,9 +11,12 @@ praatpicture(
   tfrom0 = TRUE,
   frames = c("sound", "spectrogram", "TextGrid"),
   proportion = c(30, 50, 20),
-  tiers = 1,
+  channels = "all",
+  channel_names = FALSE,
+  tiers = "all",
   focus_tier = tiers[1],
   tier_names = TRUE,
+  spec_channel = 1,
   freqrange = c(0, 5000),
   windowlength = 0.005,
   dynamicrange = 50,
@@ -33,6 +36,7 @@ praatpicture(
   tg_alignment = "central",
   tg_specialchar = TRUE,
   start_end_only = TRUE,
+  min_max_only = TRUE,
   ...
 )
 }
@@ -63,9 +67,20 @@ Default is \code{c(30,50,20)}. If more or less than three
 frames are plotted and no proportions are given, frames will be of equal
 size.}
 
-\item{tiers}{Vector of number or strings giving either numeric identifiers
-of TextGrid tiers to plot or the names of TextGrid tiers to plot. Default is
-\code{1}, which plots just the first tier.}
+\item{channels}{Vector of numbers or strings giving either numeric identifiers
+of audio channels to plot of the names of audio channels to plot. Also
+understands \code{'all'}, which plots all channels and is the default.}
+
+\item{channel_names}{Should names of audio channels be printed
+on the y-axis? If \code{TRUE}, names will be grabbed from the audio metadata if
+available. Alternatively, if two channels are available, they will be named
+\code{left} and \code{right}. If more or less than two channels are available,
+channels are named \code{Cn}, where \code{n} is the number of the channel. Alternatvely,
+a vector of strings can be provided with channel names. Default is \code{FALSE}.}
+
+\item{tiers}{Vector of numbers or strings giving either numeric identifiers
+of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
+understands \code{'all'}, which plots all tiers and is the default.}
 
 \item{focus_tier}{For which tier(s) should dotted lines be shown on all
 acoustic plots giving the locations of boundaries? Vector of number or
@@ -78,6 +93,10 @@ which case dotted lines from all tiers are shown on acoustic plots.}
 
 \item{tier_names}{Logical; should TextGrid tier names be printed along the
 y-axis? Default is \code{TRUE}.}
+
+\item{spec_channel}{Numeric giving the channel that should be used to
+generate the spectrogram. Default is \code{1}. Generating spectrograms from
+multiple channels is not currently possible with \code{praatpicture}.}
 
 \item{freqrange}{Vector of two integers giving the frequency range to be
 used for plotting spectrograms. Default is \code{c(0,5000)}.}
@@ -135,12 +154,16 @@ range is simply the minimum and maximum levels in the curve.}
 \item{draw_rectangle}{Use for drawing rectangles on plot components. A
 vector containing a) a string giving the plot component to draw a rectangle
 on, and b) arguments to pass on to \link[graphics:rect]{graphics::rect}. Alternatively a list
-of such vectors, if more rectangle should be drawn.}
+of such vectors, if more rectangles should be drawn. If multiple audio
+channels are plotted and a rectangle should be added to one of these,
+use the channel identifier instead of a string giving the frame to draw on.}
 
 \item{draw_arrow}{Use for drawing arrows on plot components. A vector
 containing a) a string giving the plot component to draw an arrow on, and
 b) arguments to pass on to \link[graphics:arrows]{graphics::arrows}. Alternatively a list of
-such vectors, if more arrows should be drawn.}
+such vectors, if more arrows should be drawn. If multiple audio
+channels are plotted and an arrow should be added to one of these,
+use the channel identifier instead of a string giving the frame to draw on.}
 
 \item{tg_alignment}{String giving the desired alignment of text in the
 TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
@@ -153,6 +176,11 @@ See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
 
 \item{start_end_only}{Logical; should there only be ticks on the x-axis
 for start and end times? Default is \code{TRUE}.}
+
+\item{min_max_only}{Logical; should only minimum and maximum values be given
+on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
+not all plot components should have minimum and maximum values on the y-axis.
+Ignored for TextGrid component.}
 
 \item{...}{Further global plotting arguments passed on to \code{par()}.}
 }

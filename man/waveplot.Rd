@@ -6,18 +6,31 @@
 \usage{
 waveplot(
   sig,
+  bit,
   t,
+  nchan = 1,
   tgbool = FALSE,
   lines = NULL,
   ind = NULL,
   nframe = NULL,
-  start_end_only = TRUE
+  rect_comp = NULL,
+  arr_comp = NULL,
+  draw_rectangle = NULL,
+  draw_arrow = NULL,
+  channel_names = FALSE,
+  cn = NULL,
+  start_end_only = TRUE,
+  min_max_only = TRUE
 )
 }
 \arguments{
 \item{sig}{Numeric vector corresponding to a sound signal.}
 
+\item{bit}{Numeric; will generally be grabbed from a loaded \code{WaveMC} object.}
+
 \item{t}{Numeric vector giving times corresponding to the signal.}
+
+\item{nchan}{Numeric; how many channels will be plotted? Default is \code{1}.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}
@@ -30,8 +43,31 @@ Default is \code{NULL}.}
 
 \item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
 
+\item{rect_comp}{Vector of strings or numbers giving plot components to draw
+rectangles on.}
+
+\item{arr_comp}{Vector of strings of numbers giving plot components to draw
+arrows on.}
+
+\item{draw_rectangle}{List of arguments for drawing rectangles passed from
+\code{praatpicture()}.}
+
+\item{draw_arrow}{List of arguments for drawing arrows passed from
+\code{praatpicture()}.}
+
+\item{channel_names}{Logical; should names of audio channels be printed on
+the y-axis? Default is \code{FALSE}.}
+
+\item{cn}{Vector of strings with channel names to be printed on the y-axis
+if \code{channel_names} is \code{TRUE}.}
+
 \item{start_end_only}{Logical; should there only be ticks on the x-axis
 for start and end times? Default is \code{TRUE}.}
+
+\item{min_max_only}{Logical; should only minimum and maximum values be given
+on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
+not all plot components should have minimum and maximum values on the y-axis.
+Ignored for TextGrid component.}
 }
 \description{
 Function for plotting waveforms called by \link{praatpicture}. Instead of using
