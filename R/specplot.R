@@ -43,6 +43,10 @@
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
 #' @param start_end_only Logical; should there only be ticks on the x-axis
 #' for start and end times? Default is `TRUE`.
+#' @param min_max_only Logical; should only minimum and maximum values be given
+#' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
+#' not all plot components should have minimum and maximum values on the y-axis.
+#' Ignored for TextGrid component.
 #'
 #' @export
 #'
@@ -55,7 +59,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
                      windowshape='Gaussian', formants_on_spec=FALSE, fm=NULL,
                      formanttype='draw', formant_dynrange=30,
                      tgbool=FALSE, lines=NULL, ind=NULL, nframe=NULL,
-                     start_end_only=TRUE) {
+                     start_end_only=TRUE, min_max_only=TRUE) {
 
   wl <- windowlength*1000
   ts <- -timestep
@@ -88,32 +92,40 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
     xax <- 'n'
   }
 
-  if (ind != 1) {
-    ytix <- grDevices::axisTicks(freqrange, log=F)
-    ytix <- ytix[-length(ytix)]
-    yax <- 'n'
+  if (!min_max_only[ind]) {
+    if (ind == 1) {
+      yax <- 's'
+    } else {
+      ytix <- grDevices::axisTicks(freqrange, log=F)
+      ytix <- ytix[-length(ytix)]
+      yax <- 'n'
+    }
   } else {
-    yax <- 's'
+    yax <- 'n'
+    ytix <- freqrange
   }
 
   spec <- phonTools::spectrogram(sig, sr, colors=F, show=F, timestep=ts,
                                  windowlength=wl, window=ws)
+
   time_s <- as.numeric(rownames(spec$spectrogram))/1000
   if (!tfrom0) time_s <- time_s + start
-
   rownames(spec$spectrogram) <- time_s
 
   plot(NULL, xaxt=xax, xlim=c(start, end+start),
        ylim=freqrange, yaxs='i', yaxt=yax)
   if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
-  if (ind != 1) graphics::axis(2, at=ytix)
-  graphics::mtext('Frequency (Hz)', side=2, line=3, cex=0.8)
+  if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
+  if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
+                                        tick=F)
+  graphics::mtext('Frequency (Hz)', side=2, line=3.5, cex=0.8)
+
   plot(spec, add=T)
   if (tgbool) graphics::abline(v=lines, lty='dotted')
+
   if (formants_on_spec) {
     nf <- fm$maxnFormants
     fm <- rPraat::formant.toArray(fm)
-
     if (tfrom0) fm$t <- fm$t - org_start
     db <- gsignal::pow2db(fm$intensityVector)
     if (formant_dynrange != 0) {

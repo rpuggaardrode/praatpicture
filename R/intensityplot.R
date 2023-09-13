@@ -21,6 +21,10 @@
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
 #' @param start_end_only Logical; should there only be ticks on the x-axis
 #' for start and end times? Default is `TRUE`.
+#' @param min_max_only Logical; should only minimum and maximum values be given
+#' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
+#' not all plot components should have minimum and maximum values on the y-axis.
+#' Ignored for TextGrid component.
 #'
 #' @export
 #'
@@ -30,18 +34,23 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='intensity')
 intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                           intensityrange=NULL, ind=NULL, nframe=NULL,
-                          start_end_only=TRUE) {
+                          start_end_only=TRUE, min_max_only=TRUE) {
 
   if (is.null(intensityrange)) {
     intensityrange <- c(min(it$i), max(it$i))
   }
 
-  if (ind != 1) {
-    ytix <- grDevices::axisTicks(intensityrange, log=FALSE)
-    ytix <- ytix[-length(ytix)]
-    yax <- 'n'
+  if (!min_max_only[ind]) {
+    if (ind == 1) {
+      yax <- 's'
+    } else {
+      ytix <- grDevices::axisTicks(intensityrange, log=F)
+      ytix <- ytix[-length(ytix)]
+      yax <- 'n'
+    }
   } else {
-    yax <- 's'
+    yax <- 'n'
+    ytix <- round(intensityrange, 0)
   }
 
   if (tfrom0) {
@@ -63,8 +72,10 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   plot(it$t, it$i, xlim=c(start, end+start), xaxt=xax,
        ylim=intensityrange, yaxt=yax, type='l')
   if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
-  if (ind != 1) graphics::axis(2, at=ytix)
+  if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
+  if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
+                                        tick=F)
   if (tgbool) graphics::abline(v=lines, lty='dotted')
-  graphics::mtext('Intensity (dB)', side=2, line=3, cex=0.8)
+  graphics::mtext('Intensity (dB)', side=2, line=3.5, cex=0.8)
 
 }

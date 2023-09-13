@@ -27,6 +27,10 @@
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
 #' @param start_end_only Logical; should there only be ticks on the x-axis
 #' for start and end times? Default is `TRUE`.
+#' @param min_max_only Logical; should only minimum and maximum values be given
+#' on the y-axis? Default is `FALSE`. Can also be a logical vector if some but
+#' not all plot components should have minimum and maximum values on the y-axis.
+#' Ignored for TextGrid component.
 #'
 #' @export
 #'
@@ -37,18 +41,23 @@
 formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         dynamicrange=30, formantrange=c(0,5500),
                         type='speckle', ind=NULL, nframe=NULL,
-                        start_end_only=TRUE) {
+                        start_end_only=TRUE, min_max_only=FALSE) {
 
   if (!type %in% c('draw', 'speckle')) {
     stop('Please select either draw or speckle as the formant plot type')
   }
 
-  if (ind != 1) {
-    ytix <- grDevices::axisTicks(formantrange, log=F)
-    ytix <- ytix[-length(ytix)]
-    yax <- 'n'
+  if (!min_max_only[ind]) {
+    if (ind == 1) {
+      yax <- 's'
+    } else {
+      ytix <- grDevices::axisTicks(formantrange, log=F)
+      ytix <- ytix[-length(ytix)]
+      yax <- 'n'
+    }
   } else {
-    yax <- 's'
+    yax <- 'n'
+    ytix <- formantrange
   }
 
   nf <- fm$maxnFormants
@@ -87,11 +96,13 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     for (i in 2:nf) {
       graphics::lines(fm$t, fm$frequencyArray[i,])
     }
-    if (ind != 1) graphics::axis(2, at=ytix)
+    if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
+    if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
+                                          tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     graphics::abline(h=freql, lty='dotted')
     if (tgbool) graphics::abline(v=lines, lty='dotted')
-    graphics::mtext('Frequency (Hz)', side=2, line=3, cex=0.8)
+    graphics::mtext('Frequency (Hz)', side=2, line=3.5, cex=0.8)
   }
 
   if (type == 'speckle') {
@@ -101,11 +112,13 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     for (i in 2:nf) {
       graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20)
     }
-    if (ind != 1) graphics::axis(2, at=ytix)
+    if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
+    if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
+                                          tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     graphics::abline(h=freql, lty='dotted')
     if (tgbool) graphics::abline(v=lines, lty='dotted')
-    graphics::mtext('Frequency (Hz)', side=2, line=3, cex=0.8)
+    graphics::mtext('Frequency (Hz)', side=2, line=3.5, cex=0.8)
   }
 
 }

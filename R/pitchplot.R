@@ -30,6 +30,10 @@
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
 #' @param start_end_only Logical; should there only be ticks on the x-axis
 #' for start and end times? Default is `TRUE`.
+#' @param min_max_only Logical; should only minimum and maximum values be given
+#' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
+#' not all plot components should have minimum and maximum values on the y-axis.
+#' Ignored for TextGrid component.
 #'
 #' @export
 #'
@@ -40,7 +44,7 @@
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       type='draw', scale='hz', pitchrange=c(50,500),
                       semitones_re=100, ind=NULL, nframe=NULL,
-                      start_end_only=TRUE) {
+                      start_end_only=TRUE, min_max_only=TRUE) {
 
   if (!type %in% c('draw', 'speckle')) {
     stop('Please select either draw or speckle as the pitch plot type')
@@ -76,12 +80,17 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     axlab <- 'Frequency (ERB)'
   }
 
-  if (ind != 1 & scale != 'logarithmic') {
-    ytix <- grDevices::axisTicks(pitchrange, log=FALSE)
-    ytix <- ytix[-length(ytix)]
-    yax <- 'n'
+  if (!min_max_only[ind]) {
+    if (ind == 1 | scale == 'logarithmic') {
+      yax <- 's'
+    } else {
+      ytix <- grDevices::axisTicks(pitchrange, log=F)
+      ytix <- ytix[-length(ytix)]
+      yax <- 'n'
+    }
   } else {
-    yax <- 's'
+    yax <- 'n'
+    ytix <- pitchrange
   }
 
   if (tfrom0) {
@@ -115,7 +124,11 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
     plot(sep_lines_t[[1]], sep_lines_f[[1]], xlim=c(start, end+start), xaxt=xax,
          ylim=pitchrange, yaxt=yax, type='l', log=logsc)
-    if (ind != 1 & scale != 'logarithmic') graphics::axis(2, at=ytix)
+    if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
+      graphics::axis(2, at=ytix)
+    }
+    if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,1),
+                                          tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (length(sep_lines_t) > 1) {
       for (i in 2:length(sep_lines_t)) {
@@ -123,15 +136,19 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       }
     }
     if (tgbool) graphics::abline(v=lines, lty='dotted')
-    graphics::mtext(axlab, side=2, line=3, cex=0.8)
+    graphics::mtext(axlab, side=2, line=3.5, cex=0.8)
   }
 
   if (type == 'speckle') {
     plot(pt$t, pt$f, xlim=c(start, end+start), xaxt=xax, ylim=pitchrange,
          yaxt=yax, type='p', pch=20, log=logsc)
-    if (ind != 1 & scale != 'logarithmic') graphics::axis(2, at=ytix)
+    if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
+      graphics::axis(2, at=ytix)
+    }
+    if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,1),
+                                          tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (tgbool) graphics::abline(v=lines, lty='dotted')
-    graphics::mtext(axlab, side=2, line=3, cex=0.8)
+    graphics::mtext(axlab, side=2, line=3.5, cex=0.8)
   }
 }
