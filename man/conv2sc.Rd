@@ -16,7 +16,7 @@ A string where all capital letters have been converted to small caps.
 \description{
 Hacky helper function to convert capital letters into Unicode small caps.
 May not work for all font families. Note that there's no Unicode small cap
-'X'.
+'X', so 'X' will just be converted to 'x'.
 }
 \examples{
 my_string <- 'ABCDEFGHIJKLM'
