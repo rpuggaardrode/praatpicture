@@ -191,7 +191,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   } else {
     tstart <- start
   }
-  tseq <- seq(tstart, nsamp/sr, by=1/sr)
+  tseq <- seq(tstart, tstart+nsamp/sr, by=1/sr)
 
   fn <- unlist(strsplit(sound, '[.]'))[1]
 

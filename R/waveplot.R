@@ -74,7 +74,7 @@ waveplot <- function(sig, bit, t, nchan=1, tgbool=FALSE, lines=NULL,
       ytix <- c(round(min(sig[,i]), 3), 0, round(max(sig[,i]), 2))
     }
 
-    plot(t, sig[,i], type='l', xlab='', xaxt=xax, ylab='', yaxt=yax)
+    plot(t[-1], sig[,i], type='l', xlab='', xaxt=xax, ylab='', yaxt=yax)
 
     if (ind == nframe & i == nchan & start_end_only) graphics::axis(1, at=xtix)
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
