@@ -137,6 +137,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          tg_alignment='central', tg_specialchar=TRUE,
                          start_end_only=TRUE, min_max_only=TRUE, ...) {
 
+  p <- par(no.readonly=TRUE)
+
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')
   if (any(!frames %in% legal_frames)) {
@@ -330,4 +332,6 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     }
   }
   graphics::mtext('Time (s)', side=1, line=3, outer=T, cex=0.8)
+
+  par(p)
 }
