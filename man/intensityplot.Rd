@@ -11,7 +11,7 @@ intensityplot(
   tfrom0 = TRUE,
   tgbool = FALSE,
   lines = NULL,
-  intensityrange = NULL,
+  range = NULL,
   ind = NULL,
   nframe = NULL,
   start_end_only = TRUE,
@@ -34,7 +34,7 @@ locations in a TextGrid? Default is \code{FALSE}.}
 \item{lines}{Numeric vector giving locations in seconds of locations from
 a TextGrid to be plotted with dotted lines. Default is \code{NULL}.}
 
-\item{intensityrange}{Vector of two integers giving the intensity range to be
+\item{range}{Vector of two integers giving the intensity range to be
 used for producing intensity plots. Default is \code{NULL}, in which case the
 range is simply the minimum and maximum levels in the curve.}
 

@@ -13,17 +13,17 @@
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
 #' a TextGrid to be plotted with dotted lines. Default is `NULL`.
-#' @param type String giving the type of pitch plot to produce; default
+#' @param plotType String giving the type of pitch plot to produce; default
 #' is `draw` (a line plot), the only other option is `speckle` (a point plot).
 #' @param scale String giving the frequency scale to use when producing
 #' pitch plots. Default is `hz`; other options are `logarithmic` (also in Hz),
 #' `semitones`, `erb`, and `mel`.
-#' @param pitchrange Vector of two integers giving the frequency range to be
+#' @param freqRange Vector of two integers giving the frequency range to be
 #' used for producing pitch plots. Default is `c(50,500)`. If the frequency
 #' scales `semitones` or `erb` are used, the pitch range is automatically reset
 #' to the Praat defaults for these scales (`c(-12,30)` and `c(0,10)`,
 #' respectively).
-#' @param semitones_re Frequency in Hz giving the reference level for converting
+#' @param semitonesRe Frequency in Hz giving the reference level for converting
 #' pitch frequency to semitones. Default is `100`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
@@ -42,11 +42,11 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='pitch')
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
-                      type='draw', scale='hz', pitchrange=c(50,500),
-                      semitones_re=100, ind=NULL, nframe=NULL,
+                      plotType='draw', scale='hz', freqRange=c(50,500),
+                      semitonesRe=100, ind=NULL, nframe=NULL,
                       start_end_only=TRUE, min_max_only=TRUE) {
 
-  if (!type %in% c('draw', 'speckle')) {
+  if (!plotType %in% c('draw', 'speckle')) {
     stop('Please select either draw or speckle as the pitch plot type')
   }
 
@@ -64,9 +64,9 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   }
 
   if (scale == 'semitones') {
-    pt <- rPraat::pt.Hz2ST(pt, ref=semitones_re)
-    pitchrange <- c(-12,30)
-    axlab <- paste('Frequency (semitones re ', semitones_re, ')')
+    pt <- rPraat::pt.Hz2ST(pt, ref=semitonesRe)
+    frequencyRange <- c(-12,30)
+    axlab <- paste('Frequency (semitones re ', semitonesRe, ')')
   }
 
   if (scale == 'mel') {
@@ -76,7 +76,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if (scale == 'erb') {
     pt$f <- soundgen::HzToERB(pt$f)
-    pitchrange <- c(0,10)
+    freqRange <- c(0,10)
     axlab <- 'Frequency (ERB)'
   }
 
@@ -84,13 +84,13 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (ind == 1 | scale == 'logarithmic') {
       yax <- 's'
     } else {
-      ytix <- grDevices::axisTicks(pitchrange, log=F)
+      ytix <- grDevices::axisTicks(freqRange, log=F)
       ytix <- ytix[-length(ytix)]
       yax <- 'n'
     }
   } else {
     yax <- 'n'
-    ytix <- pitchrange
+    ytix <- freqRange
   }
 
   if (tfrom0) {
@@ -109,7 +109,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     xax <- 'n'
   }
 
-  if (type == 'draw') {
+  if (plotType == 'draw') {
     diffs <- diff(pt$t) - min(diff(pt$t))
     gaps <- which(diffs > min(diff(pt$t)))
     gaps <- c(gaps, length(pt$t))
@@ -123,7 +123,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     }
 
     plot(sep_lines_t[[1]], sep_lines_f[[1]], xlim=c(start, end+start), xaxt=xax,
-         ylim=pitchrange, yaxt=yax, type='l', log=logsc)
+         ylim=freqRange, yaxt=yax, type='l', log=logsc)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
       graphics::axis(2, at=ytix)
     }
@@ -139,8 +139,8 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     graphics::mtext(axlab, side=2, line=3.5, cex=0.8)
   }
 
-  if (type == 'speckle') {
-    plot(pt$t, pt$f, xlim=c(start, end+start), xaxt=xax, ylim=pitchrange,
+  if (plotType == 'speckle') {
+    plot(pt$t, pt$f, xlim=c(start, end+start), xaxt=xax, ylim=freqRange,
          yaxt=yax, type='p', pch=20, log=logsc)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
       graphics::axis(2, at=ytix)

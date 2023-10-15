@@ -11,11 +11,11 @@ tgplot(
   start,
   tiers = 1,
   tfrom0 = TRUE,
-  tier_names = TRUE,
+  tierNames = TRUE,
   ind = NULL,
   nframe = NULL,
-  tg_alignment = "central",
-  tg_specialchar = TRUE,
+  alignment = "central",
+  specialChar = TRUE,
   start_end_only = TRUE
 )
 }
@@ -35,7 +35,7 @@ of TextGrid tiers to plot or the names of TextGrid tiers to plot. Default is
 \item{tfrom0}{Logical; should time on the x-axis run from 0 or from the
 original time? Default is \code{TRUE}.}
 
-\item{tier_names}{Logical; should TextGrid tier names be printed along the
+\item{tierNames}{Logical; should TextGrid tier names be printed along the
 y-axis? Default is \code{TRUE}.}
 
 \item{ind}{Integer indexing waveform relative to other plot components.
@@ -43,11 +43,11 @@ Default is \code{NULL}.}
 
 \item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
 
-\item{tg_alignment}{String giving the desired alignment of text in the
+\item{alignment}{String giving the desired alignment of text in the
 TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
 Alternatively, a vector of strings if different alignments are needed.}
 
-\item{tg_specialchar}{Logical; should Praat typesetting for special font types
+\item{specialChar}{Logical; should Praat typesetting for special font types
 such as italic, bold, and small caps be converted into corresponding
 R-readable special font types. Default is \code{TRUE}.
 See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}

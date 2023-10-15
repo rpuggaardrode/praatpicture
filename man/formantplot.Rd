@@ -11,9 +11,9 @@ formantplot(
   tfrom0 = TRUE,
   tgbool = FALSE,
   lines = NULL,
-  dynamicrange = 30,
-  formantrange = c(0, 5500),
-  type = "speckle",
+  dynamicRange = 30,
+  freqRange = c(0, 5500),
+  plotType = "speckle",
   ind = NULL,
   nframe = NULL,
   start_end_only = TRUE,
@@ -36,15 +36,15 @@ locations in a TextGrid? Default is \code{FALSE}.}
 \item{lines}{Numeric vector giving locations in seconds of locations from
 a TextGrid to be plotted with dotted lines. Default is \code{NULL}.}
 
-\item{dynamicrange}{Dynamic range in dB for producing formant plots.
-When a formant plot of \code{formanttype='speckle'} is drawn, no formants are
-shown in frames with intensity level \code{formant_dynrange} below the maximum
+\item{dynamicRange}{Dynamic range in dB for producing formant plots.
+When a formant plot of \code{plotType='speckle'} is drawn, no formants are
+shown in frames with intensity level \code{dynamicRange} below the maximum
 intensity. Default is \code{30}. If set to \code{0}, all formants are shown.}
 
-\item{formantrange}{Vector of two integers giving the frequency range to be
+\item{freqRange}{Vector of two integers giving the frequency range to be
 used for producing formant plots. Default is \code{c(0,5500)}.}
 
-\item{type}{String giving the type of formant plot to produce;
+\item{plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
 plot).}
 

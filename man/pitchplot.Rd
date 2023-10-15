@@ -11,10 +11,10 @@ pitchplot(
   tfrom0 = TRUE,
   tgbool = FALSE,
   lines = NULL,
-  type = "draw",
+  plotType = "draw",
   scale = "hz",
-  pitchrange = c(50, 500),
-  semitones_re = 100,
+  freqRange = c(50, 500),
+  semitonesRe = 100,
   ind = NULL,
   nframe = NULL,
   start_end_only = TRUE,
@@ -37,20 +37,20 @@ locations in a TextGrid? Default is \code{FALSE}.}
 \item{lines}{Numeric vector giving locations in seconds of locations from
 a TextGrid to be plotted with dotted lines. Default is \code{NULL}.}
 
-\item{type}{String giving the type of pitch plot to produce; default
+\item{plotType}{String giving the type of pitch plot to produce; default
 is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}
 
 \item{scale}{String giving the frequency scale to use when producing
 pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in Hz),
 \code{semitones}, \code{erb}, and \code{mel}.}
 
-\item{pitchrange}{Vector of two integers giving the frequency range to be
+\item{freqRange}{Vector of two integers giving the frequency range to be
 used for producing pitch plots. Default is \code{c(50,500)}. If the frequency
 scales \code{semitones} or \code{erb} are used, the pitch range is automatically reset
 to the Praat defaults for these scales (\code{c(-12,30)} and \code{c(0,10)},
 respectively).}
 
-\item{semitones_re}{Frequency in Hz giving the reference level for converting
+\item{semitonesRe}{Frequency in Hz giving the reference level for converting
 pitch frequency to semitones. Default is \code{100}.}
 
 \item{ind}{Integer indexing waveform relative to other plot components.

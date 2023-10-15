@@ -23,10 +23,10 @@
 #' `praatpicture()`.
 #' @param draw_arrow List of arguments for drawing arrows passed from
 #' `praatpicture()`.
-#' @param channel_names Logical; should names of audio channels be printed on
+#' @param channelNames Logical; should names of audio channels be printed on
 #' the y-axis? Default is `FALSE`.
 #' @param cn Vector of strings with channel names to be printed on the y-axis
-#' if `channel_names` is `TRUE`.
+#' if `channelNames` is `TRUE`.
 #' @param start_end_only Logical; should there only be ticks on the x-axis
 #' for start and end times? Default is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
@@ -44,7 +44,7 @@ waveplot <- function(sig, bit, t, nchan=1, tgbool=FALSE, lines=NULL,
                      ind=NULL, nframe=NULL,
                      rect_comp=NULL, arr_comp=NULL,
                      draw_rectangle=NULL, draw_arrow=NULL,
-                     channel_names=FALSE, cn=NULL,
+                     channelNames=FALSE, cn=NULL,
                      start_end_only=TRUE, min_max_only=TRUE) {
   for (i in 1:nchan) {
 
@@ -80,7 +80,7 @@ waveplot <- function(sig, bit, t, nchan=1, tgbool=FALSE, lines=NULL,
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,0.5,1),
                                           tick=F)
-    if (channel_names) graphics::mtext(cn[i], side=2, las=2, line=3.5, cex=0.8)
+    if (channelNames) graphics::mtext(cn[i], side=2, las=2, line=3.5, cex=0.8)
     if (tgbool) graphics::abline(v=lines, lty='dotted')
 
     if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)

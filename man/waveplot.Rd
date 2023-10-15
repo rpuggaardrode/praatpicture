@@ -17,7 +17,7 @@ waveplot(
   arr_comp = NULL,
   draw_rectangle = NULL,
   draw_arrow = NULL,
-  channel_names = FALSE,
+  channelNames = FALSE,
   cn = NULL,
   start_end_only = TRUE,
   min_max_only = TRUE
@@ -55,11 +55,11 @@ arrows on.}
 \item{draw_arrow}{List of arguments for drawing arrows passed from
 \code{praatpicture()}.}
 
-\item{channel_names}{Logical; should names of audio channels be printed on
+\item{channelNames}{Logical; should names of audio channels be printed on
 the y-axis? Default is \code{FALSE}.}
 
 \item{cn}{Vector of strings with channel names to be printed on the y-axis
-if \code{channel_names} is \code{TRUE}.}
+if \code{channelNames} is \code{TRUE}.}
 
 \item{start_end_only}{Logical; should there only be ticks on the x-axis
 for start and end times? Default is \code{TRUE}.}

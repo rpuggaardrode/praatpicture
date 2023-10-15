@@ -11,15 +11,15 @@ specplot(
   start,
   end,
   tfrom0 = TRUE,
-  freqrange = c(0, 5000),
-  windowlength = 0.005,
-  dynamicrange = 60,
-  timestep = 1000,
-  windowshape = "Gaussian",
-  formants_on_spec = FALSE,
+  freqRange = c(0, 5000),
+  windowLength = 0.005,
+  dynamicRange = 60,
+  timeStep = 1000,
+  windowShape = "Gaussian",
+  formant_plotOnSpec = FALSE,
   fm = NULL,
-  formanttype = "draw",
-  formant_dynrange = 30,
+  formant_plotType = "draw",
+  formant_dynamicRange = 30,
   tgbool = FALSE,
   lines = NULL,
   ind = NULL,
@@ -42,36 +42,36 @@ specplot(
 \item{tfrom0}{Logical; should time on the x-axis run from 0 or from the
 original time? Default is \code{TRUE}.}
 
-\item{freqrange}{Vector of two integers giving the frequency range to be
+\item{freqRange}{Vector of two integers giving the frequency range to be
 used for plotting spectrograms. Default is \code{c(0,5000)}.}
 
-\item{windowlength}{Window length in seconds for generating spectrograms.
+\item{windowLength}{Window length in seconds for generating spectrograms.
 Default is \code{0.005}.}
 
-\item{dynamicrange}{Dynamic range in dB for generating spectrograms. The
-maximum intensity minus \code{dynamicrange} will all be printed in white. Default
+\item{dynamicRange}{Dynamic range in dB for generating spectrograms. The
+maximum intensity minus \code{dynamicRange} will all be printed in white. Default
 is \code{50}.}
 
-\item{timestep}{How many time steps should be calculated for spectrograms?
+\item{timeStep}{How many time steps should be calculated for spectrograms?
 Default is \code{1000}. Note that this takes a while to plot, so for fiddling with
 plotting parameters it is a good idea to choose a smaller value.}
 
-\item{windowshape}{String giving the name of the window shape to be applied
+\item{windowShape}{String giving the name of the window shape to be applied
 to the signal when generating spectrograms. Default is \code{Gaussian}; other
 options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
 
-\item{formants_on_spec}{Boolean; should formants be plotted on top of
+\item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
 \item{fm}{Formant object loaded using \link[rPraat:formant.read]{rPraat::formant.read}}
 
-\item{formanttype}{String giving the type of formant plot to produce;
+\item{formant_plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
 plot).}
 
-\item{formant_dynrange}{Dynamic range in dB for producing formant plots.
-When a formant plot of \code{formanttype='speckle'} is drawn, no formants are
-shown in frames with intensity level \code{formant_dynrange} below the maximum
+\item{formant_dynamicRange}{Dynamic range in dB for producing formant plots.
+When a formant plot of \code{formant_plotType='speckle'} is drawn, no formants are
+shown in frames with intensity level \code{formant_dynamicRange} below the maximum
 intensity. Default is \code{30}. If set to \code{0}, all formants are shown.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to

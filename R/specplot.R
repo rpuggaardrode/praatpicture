@@ -11,28 +11,28 @@
 #' @param end End time (in seconds) of desired plotted area.
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
 #' original time? Default is `TRUE`.
-#' @param freqrange Vector of two integers giving the frequency range to be
+#' @param freqRange Vector of two integers giving the frequency range to be
 #' used for plotting spectrograms. Default is `c(0,5000)`.
-#' @param windowlength Window length in seconds for generating spectrograms.
+#' @param windowLength Window length in seconds for generating spectrograms.
 #' Default is `0.005`.
-#' @param dynamicrange Dynamic range in dB for generating spectrograms. The
-#' maximum intensity minus `dynamicrange` will all be printed in white. Default
+#' @param dynamicRange Dynamic range in dB for generating spectrograms. The
+#' maximum intensity minus `dynamicRange` will all be printed in white. Default
 #' is `50`.
-#' @param timestep How many time steps should be calculated for spectrograms?
+#' @param timeStep How many time steps should be calculated for spectrograms?
 #' Default is `1000`. Note that this takes a while to plot, so for fiddling with
 #' plotting parameters it is a good idea to choose a smaller value.
-#' @param windowshape String giving the name of the window shape to be applied
+#' @param windowShape String giving the name of the window shape to be applied
 #' to the signal when generating spectrograms. Default is `Gaussian`; other
 #' options are `square`, `Hamming`, `Bartlett`, or `Hanning`.
-#' @param formants_on_spec Boolean; should formants be plotted on top of
+#' @param formant_plotOnSpec Boolean; should formants be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param fm Formant object loaded using [rPraat::formant.read]
-#' @param formanttype String giving the type of formant plot to produce;
+#' @param formant_plotType String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
 #' plot).
-#' @param formant_dynrange Dynamic range in dB for producing formant plots.
-#' When a formant plot of `formanttype='speckle'` is drawn, no formants are
-#' shown in frames with intensity level `formant_dynrange` below the maximum
+#' @param formant_dynamicRange Dynamic range in dB for producing formant plots.
+#' When a formant plot of `formant_plotType='speckle'` is drawn, no formants are
+#' shown in frames with intensity level `formant_dynamicRange` below the maximum
 #' intensity. Default is `30`. If set to `0`, all formants are shown.
 #' @param tgbool Logical; should dotted lines be plotted corresponding to
 #' locations in a TextGrid? Default is `FALSE`.
@@ -54,18 +54,18 @@
 #' #dont use directly
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='spectrogram')
-specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
-                     windowlength=0.005, dynamicrange=60, timestep=1000,
-                     windowshape='Gaussian', formants_on_spec=FALSE, fm=NULL,
-                     formanttype='draw', formant_dynrange=30,
+specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
+                     windowLength=0.005, dynamicRange=60, timeStep=1000,
+                     windowShape='Gaussian', formant_plotOnSpec=FALSE, fm=NULL,
+                     formant_plotType='draw', formant_dynamicRange=30,
                      tgbool=FALSE, lines=NULL, ind=NULL, nframe=NULL,
                      start_end_only=TRUE, min_max_only=TRUE) {
 
-  wl <- windowlength*1000
-  ts <- -timestep
+  wl <- windowLength*1000
+  ts <- -timeStep
 
   legal_ws <- c('square', 'Hamming', 'Bartlett', 'Hanning', 'Gaussian')
-  if (!windowshape %in% legal_ws) {
+  if (!windowShape %in% legal_ws) {
     stop('Possible window shapes are square, Hamming, Bartlett, Hanning, or ',
          'Gaussian.')
   }
@@ -75,11 +75,11 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
     start <- 0
   }
 
-  if (windowshape == 'square') ws <- 'rectangular'
-  if (windowshape == 'Hamming') ws <- 'hamming'
-  if (windowshape == 'Bartlett') ws <- 'bartlett'
-  if (windowshape == 'Hanning') ws <- 'hann'
-  if (windowshape == 'Gaussian') ws <- 'gaussian'
+  if (windowShape == 'square') ws <- 'rectangular'
+  if (windowShape == 'Hamming') ws <- 'hamming'
+  if (windowShape == 'Bartlett') ws <- 'bartlett'
+  if (windowShape == 'Hanning') ws <- 'hann'
+  if (windowShape == 'Gaussian') ws <- 'gaussian'
 
   if (ind==nframe) {
     if (!start_end_only) {
@@ -96,24 +96,25 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
     if (ind == 1) {
       yax <- 's'
     } else {
-      ytix <- grDevices::axisTicks(freqrange, log=F)
+      ytix <- grDevices::axisTicks(freqRange, log=F)
       ytix <- ytix[-length(ytix)]
       yax <- 'n'
     }
   } else {
     yax <- 'n'
-    ytix <- freqrange
+    ytix <- freqRange
   }
 
   spec <- phonTools::spectrogram(sig, sr, colors=F, show=F, timestep=ts,
-                                 windowlength=wl, window=ws)
+                                 windowlength=wl, window=ws,
+                                 dynamicrange=dynamicRange)
 
   time_s <- as.numeric(rownames(spec$spectrogram))/1000
   if (!tfrom0) time_s <- time_s + start
   rownames(spec$spectrogram) <- time_s
 
   plot(NULL, xaxt=xax, xlim=c(start, end+start),
-       ylim=freqrange, yaxs='i', yaxt=yax)
+       ylim=freqRange, yaxs='i', yaxt=yax)
   if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
@@ -123,24 +124,27 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqrange=c(0,5000),
   plot(spec, add=T)
   if (tgbool) graphics::abline(v=lines, lty='dotted')
 
-  if (formants_on_spec) {
+  if (formant_plotOnSpec) {
     nf <- fm$maxnFormants
-    fm <- rPraat::formant.toArray(fm)
     if (tfrom0) fm$t <- fm$t - org_start
-    db <- gsignal::pow2db(fm$intensityVector)
-    if (formant_dynrange != 0) {
-      subdr <- which(db < max(db)-formant_dynrange)
+    if (fm$conv2db) {
+      db <- gsignal::pow2db(fm$intensityVector)
+    } else {
+      db <- fm$intensityVector
+    }
+    if (formant_dynamicRange != 0) {
+      subdr <- which(db < max(db)-formant_dynamicRange)
       if (length(subdr) == 0) subdr <- 1
     } else {
       subdr <- 1
     }
-    if (formanttype == 'draw') {
+    if (formant_plotType == 'draw') {
       graphics::lines(fm$t, fm$frequencyArray[1,])
       for (i in 2:nf) {
         graphics::lines(fm$t, fm$frequencyArray[i,])
       }
     }
-    if (formanttype == 'speckle') {
+    if (formant_plotType == 'speckle') {
       graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20)
       for (i in 2:nf) {
         graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20)

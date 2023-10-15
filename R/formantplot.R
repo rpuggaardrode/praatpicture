@@ -13,13 +13,13 @@
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
 #' a TextGrid to be plotted with dotted lines. Default is `NULL`.
-#' @param dynamicrange Dynamic range in dB for producing formant plots.
-#' When a formant plot of `formanttype='speckle'` is drawn, no formants are
-#' shown in frames with intensity level `formant_dynrange` below the maximum
+#' @param dynamicRange Dynamic range in dB for producing formant plots.
+#' When a formant plot of `plotType='speckle'` is drawn, no formants are
+#' shown in frames with intensity level `dynamicRange` below the maximum
 #' intensity. Default is `30`. If set to `0`, all formants are shown.
-#' @param formantrange Vector of two integers giving the frequency range to be
+#' @param freqRange Vector of two integers giving the frequency range to be
 #' used for producing formant plots. Default is `c(0,5500)`.
-#' @param type String giving the type of formant plot to produce;
+#' @param plotType String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
 #' plot).
 #' @param ind Integer indexing waveform relative to other plot components.
@@ -39,11 +39,11 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='formant')
 formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
-                        dynamicrange=30, formantrange=c(0,5500),
-                        type='speckle', ind=NULL, nframe=NULL,
+                        dynamicRange=30, freqRange=c(0,5500),
+                        plotType='speckle', ind=NULL, nframe=NULL,
                         start_end_only=TRUE, min_max_only=FALSE) {
 
-  if (!type %in% c('draw', 'speckle')) {
+  if (!plotType %in% c('draw', 'speckle')) {
     stop('Please select either draw or speckle as the formant plot type')
   }
 
@@ -51,17 +51,16 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (ind == 1) {
       yax <- 's'
     } else {
-      ytix <- grDevices::axisTicks(formantrange, log=F)
+      ytix <- grDevices::axisTicks(freqRange, log=F)
       ytix <- ytix[-length(ytix)]
       yax <- 'n'
     }
   } else {
     yax <- 'n'
-    ytix <- formantrange
+    ytix <- freqRange
   }
 
   nf <- fm$maxnFormants
-  fm <- rPraat::formant.toArray(fm)
 
   if (tfrom0) {
     fm$t <- fm$t - start
@@ -79,20 +78,24 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     xax <- 'n'
   }
 
-  db <- gsignal::pow2db(fm$intensityVector)
-  if (dynamicrange != 0) {
-    subdr <- which(db < max(db)-dynamicrange)
+  if (fm$conv2db) {
+    db <- gsignal::pow2db(fm$intensityVector)
+  } else {
+    db <- fm$intensityVector
+  }
+  if (dynamicRange != 0) {
+    subdr <- which(db < max(db)-dynamicRange)
     if (length(subdr) == 0) subdr <- 1
   } else {
     subdr <- 1
   }
 
-  s <- formantrange[1]:formantrange[2]
+  s <- freqRange[1]:freqRange[2]
   freql <- s[s %% 1000 == 0]
 
-  if (type == 'draw') {
+  if (plotType == 'draw') {
     plot(fm$t, fm$frequencyArray[1,], xlim=c(start, end+start),
-         xaxt=xax, ylim=formantrange, yaxt=yax, type='l')
+         xaxt=xax, ylim=freqRange, yaxt=yax, type='l')
     for (i in 2:nf) {
       graphics::lines(fm$t, fm$frequencyArray[i,])
     }
@@ -105,10 +108,10 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     graphics::mtext('Frequency (Hz)', side=2, line=3.5, cex=0.8)
   }
 
-  if (type == 'speckle') {
+  if (plotType == 'speckle') {
     plot(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
          xlim=c(start, end+start), xaxt=xax,
-         ylim=formantrange, yaxt=yax)
+         ylim=freqRange, yaxt=yax)
     for (i in 2:nf) {
       graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20)
     }

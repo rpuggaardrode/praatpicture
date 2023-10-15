@@ -11,38 +11,50 @@ praatpicture(
   tfrom0 = TRUE,
   frames = c("sound", "spectrogram", "TextGrid"),
   proportion = c(30, 50, 20),
-  channels = "all",
-  channel_names = FALSE,
-  tiers = "all",
-  focus_tier = tiers[1],
-  tier_names = TRUE,
-  spec_channel = 1,
-  freqrange = c(0, 5000),
-  windowlength = 0.005,
-  dynamicrange = 50,
-  timestep = 1000,
-  windowshape = "Gaussian",
-  pitchtype = "draw",
-  pitchscale = "hz",
-  pitchrange = c(50, 500),
-  semitones_re = 100,
-  formant_dynrange = 30,
-  formantrange = c(50, 5500),
-  formanttype = "speckle",
-  formants_on_spec = FALSE,
-  intensityrange = NULL,
-  draw_rectangle = NULL,
-  draw_arrow = NULL,
-  tg_alignment = "central",
-  tg_specialchar = TRUE,
   start_end_only = TRUE,
   min_max_only = TRUE,
+  wave_channels = "all",
+  wave_channelNames = FALSE,
+  tg_tiers = "all",
+  tg_focusTier = tg_tiers[1],
+  tg_tierNames = TRUE,
+  tg_alignment = "central",
+  tg_specialChar = TRUE,
+  spec_channel = 1,
+  spec_freqRange = c(0, 5000),
+  spec_windowLength = 0.0025,
+  spec_dynamicRange = 50,
+  spec_timeStep = 1000,
+  spec_windowShape = "Gaussian",
+  pitch_timeStep = NULL,
+  pitch_floor = 75,
+  pitch_ceiling = 600,
+  pitch_plotType = "draw",
+  pitch_scale = "hz",
+  pitch_freqRange = c(50, 500),
+  pitch_semitonesRe = 100,
+  pitch_ssff = NULL,
+  formant_timeStep = NULL,
+  formant_maxN = 5,
+  formant_windowLength = 0.025,
+  formant_dynamicRange = 30,
+  formant_freqRange = c(50, 5500),
+  formant_plotType = "speckle",
+  formant_plotOnSpec = FALSE,
+  formant_ssff = NULL,
+  intensity_timeStep = NULL,
+  intensity_minPitch = 100,
+  intensity_range = NULL,
+  intensity_ssff = NULL,
+  draw_rectangle = NULL,
+  draw_arrow = NULL,
+  gender = "u",
   ...
 )
 }
 \arguments{
-\item{sound}{String giving the file name of a sound file with the .wav or
-.mp3 extension.}
+\item{sound}{String giving the file name of a sound file with the .wav
+extension.}
 
 \item{start}{Start time (in seconds) of desired plotted area. Default is \code{0}.}
 
@@ -55,10 +67,8 @@ original time? Default is \code{TRUE}.}
 \item{frames}{String or vector of strings giving the frames that the plot
 should consist of. Default is \code{sound}, \code{spectrogram}, \code{TextGrid}. This
 requires a file with the extension \code{.TextGrid} and the same base name as the
-sound file. Other options are \code{pitch}, \code{formant}, and \code{intensity}. For these,
-files with the same base name as the sound file and the extensions
-\code{.PitchTier}, \code{.Formant}, and \code{.IntensityTier} are required, respectively.
-These will be plotted in the given order from top to bottom.}
+sound file. Other options are \code{pitch}, \code{formant}, and \code{intensity}. See
+details for more information.}
 
 \item{proportion}{Integer or vector of integers of the same size as \code{frames}
 giving the proportion in percents of the plotting area to be taken up by the
@@ -67,89 +77,143 @@ Default is \code{c(30,50,20)}. If more or less than three
 frames are plotted and no proportions are given, frames will be of equal
 size.}
 
-\item{channels}{Vector of numbers or strings giving either numeric identifiers
-of audio channels to plot of the names of audio channels to plot. Also
-understands \code{'all'}, which plots all channels and is the default.}
+\item{start_end_only}{Logical; should there only be ticks on the x-axis
+for start and end times? Default is \code{TRUE}.}
 
-\item{channel_names}{Should names of audio channels be printed
+\item{min_max_only}{Logical; should only minimum and maximum values be given
+on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
+not all plot components should have minimum and maximum values on the y-axis.
+Ignored for TextGrid component.}
+
+\item{wave_channels}{Vector of numbers or strings giving either numeric
+identifiers of audio channels to plot of the names of audio channels to plot.
+Also understands \code{'all'}, which plots all channels and is the default.}
+
+\item{wave_channelNames}{Should names of audio channels be printed
 on the y-axis? If \code{TRUE}, names will be grabbed from the audio metadata if
 available. Alternatively, if two channels are available, they will be named
 \code{left} and \code{right}. If more or less than two channels are available,
 channels are named \code{Cn}, where \code{n} is the number of the channel. Alternatvely,
 a vector of strings can be provided with channel names. Default is \code{FALSE}.}
 
-\item{tiers}{Vector of numbers or strings giving either numeric identifiers
+\item{tg_tiers}{Vector of numbers or strings giving either numeric identifiers
 of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
 understands \code{'all'}, which plots all tiers and is the default.}
 
-\item{focus_tier}{For which tier(s) should dotted lines be shown on all
+\item{tg_focusTier}{For which tier(s) should dotted lines be shown on all
 acoustic plots giving the locations of boundaries? Vector of number or
 strings giving either numeric identifiers
 of TextGrid tiers or the names of TextGrid tiers to plot. Default is
-\code{tiers[1]}, i.e. the first tier given in the \code{tiers} argument. Additionally
-accepts the string \code{none},
+\code{tg_tiers[1]}, i.e. the first tier given in the \code{tg_tiers} argument.
+Additionally accepts the string \code{none},
 in which case no dotted lines are shown on acoustic plots, and \code{all}, in
 which case dotted lines from all tiers are shown on acoustic plots.}
 
-\item{tier_names}{Logical; should TextGrid tier names be printed along the
+\item{tg_tierNames}{Logical; should TextGrid tier names be printed along the
 y-axis? Default is \code{TRUE}.}
+
+\item{tg_alignment}{String giving the desired alignment of text in the
+TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
+Alternatively, a vector of strings if different alignments are needed.}
+
+\item{tg_specialChar}{Logical; should Praat typesetting for special font types
+such as italic, bold, and small caps be converted into corresponding
+R-readable special font types. Default is \code{TRUE}.
+See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
 
 \item{spec_channel}{Numeric giving the channel that should be used to
 generate the spectrogram. Default is \code{1}. Generating spectrograms from
 multiple channels is not currently possible with \code{praatpicture}.}
 
-\item{freqrange}{Vector of two integers giving the frequency range to be
+\item{spec_freqRange}{Vector of two integers giving the frequency range to be
 used for plotting spectrograms. Default is \code{c(0,5000)}.}
 
-\item{windowlength}{Window length in seconds for generating spectrograms.
+\item{spec_windowLength}{Window length in seconds for generating spectrograms.
 Default is \code{0.005}.}
 
-\item{dynamicrange}{Dynamic range in dB for generating spectrograms. The
-maximum intensity minus \code{dynamicrange} will all be printed in white. Default
-is \code{50}.}
+\item{spec_dynamicRange}{Dynamic range in dB for generating spectrograms. The
+maximum intensity minus \code{spec_dynamicRange} will all be printed in white.
+Default is \code{50}.}
 
-\item{timestep}{How many time steps should be calculated for spectrograms?
+\item{spec_timeStep}{How many time steps should be calculated for spectrograms?
 Default is \code{1000}. Note that this takes a while to plot, so for fiddling with
 plotting parameters it is a good idea to choose a smaller value.}
 
-\item{windowshape}{String giving the name of the window shape to be applied
-to the signal when generating spectrograms. Default is \code{Gaussian}; other
-options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
+\item{spec_windowShape}{String giving the name of the window shape to be
+applied to the signal when generating spectrograms. Default is \code{Gaussian};
+other options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
 
-\item{pitchtype}{String giving the type of pitch plot to produce; default
+\item{pitch_timeStep}{Measurement interval in seconds for tracking pitch.
+Default is \code{NULL}, in which case the measurement interval is equal to
+0.75 / \code{pitch_floor}.}
+
+\item{pitch_floor}{Frequency in Hz; no pitch candidates considered below
+this frequency. Default is \code{75}.}
+
+\item{pitch_ceiling}{Frequency in Hz; no pitch candidates considered above
+this frequency. Default is \code{600}.}
+
+\item{pitch_plotType}{String giving the type of pitch plot to produce; default
 is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}
 
-\item{pitchscale}{String giving the frequency scale to use when producing
+\item{pitch_scale}{String giving the frequency scale to use when producing
 pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in Hz),
 \code{semitones}, \code{erb}, and \code{mel}.}
 
-\item{pitchrange}{Vector of two integers giving the frequency range to be
+\item{pitch_freqRange}{Vector of two integers giving the frequency range to be
 used for producing pitch plots. Default is \code{c(50,500)}. If the frequency
 scales \code{semitones} or \code{erb} are used, the pitch range is automatically reset
 to the Praat defaults for these scales (\code{c(-12,30)} and \code{c(0,10)},
 respectively).}
 
-\item{semitones_re}{Frequency in Hz giving the reference level for converting
-pitch frequency to semitones. Default is \code{100}.}
+\item{pitch_semitonesRe}{Frequency in Hz giving the reference level for
+converting pitch frequency to semitones. Default is \code{100}.}
 
-\item{formant_dynrange}{Dynamic range in dB for producing formant plots.
-When a formant plot of \code{formanttype='speckle'} is drawn, no formants are
-shown in frames with intensity level \code{formant_dynrange} below the maximum
+\item{pitch_ssff}{An object of class \code{AsspDataObj} containing a pitch track.
+Default is \code{NULL}.}
+
+\item{formant_timeStep}{Measurement interval in seconds for tracking formants.
+Default is \code{NULL}, in which case the measurement interval is equal to
+\code{formant_windowLength} / 4.}
+
+\item{formant_maxN}{Integer giving the maximum number of formants to track.
+Default is \code{5}.}
+
+\item{formant_windowLength}{The effective duration of the analysis window
+used for tracking formants in seconds; the actual duration of the
+analysis window is twice this value.}
+
+\item{formant_dynamicRange}{Dynamic range in dB for producing formant plots.
+When a formant plot of \code{formant_plotType='speckle'} is drawn, no formants are
+shown in frames with intensity level \code{formant_dynamicRange} below the maximum
 intensity. Default is \code{30}. If set to \code{0}, all formants are shown.}
 
-\item{formantrange}{Vector of two integers giving the frequency range to be
-used for producing formant plots. Default is \code{c(0,5500)}.}
+\item{formant_freqRange}{Vector of two integers giving the frequency range to
+be used for producing formant plots. Default is \code{c(0,5500)}.}
 
-\item{formanttype}{String giving the type of formant plot to produce;
+\item{formant_plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
 plot).}
 
-\item{formants_on_spec}{Boolean; should formants be plotted on top of
+\item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
-\item{intensityrange}{Vector of two integers giving the intensity range to be
+\item{formant_ssff}{An object of class \code{AsspDataObj} containing formant tracks.
+Default is \code{NULL}.}
+
+\item{intensity_timeStep}{Measurement interval in seconds for tracking
+intensity. Default is \code{NULL}, in which case the measurement interval is
+equal to 0.8 * \code{intensity_minPitch}.}
+
+\item{intensity_minPitch}{Lowest pitch in Hz used when calculating
+intensity; default is \code{100}}
+
+\item{intensity_range}{Vector of two integers giving the intensity range to be
 used for producing intensity plots. Default is \code{NULL}, in which case the
 range is simply the minimum and maximum levels in the curve.}
+
+\item{intensity_ssff}{An object of class \code{AsspDataObj} containing intensity
+tracks. Default is \code{NULL}.}
 
 \item{draw_rectangle}{Use for drawing rectangles on plot components. A
 vector containing a) a string giving the plot component to draw a rectangle
@@ -165,22 +229,9 @@ such vectors, if more arrows should be drawn. If multiple audio
 channels are plotted and an arrow should be added to one of these,
 use the channel identifier instead of a string giving the frame to draw on.}
 
-\item{tg_alignment}{String giving the desired alignment of text in the
-TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
-Alternatively, a vector of strings if different alignments are needed.}
-
-\item{tg_specialchar}{Logical; should Praat typesetting for special font types
-such as italic, bold, and small caps be converted into corresponding
-R-readable special font types. Default is \code{TRUE}.
-See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
-
-\item{start_end_only}{Logical; should there only be ticks on the x-axis
-for start and end times? Default is \code{TRUE}.}
-
-\item{min_max_only}{Logical; should only minimum and maximum values be given
-on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
-not all plot components should have minimum and maximum values on the y-axis.
-Ignored for TextGrid component.}
+\item{gender}{String indicating the gender of the speaker; default is
+\code{u} for unknown, other legal values are \code{m} and \code{f}. Used to tweak pitch
+and formant tracking parameters.}
 
 \item{...}{Further global plotting arguments passed on to \code{par()}.}
 }
@@ -190,10 +241,29 @@ to those made with Praat Picture. The default is to produce a plot with a
 relatively small waveform, somewhat larger spectrogram, and the first tier
 of a TextGrid.
 }
+\details{
+When available, pitch, formant, and intensity tracks are loaded
+from Praat files with the same base name as \code{sound}; i.e., if your sound
+file is called \verb{1.wav} and there is a Praat file called \verb{1.Formant} in the
+same directory, this file is used for plotting formants. Pitch files should
+have the \code{PitchTier} extension, and intensity files should have the
+\code{IntensityTier} extension.
+
+If no such files are available, the signal processing tools in the \code{wrassp}
+package are used; pitch is tracked with the function \link[wrassp:ksvF0]{wrassp::ksvF0},
+formants are tracked with \link[wrassp:forest]{wrassp::forest}, and intensity is tracked with
+\link[wrassp:rmsana]{wrassp::rmsana}. Parameters are set to mimic Praat as closely as possible,
+e.g. using a Gaussian-like window shape \code{KAISER2_0}, but results will differ
+from Praat simply because the tracking algorithms differ; as far as I know,
+the Burg algorithm used by Praat for tracking formants isn't implemented in R,
+nor is the autocorrelation method for tracking pitch.
+
+Spectrograms are generated with the function \link[phonTools:spectrogram]{phonTools::spectrogram}.
+These also do not look exactly equivalent to Praat because of how raster image
+rendering works in R; you will find that the Praat-generated spectrograms
+are somewhat smoother, and the spectrograms made in \code{phonTools} take rather
+long to render.
+}
 \examples{
 praatpicture('inst/extdata/1.wav')
-}
-\seealso{
-Functions from \code{rPraat} are used to load in files created with
-Praat. Spectrograms are generated using \link[phonTools:spectrogram]{phonTools::spectrogram}.
 }
