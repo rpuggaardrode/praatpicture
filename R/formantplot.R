@@ -31,6 +31,8 @@
 #' on the y-axis? Default is `FALSE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param axisLabel String giving the name of the label to print along the
+#' y-axis when plotting formants. Default is `Frequency (Hz)`.
 #'
 #' @export
 #'
@@ -41,7 +43,8 @@
 formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         dynamicRange=30, freqRange=c(0,5500),
                         plotType='speckle', ind=NULL, nframe=NULL,
-                        start_end_only=TRUE, min_max_only=FALSE) {
+                        start_end_only=TRUE, min_max_only=FALSE,
+                        axisLabel='Frequency (Hz)') {
 
   if (!plotType %in% c('draw', 'speckle')) {
     stop('Please select either draw or speckle as the formant plot type')
@@ -105,7 +108,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     graphics::abline(h=freql, lty='dotted')
     if (tgbool) graphics::abline(v=lines, lty='dotted')
-    graphics::mtext('Frequency (Hz)', side=2, line=3.5, cex=0.8)
+    graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
   if (plotType == 'speckle') {
@@ -121,7 +124,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     graphics::abline(h=freql, lty='dotted')
     if (tgbool) graphics::abline(v=lines, lty='dotted')
-    graphics::mtext('Frequency (Hz)', side=2, line=3.5, cex=0.8)
+    graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
 }

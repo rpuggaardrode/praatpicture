@@ -15,7 +15,8 @@ intensityplot(
   ind = NULL,
   nframe = NULL,
   start_end_only = TRUE,
-  min_max_only = TRUE
+  min_max_only = TRUE,
+  axisLabel = "Intensity (dB)"
 )
 }
 \arguments{
@@ -50,6 +51,9 @@ for start and end times? Default is \code{TRUE}.}
 on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
 not all plot components should have minimum and maximum values on the y-axis.
 Ignored for TextGrid component.}
+
+\item{axisLabel}{String giving the name of the label to print along
+the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
 }
 \description{
 Function for plotting intensity objects called by \link{praatpicture}. Instead of

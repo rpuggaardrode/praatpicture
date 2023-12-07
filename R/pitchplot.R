@@ -34,6 +34,9 @@
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param axisLabel String giving the name of the label to print along the
+#' y-axis when printing a pitch track. Default is `NULL`, in which case the
+#' axis label will depend on the scale.
 #'
 #' @export
 #'
@@ -44,7 +47,8 @@
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       plotType='draw', scale='hz', freqRange=c(50,500),
                       semitonesRe=100, ind=NULL, nframe=NULL,
-                      start_end_only=TRUE, min_max_only=TRUE) {
+                      start_end_only=TRUE, min_max_only=TRUE,
+                      axisLabel=NULL) {
 
   if (!plotType %in% c('draw', 'speckle')) {
     stop('Please select either draw or speckle as the pitch plot type')
@@ -108,6 +112,8 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   } else {
     xax <- 'n'
   }
+
+  if (!is.null(axisLabel)) axlab <- axisLabel
 
   if (plotType == 'draw') {
     diffs <- diff(pt$t) - min(diff(pt$t))

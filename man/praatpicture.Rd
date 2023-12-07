@@ -26,6 +26,7 @@ praatpicture(
   spec_dynamicRange = 50,
   spec_timeStep = 1000,
   spec_windowShape = "Gaussian",
+  spec_axisLabel = "Frequency (Hz)",
   pitch_timeStep = NULL,
   pitch_floor = 75,
   pitch_ceiling = 600,
@@ -34,6 +35,7 @@ praatpicture(
   pitch_freqRange = c(50, 500),
   pitch_semitonesRe = 100,
   pitch_ssff = NULL,
+  pitch_axisLabel = NULL,
   formant_timeStep = NULL,
   formant_maxN = 5,
   formant_windowLength = 0.025,
@@ -42,10 +44,13 @@ praatpicture(
   formant_plotType = "speckle",
   formant_plotOnSpec = FALSE,
   formant_ssff = NULL,
+  formant_axisLabel = "Frequency (Hz)",
   intensity_timeStep = NULL,
   intensity_minPitch = 100,
   intensity_range = NULL,
   intensity_ssff = NULL,
+  intensity_axisLabel = "Intensity (dB)",
+  time_axisLabel = "Time (s)",
   draw_rectangle = NULL,
   draw_arrow = NULL,
   gender = "u",
@@ -143,6 +148,9 @@ plotting parameters it is a good idea to choose a smaller value.}
 applied to the signal when generating spectrograms. Default is \code{Gaussian};
 other options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
 
+\item{spec_axisLabel}{String giving the name of the label to print along the
+y-axis when plotting a spectrogram. Default is \code{Frequency (Hz)}.}
+
 \item{pitch_timeStep}{Measurement interval in seconds for tracking pitch.
 Default is \code{NULL}, in which case the measurement interval is equal to
 0.75 / \code{pitch_floor}.}
@@ -171,6 +179,10 @@ converting pitch frequency to semitones. Default is \code{100}.}
 
 \item{pitch_ssff}{An object of class \code{AsspDataObj} containing a pitch track.
 Default is \code{NULL}.}
+
+\item{pitch_axisLabel}{String giving the name of the label to print along the
+y-axis when printing a pitch track. Default is \code{NULL}, in which case the
+axis label will depend on the scale.}
 
 \item{formant_timeStep}{Measurement interval in seconds for tracking formants.
 Default is \code{NULL}, in which case the measurement interval is equal to
@@ -201,6 +213,9 @@ spectrogram? Default is \code{FALSE}.}
 \item{formant_ssff}{An object of class \code{AsspDataObj} containing formant tracks.
 Default is \code{NULL}.}
 
+\item{formant_axisLabel}{String giving the name of the label to print along the
+y-axis when plotting formants. Default is \code{Frequency (Hz)}.}
+
 \item{intensity_timeStep}{Measurement interval in seconds for tracking
 intensity. Default is \code{NULL}, in which case the measurement interval is
 equal to 0.8 * \code{intensity_minPitch}.}
@@ -214,6 +229,12 @@ range is simply the minimum and maximum levels in the curve.}
 
 \item{intensity_ssff}{An object of class \code{AsspDataObj} containing intensity
 tracks. Default is \code{NULL}.}
+
+\item{intensity_axisLabel}{String giving the name of the label to print along
+the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
+
+\item{time_axisLabel}{String giving the name of the label to print along
+the x-axis. Default is \code{Time (s)}.}
 
 \item{draw_rectangle}{Use for drawing rectangles on plot components. A
 vector containing a) a string giving the plot component to draw a rectangle

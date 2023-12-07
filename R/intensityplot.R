@@ -25,6 +25,8 @@
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param axisLabel String giving the name of the label to print along
+#' the y-axis when plotting intensity. Default is `Intensity (dB)`.
 #'
 #' @export
 #'
@@ -34,7 +36,8 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='intensity')
 intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                           range=NULL, ind=NULL, nframe=NULL,
-                          start_end_only=TRUE, min_max_only=TRUE) {
+                          start_end_only=TRUE, min_max_only=TRUE,
+                          axisLabel='Intensity (dB)') {
 
   if (is.null(range)) {
     range <- c(min(it$i), max(it$i))
@@ -76,6 +79,6 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                         tick=F)
   if (tgbool) graphics::abline(v=lines, lty='dotted')
-  graphics::mtext('Intensity (dB)', side=2, line=3.5, cex=0.8)
+  graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
 
 }

@@ -74,6 +74,8 @@
 #' @param spec_windowShape String giving the name of the window shape to be
 #' applied to the signal when generating spectrograms. Default is `Gaussian`;
 #' other options are `square`, `Hamming`, `Bartlett`, or `Hanning`.
+#' @param spec_axisLabel String giving the name of the label to print along the
+#' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
 #' @param pitch_timeStep Measurement interval in seconds for tracking pitch.
 #' Default is `NULL`, in which case the measurement interval is equal to
 #' 0.75 / `pitch_floor`.
@@ -95,6 +97,9 @@
 #' converting pitch frequency to semitones. Default is `100`.
 #' @param pitch_ssff An object of class `AsspDataObj` containing a pitch track.
 #' Default is `NULL`.
+#' @param pitch_axisLabel String giving the name of the label to print along the
+#' y-axis when printing a pitch track. Default is `NULL`, in which case the
+#' axis label will depend on the scale.
 #' @param formant_timeStep Measurement interval in seconds for tracking formants.
 #' Default is `NULL`, in which case the measurement interval is equal to
 #' `formant_windowLength` / 4.
@@ -116,6 +121,8 @@
 #' spectrogram? Default is `FALSE`.
 #' @param formant_ssff An object of class `AsspDataObj` containing formant tracks.
 #' Default is `NULL`.
+#' @param formant_axisLabel String giving the name of the label to print along the
+#' y-axis when plotting formants. Default is `Frequency (Hz)`.
 #' @param intensity_timeStep Measurement interval in seconds for tracking
 #' intensity. Default is `NULL`, in which case the measurement interval is
 #' equal to 0.8 * `intensity_minPitch`.
@@ -126,6 +133,10 @@
 #' range is simply the minimum and maximum levels in the curve.
 #' @param intensity_ssff An object of class `AsspDataObj` containing intensity
 #' tracks. Default is `NULL`.
+#' @param intensity_axisLabel String giving the name of the label to print along
+#' the y-axis when plotting intensity. Default is `Intensity (dB)`.
+#' @param time_axisLabel String giving the name of the label to print along
+#' the x-axis. Default is `Time (s)`.
 #' @param draw_rectangle Use for drawing rectangles on plot components. A
 #' vector containing a) a string giving the plot component to draw a rectangle
 #' on, and b) arguments to pass on to [graphics::rect]. Alternatively a list
@@ -180,17 +191,20 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          spec_channel=1, spec_freqRange=c(0,5000),
                          spec_windowLength=0.0025, spec_dynamicRange=50,
                          spec_timeStep=1000, spec_windowShape='Gaussian',
+                         spec_axisLabel='Frequency (Hz)',
                          pitch_timeStep=NULL, pitch_floor=75, pitch_ceiling=600,
                          pitch_plotType='draw', pitch_scale='hz',
                          pitch_freqRange=c(50,500), pitch_semitonesRe=100,
-                         pitch_ssff=NULL,
+                         pitch_ssff=NULL, pitch_axisLabel=NULL,
                          formant_timeStep=NULL, formant_maxN=5,
                          formant_windowLength=0.025, formant_dynamicRange=30,
                          formant_freqRange=c(50, 5500),
                          formant_plotType='speckle', formant_plotOnSpec=FALSE,
-                         formant_ssff=NULL,
+                         formant_ssff=NULL, formant_axisLabel='Frequency (Hz)',
                          intensity_timeStep=NULL, intensity_minPitch=100,
                          intensity_range=NULL, intensity_ssff=NULL,
+                         intensity_axisLabel='Intensity (dB)',
+                         time_axisLabel='Time (s)',
                          draw_rectangle=NULL, draw_arrow=NULL,
                          gender='u', ...) {
 
@@ -443,7 +457,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                spec_freqRange, spec_windowLength, spec_dynamicRange,
                spec_timeStep, spec_windowShape,
                formant_plotOnSpec, fm, formant_plotType, formant_dynamicRange,
-               tgbool, focus_linevec, ind, nframe, start_end_only, min_max_only)
+               tgbool, focus_linevec, ind, nframe, start_end_only, min_max_only,
+               spec_axisLabel)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram', draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
     } else if (frames[i] == 'TextGrid') {
@@ -456,25 +471,27 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                 pitch_plotType, pitch_scale, pitch_freqRange,
-                pitch_semitonesRe, ind, nframe, start_end_only, min_max_only)
+                pitch_semitonesRe, ind, nframe, start_end_only, min_max_only,
+                pitch_axisLabel)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                   formant_dynamicRange, formant_freqRange, formant_plotType, ind,
-                  nframe, start_end_only, min_max_only)
+                  nframe, start_end_only, min_max_only, formant_axisLabel)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
-                    intensity_range, ind, nframe, start_end_only, min_max_only)
+                    intensity_range, ind, nframe, start_end_only, min_max_only,
+                    intensity_axisLabel)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity', draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
     }
   }
-  graphics::mtext('Time (s)', side=1, line=3, outer=T, cex=0.8)
+  graphics::mtext(time_axisLabel, side=1, line=3, outer=T, cex=0.8)
 
   graphics::par(p)
 }

@@ -47,6 +47,8 @@
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param axisLabel String giving the name of the label to print along the
+#' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
 #'
 #' @export
 #'
@@ -59,7 +61,8 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                      windowShape='Gaussian', formant_plotOnSpec=FALSE, fm=NULL,
                      formant_plotType='draw', formant_dynamicRange=30,
                      tgbool=FALSE, lines=NULL, ind=NULL, nframe=NULL,
-                     start_end_only=TRUE, min_max_only=TRUE) {
+                     start_end_only=TRUE, min_max_only=TRUE,
+                     axisLabel='Frequency (Hz)') {
 
   wl <- windowLength*1000
   ts <- -timeStep
@@ -119,7 +122,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                         tick=F)
-  graphics::mtext('Frequency (Hz)', side=2, line=3.5, cex=0.8)
+  graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
 
   plot(spec, add=T)
   if (tgbool) graphics::abline(v=lines, lty='dotted')
