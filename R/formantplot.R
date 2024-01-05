@@ -22,6 +22,12 @@
 #' @param plotType String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
 #' plot).
+#' @param color String or vector of strings giving the name(s) of
+#' colors to be used for plotting formants. If one color is provided, all
+#' formants will be plotted in this color. If multiple colors are provided,
+#' different formants will be shown in different colors. Default is `'black'`.
+#' @param dottedLines Logical; should dotted lines indicate the
+#' locations of frequency multiples of 1000 as in Praat? Default is `TRUE`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
@@ -42,7 +48,8 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='formant')
 formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         dynamicRange=30, freqRange=c(0,5500),
-                        plotType='speckle', ind=NULL, nframe=NULL,
+                        plotType='speckle', color='black', dottedLines=TRUE,
+                        ind=NULL, nframe=NULL,
                         start_end_only=TRUE, min_max_only=FALSE,
                         axisLabel='Frequency (Hz)') {
 
@@ -64,6 +71,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   }
 
   nf <- fm$maxnFormants
+  if (length(color) == 1) color <- rep(color, nf)
 
   if (tfrom0) {
     fm$t <- fm$t - start
@@ -98,15 +106,15 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if (plotType == 'draw') {
     plot(fm$t, fm$frequencyArray[1,], xlim=c(start, end+start),
-         xaxt=xax, ylim=freqRange, yaxt=yax, type='l')
+         xaxt=xax, ylim=freqRange, yaxt=yax, type='l', col=color[1])
     for (i in 2:nf) {
-      graphics::lines(fm$t, fm$frequencyArray[i,])
+      graphics::lines(fm$t, fm$frequencyArray[i,], col=color[i])
     }
     if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                           tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
-    graphics::abline(h=freql, lty='dotted')
+    if (dottedLines) graphics::abline(h=freql, lty='dotted')
     if (tgbool) graphics::abline(v=lines, lty='dotted')
     graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
@@ -114,15 +122,16 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   if (plotType == 'speckle') {
     plot(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
          xlim=c(start, end+start), xaxt=xax,
-         ylim=freqRange, yaxt=yax)
+         ylim=freqRange, yaxt=yax, col=color[1])
     for (i in 2:nf) {
-      graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20)
+      graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
+                       col=color[i])
     }
     if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                           tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
-    graphics::abline(h=freql, lty='dotted')
+    if (dottedLines) graphics::abline(h=freql, lty='dotted')
     if (tgbool) graphics::abline(v=lines, lty='dotted')
     graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }

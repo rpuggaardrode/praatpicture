@@ -8,6 +8,8 @@
 #' @param bit Numeric; will generally be grabbed from a loaded `WaveMC` object.
 #' @param t Numeric vector giving times corresponding to the signal.
 #' @param nchan Numeric; how many channels will be plotted? Default is `1`.
+#' @param color String giving the name of the color to be used for plotting
+#' the waveform. Default is `'black'`.
 #' @param tgbool Logical; should dotted lines be plotted corresponding to
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
@@ -40,8 +42,8 @@
 #' #dont use directly
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='sound')
-waveplot <- function(sig, bit, t, nchan=1, tgbool=FALSE, lines=NULL,
-                     ind=NULL, nframe=NULL,
+waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
+                     lines=NULL, ind=NULL, nframe=NULL,
                      rect_comp=NULL, arr_comp=NULL,
                      draw_rectangle=NULL, draw_arrow=NULL,
                      channelNames=FALSE, cn=NULL,
@@ -74,7 +76,8 @@ waveplot <- function(sig, bit, t, nchan=1, tgbool=FALSE, lines=NULL,
       ytix <- c(round(min(sig[,i]), 3), 0, round(max(sig[,i]), 2))
     }
 
-    plot(t[-1], sig[,i], type='l', xlab='', xaxt=xax, ylab='', yaxt=yax)
+    plot(t[-1], sig[,i], type='l', xlab='', xaxt=xax, ylab='', yaxt=yax,
+         col=color)
 
     if (ind == nframe & i == nchan & start_end_only) graphics::axis(1, at=xtix)
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)

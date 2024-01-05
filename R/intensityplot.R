@@ -16,6 +16,8 @@
 #' @param range Vector of two integers giving the intensity range to be
 #' used for producing intensity plots. Default is `NULL`, in which case the
 #' range is simply the minimum and maximum levels in the curve.
+#' @param color String giving the name of the color to be used for
+#' plotting intensity. Default is `'black'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
@@ -35,7 +37,7 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='intensity')
 intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
-                          range=NULL, ind=NULL, nframe=NULL,
+                          range=NULL, color='black', ind=NULL, nframe=NULL,
                           start_end_only=TRUE, min_max_only=TRUE,
                           axisLabel='Intensity (dB)') {
 
@@ -73,7 +75,7 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   }
 
   plot(it$t, it$i, xlim=c(start, end+start), xaxt=xax,
-       ylim=range, yaxt=yax, type='l')
+       ylim=range, yaxt=yax, type='l', col=color)
   if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,

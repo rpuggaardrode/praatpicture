@@ -25,6 +25,8 @@
 #' respectively).
 #' @param semitonesRe Frequency in Hz giving the reference level for converting
 #' pitch frequency to semitones. Default is `100`.
+#' @param color String giving the name of the color to be used for
+#' plotting pitch. Default is `'black'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
@@ -46,7 +48,7 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='pitch')
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       plotType='draw', scale='hz', freqRange=c(50,500),
-                      semitonesRe=100, ind=NULL, nframe=NULL,
+                      semitonesRe=100, color='black', ind=NULL, nframe=NULL,
                       start_end_only=TRUE, min_max_only=TRUE,
                       axisLabel=NULL) {
 
@@ -129,7 +131,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     }
 
     plot(sep_lines_t[[1]], sep_lines_f[[1]], xlim=c(start, end+start), xaxt=xax,
-         ylim=freqRange, yaxt=yax, type='l', log=logsc)
+         ylim=freqRange, yaxt=yax, type='l', log=logsc, col=color)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
       graphics::axis(2, at=ytix)
     }
@@ -138,7 +140,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (length(sep_lines_t) > 1) {
       for (i in 2:length(sep_lines_t)) {
-        graphics::lines(sep_lines_t[[i]], sep_lines_f[[i]])
+        graphics::lines(sep_lines_t[[i]], sep_lines_f[[i]], col=color)
       }
     }
     if (tgbool) graphics::abline(v=lines, lty='dotted')
@@ -147,7 +149,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if (plotType == 'speckle') {
     plot(pt$t, pt$f, xlim=c(start, end+start), xaxt=xax, ylim=freqRange,
-         yaxt=yax, type='p', pch=20, log=logsc)
+         yaxt=yax, type='p', pch=20, log=logsc, col=color)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
       graphics::axis(2, at=ytix)
     }

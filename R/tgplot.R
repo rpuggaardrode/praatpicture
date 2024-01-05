@@ -25,6 +25,9 @@
 #' such as italic, bold, and small caps be converted into corresponding
 #' R-readable special font types. Default is `TRUE`.
 #' See [https://www.fon.hum.uva.nl/praat/manual/Text_styles.html].
+#' @param color String or vector of strings giving the name of the color(s)
+#' to be used for the text in TextGrids. Default is `'black'`. If a vector is
+#' provided, different colors are used for different tiers.
 #' @param start_end_only Logical; should there only be ticks on the x-axis
 #' for start and end times? Default is `TRUE`.
 #'
@@ -36,11 +39,13 @@
 #' praatpicture(paste0(datapath, '/1.wav'), frames='TextGrid')
 tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
                    ind=NULL, nframe=NULL, alignment='central',
-                   specialChar=TRUE, start_end_only=TRUE) {
+                   specialChar=TRUE, color='black', start_end_only=TRUE) {
 
   if (length(alignment) != length(tiers)) {
     alignment <- rep(alignment, length(tiers))
   }
+
+  if (length(color) == 1) color <- rep(color, length(tiers))
 
   i <- 0
   for (tier in tiers) {
@@ -93,15 +98,15 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
     if (tg[[tier]]$type == 'interval') {
       graphics::abline(v=line_vec)
       if (alignment[[i]]=='central') graphics::text(
-        t1+(t2-t1)/2, 5, as.expression(lab))
+        t1+(t2-t1)/2, 5, as.expression(lab), col=color[i])
       if (alignment[[i]]=='left') graphics::text(
-        t1, 5, as.expression(lab), pos=4)
+        t1, 5, as.expression(lab), pos=4, col=color[i])
       if (alignment[[i]]=='right') graphics::text(
-        t2, 5, as.expression(lab), pos=2)
+        t2, 5, as.expression(lab), pos=2, col=color[i])
     } else {
       graphics::segments(x0=line_vec, x1=line_vec, y0=0, y1=2)
       graphics::segments(x0=line_vec, x1=line_vec, y0=8, y1=10)
-      graphics::text(t0, 5, as.expression(lab), adj=0.5)
+      graphics::text(t0, 5, as.expression(lab), adj=0.5, col=color[i])
     }
     if (ind == nframe & start_end_only & tier == utils::tail(tiers, n=1)) {
       graphics::axis(1, at=xtix)

@@ -38,6 +38,8 @@
 #' `left` and `right`. If more or less than two channels are available,
 #' channels are named `Cn`, where `n` is the number of the channel. Alternatvely,
 #' a vector of strings can be provided with channel names. Default is `FALSE`.
+#' @param wave_color String giving the name of the color to be used for plotting
+#' the waveform. Default is `'black'`.
 #' @param tg_tiers Vector of numbers or strings giving either numeric identifiers
 #' of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
 #' understands `'all'`, which plots all tiers and is the default.
@@ -58,6 +60,9 @@
 #' See [https://www.fon.hum.uva.nl/praat/manual/Text_styles.html].
 #' @param tg_tierNames Logical; should TextGrid tier names be printed along the
 #' y-axis? Default is `TRUE`.
+#' @param tg_color String or vector of strings giving the name of the color(s)
+#' to be used for the text in TextGrids. Default is `'black'`. If a vector is
+#' provided, different colors are used for different tiers.
 #' @param spec_channel Numeric giving the channel that should be used to
 #' generate the spectrogram. Default is `1`. Generating spectrograms from
 #' multiple channels is not currently possible with `praatpicture`.
@@ -74,6 +79,11 @@
 #' @param spec_windowShape String giving the name of the window shape to be
 #' applied to the signal when generating spectrograms. Default is `Gaussian`;
 #' other options are `square`, `Hamming`, `Bartlett`, or `Hanning`.
+#' @param spec_colors Vector of strings giving the names of colors to be used
+#' for plotting the spectrogram; default is `c('white', 'black')`. The first
+#' value is used for plotting the lowest visible amplitude, and the last for
+#' plotting the highest visible amplitude. Vectors with more than two color
+#' names can be used for plotting values in between in different colors.
 #' @param spec_axisLabel String giving the name of the label to print along the
 #' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
 #' @param pitch_timeStep Measurement interval in seconds for tracking pitch.
@@ -95,6 +105,8 @@
 #' respectively).
 #' @param pitch_semitonesRe Frequency in Hz giving the reference level for
 #' converting pitch frequency to semitones. Default is `100`.
+#' @param pitch_color String giving the name of the color to be used for
+#' plotting pitch. Default is `'black'`.
 #' @param pitch_ssff An object of class `AsspDataObj` containing a pitch track.
 #' Default is `NULL`.
 #' @param pitch_axisLabel String giving the name of the label to print along the
@@ -117,6 +129,12 @@
 #' @param formant_plotType String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
 #' plot).
+#' @param formant_color String or vector of strings giving the name(s) of
+#' colors to be used for plotting formants. If one color is provided, all
+#' formants will be plotted in this color. If multiple colors are provided,
+#' different formants will be shown in different colors. Default is `'black'`.
+#' @param formant_dottedLines Logical; should dotted lines indicate the
+#' locations of frequency multiples of 1000 as in Praat? Default is `TRUE`.
 #' @param formant_plotOnSpec Boolean; should formants be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param formant_ssff An object of class `AsspDataObj` containing formant tracks.
@@ -131,6 +149,8 @@
 #' @param intensity_range Vector of two integers giving the intensity range to be
 #' used for producing intensity plots. Default is `NULL`, in which case the
 #' range is simply the minimum and maximum levels in the curve.
+#' @param intensity_color String giving the name of the color to be used for
+#' plotting intensity. Default is `'black'`.
 #' @param intensity_ssff An object of class `AsspDataObj` containing intensity
 #' tracks. Default is `NULL`.
 #' @param intensity_axisLabel String giving the name of the label to print along
@@ -170,11 +190,11 @@
 #' the Burg algorithm used by Praat for tracking formants isn't implemented in R,
 #' nor is the autocorrelation method for tracking pitch.
 #'
-#' Spectrograms are generated with the function [phonTools::spectrogram].
-#' These also do not look exactly equivalent to Praat because of how raster image
-#' rendering works in R; you will find that the Praat-generated spectrograms
-#' are somewhat smoother, and the spectrograms made in `phonTools` take rather
-#' long to render.
+#' Spectrograms are generated with the function [phonTools::spectrogram]. The
+#' code portion that actually adds the spectrogram to a plot is based on
+#' [phonTools::plot.spectrogram] but rewritten to use a bitmap raster for
+#' rendering the image if the graphics device allows for it, which
+#' significantly speeds up rendering the spectrogram.
 #'
 #' @export
 #'
@@ -185,30 +205,36 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          proportion=c(30,50,20),
                          start_end_only=TRUE, min_max_only=TRUE,
                          wave_channels='all', wave_channelNames=FALSE,
+                         wave_color='black',
                          tg_tiers='all',tg_focusTier=tg_tiers[1],
                          tg_tierNames=TRUE,
                          tg_alignment='central', tg_specialChar=TRUE,
+                         tg_color='black',
                          spec_channel=1, spec_freqRange=c(0,5000),
                          spec_windowLength=0.0025, spec_dynamicRange=50,
                          spec_timeStep=1000, spec_windowShape='Gaussian',
+                         spec_colors=c('white', 'black'),
                          spec_axisLabel='Frequency (Hz)',
                          pitch_timeStep=NULL, pitch_floor=75, pitch_ceiling=600,
                          pitch_plotType='draw', pitch_scale='hz',
                          pitch_freqRange=c(50,500), pitch_semitonesRe=100,
-                         pitch_ssff=NULL, pitch_axisLabel=NULL,
+                         pitch_color='black', pitch_ssff=NULL,
+                         pitch_axisLabel=NULL,
                          formant_timeStep=NULL, formant_maxN=5,
                          formant_windowLength=0.025, formant_dynamicRange=30,
                          formant_freqRange=c(50, 5500),
-                         formant_plotType='speckle', formant_plotOnSpec=FALSE,
+                         formant_plotType='speckle', formant_color='black',
+                         formant_dottedLines=TRUE, formant_plotOnSpec=FALSE,
                          formant_ssff=NULL, formant_axisLabel='Frequency (Hz)',
                          intensity_timeStep=NULL, intensity_minPitch=100,
-                         intensity_range=NULL, intensity_ssff=NULL,
+                         intensity_range=NULL, intensity_color='black',
+                         intensity_ssff=NULL,
                          intensity_axisLabel='Intensity (dB)',
                          time_axisLabel='Time (s)',
                          draw_rectangle=NULL, draw_arrow=NULL,
                          gender='u', ...) {
 
-  p <- par(no.readonly=TRUE)
+  p <- graphics::par(no.readonly=TRUE)
 
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')
@@ -216,7 +242,6 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     stop('Currently available frames are sound, TextGrid, spectrogram, formant, ',
          'pitch, and intensity')
   }
-
   if (sum(proportion) != 100) {
     stop('The numbers in proportion should sum up to 100')
   }
@@ -225,6 +250,9 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   if (nframe != 3 & length(proportion) != nframe) {
     proportion <- rep(round(100/nframe), nframe)
   }
+  if (nframe != length(proportion)) stop(paste('The proportion argument must',
+                                               'be the same length as the',
+                                               'frames argument'))
   if (nframe > length(min_max_only)) min_max_only <- rep(min_max_only, nframe)
 
   if (class(draw_rectangle) != 'list') draw_rectangle <- list(draw_rectangle)
@@ -271,10 +299,10 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   if ('TextGrid' %in% frames) {
     tgfn <- paste0(fn, '.TextGrid')
     tg <- rPraat::tg.read(tgfn)
+    tgind <- which(frames == 'TextGrid')
     if (any(tg_tiers == 'all')) tg_tiers <- 1:length(tg)
     if (length(tg_tiers) > 1) {
       ntiers <- length(tg_tiers)
-      tgind <- which(frames == 'TextGrid')
       tgprop <- proportion[tgind]
       proportion[tgind] <- round(tgprop / ntiers)
       if (tgind == nframe) {
@@ -336,7 +364,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                              maxF=pitch_ceiling, minF=pitch_floor,
                              gender=gender)
       }
-      f <- wpt$F0[,1]
+      f <- wpt[[1]][,1]
       a <- attributes(wpt)
       t <- seq(a$startTime, a$endRecord/a$sampleRate, by=1/a$sampleRate)
       del <- which(f == 0)
@@ -371,7 +399,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                               beginTime=start, endTime=end,
                               windowShift = formant_timeStep,
                               windowSize = formant_windowLength*2000,
-                              numFormants = formant_maxN,
+                              numFormants = formant_maxN, estimate=TRUE,
                               window='KAISER2_0', gender=gender)
         wit <- wrassp::rmsana(paste0(fn, '.wav'), toFile=F,
                               beginTime=start, endTime=end,
@@ -381,7 +409,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
       }
       a <- attributes(wfm)
       t <- seq(a$startTime, a$endRecord/a$sampleRate, by=1/a$sampleRate)
-      fArray <- t(wfm$fm)
+      fArray <- t(wfm[[1]])
       mnf <- nrow(fArray)
       fm <- list(t = t, frequencyArray = fArray, maxnFormants = mnf,
                  intensityVector = wit$rms, conv2db = FALSE)
@@ -409,7 +437,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                               windowSize=(3.2/intensity_minPitch)*1000,
                               window='KAISER2_0')
       }
-      db <- wit$rms[,1]
+      db <- wit[[1]][,1]
       a <- attributes(wit)
       t <- seq(a$startTime, a$endRecord/a$sampleRate, by=1/a$sampleRate)
       it <- list(t = t, i = db)
@@ -425,8 +453,10 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   if (nchan > 1) {
     nf <- nframe + length(tg_tiers) - 1
     wavind <- which(frames=='sound')
-    if (length(tg_tiers) > 1 & wavind > tgind) wavind <-
-      wavind + length(tg_tiers) - 1
+    if ('TextGrid' %in% frames) {
+      if (length(tg_tiers) > 1 & wavind > tgind) wavind <-
+          wavind + length(tg_tiers) - 1
+    }
     wavprop <- proportion[wavind]
     proportion[wavind] <- round(wavprop / nchan)
     if (wavind == nf) {
@@ -447,46 +477,47 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   for (i in 1:nframe) {
     if (frames[i] == 'sound') {
       ind <- which(frames == 'sound')
-      waveplot(sig, bit, t, nchan, tgbool, focus_linevec, ind, nframe,
-               rect_comp, arr_comp, draw_rectangle, draw_arrow,
+      waveplot(sig, bit, t, nchan, wave_color, tgbool, focus_linevec, ind,
+               nframe, rect_comp, arr_comp, draw_rectangle, draw_arrow,
                wave_channelNames, cn, start_end_only, min_max_only)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,
                max(tseq)-start, tfrom0,
                spec_freqRange, spec_windowLength, spec_dynamicRange,
-               spec_timeStep, spec_windowShape,
+               spec_timeStep, spec_windowShape, spec_colors,
                formant_plotOnSpec, fm, formant_plotType, formant_dynamicRange,
-               tgbool, focus_linevec, ind, nframe, start_end_only, min_max_only,
-               spec_axisLabel)
+               formant_color, tgbool, focus_linevec, ind, nframe,
+               start_end_only, min_max_only, spec_axisLabel)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram', draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tg_tiers, tfrom0, tg_tierNames, ind, nframe,
-             tg_alignment, tg_specialChar, start_end_only)
+             tg_alignment, tg_specialChar, tg_color, start_end_only)
       if ('TextGrid' %in% rect_comp) draw_rectangle('TextGrid', draw_rectangle)
       if ('TextGrid' %in% arr_comp) draw_arrow('TextGrid', draw_arrow)
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                 pitch_plotType, pitch_scale, pitch_freqRange,
-                pitch_semitonesRe, ind, nframe, start_end_only, min_max_only,
-                pitch_axisLabel)
+                pitch_semitonesRe, pitch_color, ind, nframe, start_end_only,
+                min_max_only, pitch_axisLabel)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
-                  formant_dynamicRange, formant_freqRange, formant_plotType, ind,
+                  formant_dynamicRange, formant_freqRange, formant_plotType,
+                  formant_color, formant_dottedLines, ind,
                   nframe, start_end_only, min_max_only, formant_axisLabel)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
-                    intensity_range, ind, nframe, start_end_only, min_max_only,
-                    intensity_axisLabel)
+                    intensity_range, intensity_color, ind, nframe,
+                    start_end_only, min_max_only, intensity_axisLabel)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity', draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
     }
