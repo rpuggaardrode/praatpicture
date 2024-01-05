@@ -15,6 +15,7 @@ pitchplot(
   scale = "hz",
   freqRange = c(50, 500),
   semitonesRe = 100,
+  color = "black",
   ind = NULL,
   nframe = NULL,
   start_end_only = TRUE,
@@ -53,6 +54,9 @@ respectively).}
 
 \item{semitonesRe}{Frequency in Hz giving the reference level for converting
 pitch frequency to semitones. Default is \code{100}.}
+
+\item{color}{String giving the name of the color to be used for
+plotting pitch. Default is \code{'black'}.}
 
 \item{ind}{Integer indexing waveform relative to other plot components.
 Default is \code{NULL}.}

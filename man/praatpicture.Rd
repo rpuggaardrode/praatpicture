@@ -15,17 +15,20 @@ praatpicture(
   min_max_only = TRUE,
   wave_channels = "all",
   wave_channelNames = FALSE,
+  wave_color = "black",
   tg_tiers = "all",
   tg_focusTier = tg_tiers[1],
   tg_tierNames = TRUE,
   tg_alignment = "central",
   tg_specialChar = TRUE,
+  tg_color = "black",
   spec_channel = 1,
   spec_freqRange = c(0, 5000),
   spec_windowLength = 0.0025,
   spec_dynamicRange = 50,
   spec_timeStep = 1000,
   spec_windowShape = "Gaussian",
+  spec_colors = c("white", "black"),
   spec_axisLabel = "Frequency (Hz)",
   pitch_timeStep = NULL,
   pitch_floor = 75,
@@ -34,6 +37,7 @@ praatpicture(
   pitch_scale = "hz",
   pitch_freqRange = c(50, 500),
   pitch_semitonesRe = 100,
+  pitch_color = "black",
   pitch_ssff = NULL,
   pitch_axisLabel = NULL,
   formant_timeStep = NULL,
@@ -42,12 +46,15 @@ praatpicture(
   formant_dynamicRange = 30,
   formant_freqRange = c(50, 5500),
   formant_plotType = "speckle",
+  formant_color = "black",
+  formant_dottedLines = TRUE,
   formant_plotOnSpec = FALSE,
   formant_ssff = NULL,
   formant_axisLabel = "Frequency (Hz)",
   intensity_timeStep = NULL,
   intensity_minPitch = 100,
   intensity_range = NULL,
+  intensity_color = "black",
   intensity_ssff = NULL,
   intensity_axisLabel = "Intensity (dB)",
   time_axisLabel = "Time (s)",
@@ -101,6 +108,9 @@ available. Alternatively, if two channels are available, they will be named
 channels are named \code{Cn}, where \code{n} is the number of the channel. Alternatvely,
 a vector of strings can be provided with channel names. Default is \code{FALSE}.}
 
+\item{wave_color}{String giving the name of the color to be used for plotting
+the waveform. Default is \code{'black'}.}
+
 \item{tg_tiers}{Vector of numbers or strings giving either numeric identifiers
 of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
 understands \code{'all'}, which plots all tiers and is the default.}
@@ -126,6 +136,10 @@ such as italic, bold, and small caps be converted into corresponding
 R-readable special font types. Default is \code{TRUE}.
 See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
 
+\item{tg_color}{String or vector of strings giving the name of the color(s)
+to be used for the text in TextGrids. Default is \code{'black'}. If a vector is
+provided, different colors are used for different tiers.}
+
 \item{spec_channel}{Numeric giving the channel that should be used to
 generate the spectrogram. Default is \code{1}. Generating spectrograms from
 multiple channels is not currently possible with \code{praatpicture}.}
@@ -147,6 +161,12 @@ plotting parameters it is a good idea to choose a smaller value.}
 \item{spec_windowShape}{String giving the name of the window shape to be
 applied to the signal when generating spectrograms. Default is \code{Gaussian};
 other options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
+
+\item{spec_colors}{Vector of strings giving the names of colors to be used
+for plotting the spectrogram; default is \code{c('white', 'black')}. The first
+value is used for plotting the lowest visible amplitude, and the last for
+plotting the highest visible amplitude. Vectors with more than two color
+names can be used for plotting values in between in different colors.}
 
 \item{spec_axisLabel}{String giving the name of the label to print along the
 y-axis when plotting a spectrogram. Default is \code{Frequency (Hz)}.}
@@ -176,6 +196,9 @@ respectively).}
 
 \item{pitch_semitonesRe}{Frequency in Hz giving the reference level for
 converting pitch frequency to semitones. Default is \code{100}.}
+
+\item{pitch_color}{String giving the name of the color to be used for
+plotting pitch. Default is \code{'black'}.}
 
 \item{pitch_ssff}{An object of class \code{AsspDataObj} containing a pitch track.
 Default is \code{NULL}.}
@@ -207,6 +230,14 @@ be used for producing formant plots. Default is \code{c(0,5500)}.}
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
 plot).}
 
+\item{formant_color}{String or vector of strings giving the name(s) of
+colors to be used for plotting formants. If one color is provided, all
+formants will be plotted in this color. If multiple colors are provided,
+different formants will be shown in different colors. Default is \code{'black'}.}
+
+\item{formant_dottedLines}{Logical; should dotted lines indicate the
+locations of frequency multiples of 1000 as in Praat? Default is \code{TRUE}.}
+
 \item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
@@ -226,6 +257,9 @@ intensity; default is \code{100}}
 \item{intensity_range}{Vector of two integers giving the intensity range to be
 used for producing intensity plots. Default is \code{NULL}, in which case the
 range is simply the minimum and maximum levels in the curve.}
+
+\item{intensity_color}{String giving the name of the color to be used for
+plotting intensity. Default is \code{'black'}.}
 
 \item{intensity_ssff}{An object of class \code{AsspDataObj} containing intensity
 tracks. Default is \code{NULL}.}
@@ -279,11 +313,11 @@ from Praat simply because the tracking algorithms differ; as far as I know,
 the Burg algorithm used by Praat for tracking formants isn't implemented in R,
 nor is the autocorrelation method for tracking pitch.
 
-Spectrograms are generated with the function \link[phonTools:spectrogram]{phonTools::spectrogram}.
-These also do not look exactly equivalent to Praat because of how raster image
-rendering works in R; you will find that the Praat-generated spectrograms
-are somewhat smoother, and the spectrograms made in \code{phonTools} take rather
-long to render.
+Spectrograms are generated with the function \link[phonTools:spectrogram]{phonTools::spectrogram}. The
+code portion that actually adds the spectrogram to a plot is based on
+\link[phonTools:spectrogram]{phonTools::plot.spectrogram} but rewritten to use a bitmap raster for
+rendering the image if the graphics device allows for it, which
+significantly speeds up rendering the spectrogram.
 }
 \examples{
 praatpicture('inst/extdata/1.wav')

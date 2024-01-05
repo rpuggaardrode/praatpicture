@@ -9,6 +9,7 @@ waveplot(
   bit,
   t,
   nchan = 1,
+  color = "black",
   tgbool = FALSE,
   lines = NULL,
   ind = NULL,
@@ -31,6 +32,9 @@ waveplot(
 \item{t}{Numeric vector giving times corresponding to the signal.}
 
 \item{nchan}{Numeric; how many channels will be plotted? Default is \code{1}.}
+
+\item{color}{String giving the name of the color to be used for plotting
+the waveform. Default is \code{'black'}.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}

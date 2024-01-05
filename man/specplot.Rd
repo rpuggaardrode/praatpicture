@@ -16,10 +16,12 @@ specplot(
   dynamicRange = 60,
   timeStep = 1000,
   windowShape = "Gaussian",
+  colors = c("white", "black"),
   formant_plotOnSpec = FALSE,
   fm = NULL,
   formant_plotType = "draw",
   formant_dynamicRange = 30,
+  formant_color = "black",
   tgbool = FALSE,
   lines = NULL,
   ind = NULL,
@@ -61,6 +63,12 @@ plotting parameters it is a good idea to choose a smaller value.}
 to the signal when generating spectrograms. Default is \code{Gaussian}; other
 options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
 
+\item{colors}{Vector of strings giving the names of colors to be used
+for plotting the spectrogram; default is \code{c('white', 'black')}. The first
+value is used for plotting the lowest visible amplitude, and the last for
+plotting the highest visible amplitude. Vectors with more than two color
+names can be used for plotting values in between in different colors.}
+
 \item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
@@ -74,6 +82,11 @@ plot).}
 When a formant plot of \code{formant_plotType='speckle'} is drawn, no formants are
 shown in frames with intensity level \code{formant_dynamicRange} below the maximum
 intensity. Default is \code{30}. If set to \code{0}, all formants are shown.}
+
+\item{formant_color}{String or vector of strings giving the name(s) of
+colors to be used for plotting formants. If one color is provided, all
+formants will be plotted in this color. If multiple colors are provided,
+different formants will be shown in different colors. Default is \code{'black'}.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}

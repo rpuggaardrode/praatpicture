@@ -12,6 +12,7 @@ intensityplot(
   tgbool = FALSE,
   lines = NULL,
   range = NULL,
+  color = "black",
   ind = NULL,
   nframe = NULL,
   start_end_only = TRUE,
@@ -38,6 +39,9 @@ a TextGrid to be plotted with dotted lines. Default is \code{NULL}.}
 \item{range}{Vector of two integers giving the intensity range to be
 used for producing intensity plots. Default is \code{NULL}, in which case the
 range is simply the minimum and maximum levels in the curve.}
+
+\item{color}{String giving the name of the color to be used for
+plotting intensity. Default is \code{'black'}.}
 
 \item{ind}{Integer indexing waveform relative to other plot components.
 Default is \code{NULL}.}

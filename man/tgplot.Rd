@@ -16,6 +16,7 @@ tgplot(
   nframe = NULL,
   alignment = "central",
   specialChar = TRUE,
+  color = "black",
   start_end_only = TRUE
 )
 }
@@ -51,6 +52,10 @@ Alternatively, a vector of strings if different alignments are needed.}
 such as italic, bold, and small caps be converted into corresponding
 R-readable special font types. Default is \code{TRUE}.
 See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
+
+\item{color}{String or vector of strings giving the name of the color(s)
+to be used for the text in TextGrids. Default is \code{'black'}. If a vector is
+provided, different colors are used for different tiers.}
 
 \item{start_end_only}{Logical; should there only be ticks on the x-axis
 for start and end times? Default is \code{TRUE}.}

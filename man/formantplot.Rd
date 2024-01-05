@@ -14,6 +14,8 @@ formantplot(
   dynamicRange = 30,
   freqRange = c(0, 5500),
   plotType = "speckle",
+  color = "black",
+  dottedLines = TRUE,
   ind = NULL,
   nframe = NULL,
   start_end_only = TRUE,
@@ -48,6 +50,14 @@ used for producing formant plots. Default is \code{c(0,5500)}.}
 \item{plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
 plot).}
+
+\item{color}{String or vector of strings giving the name(s) of
+colors to be used for plotting formants. If one color is provided, all
+formants will be plotted in this color. If multiple colors are provided,
+different formants will be shown in different colors. Default is \code{'black'}.}
+
+\item{dottedLines}{Logical; should dotted lines indicate the
+locations of frequency multiples of 1000 as in Praat? Default is \code{TRUE}.}
 
 \item{ind}{Integer indexing waveform relative to other plot components.
 Default is \code{NULL}.}
