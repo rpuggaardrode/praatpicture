@@ -69,7 +69,13 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 
 ## The waveform
 
-By default, all channels of a sound file are plotted. This can be changed with the `wave_channels` argument. If you want names next to individual channels, this can be achieved with the `wave_channelNames` argument, which is set to `FALSE` by default.
+By default, all channels of a sound file are plotted. This can be changed with the `wave_channels` argument. If you want names next to individual channels, this can be achieved with the `wave_channelNames` argument, which is set to `FALSE` by default. If you want to plot the waveform in a different color than black, this is controlled with the `wave_color` argument:
+
+```{r}
+praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+             frames=c('sound', 'spectrogram'), proportion=c(20,80),
+             wave_color='lightgrey')
+```
 
 ## The TextGrid
 
@@ -82,7 +88,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 
 By default, text is center aligned, but we can also align it to the left or to the right with the `tg_alignment` argument. This doesn't have to be the same for all tiers! 
 
-You may have noticed something strange going on in after the `b` in both of the tiers in the above plot. This should be `b_<`, which is the SAMPA character for a bilabial implosive, but Praat usually interprets a `_` as meaning that the following character should be subscripted, so `praatpicture` emulates this behavior by default. You can override this using the `tg_specialChar` argument as below.
+You may have noticed something strange going on in after the `b` in both of the tiers in the above plot. This should be `b_<`, which is the SAMPA character for a bilabial implosive, but Praat usually interprets a `_` as meaning that the following character should be subscripted, so `praatpicture` emulates this behavior by default. You can override this using the `tg_specialChar` argument as below. Text color can be controlled with the `tg_color` argument, which takes either a single string or a vector of strings, if you want different tiers to have different colors.
 
 ```{r}
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
@@ -100,13 +106,21 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
              spec_freqRange=c(0,8000), spec_dynamicRange=70)
 ```
 
-You can also change the shape and length of windows used for the Fourier transformations, and the number of time steps at which spectra are generated. Note that not all window shapes offered by Praat are available in `phonTools`. Lowering the latter can be smart when fiddling around with plot settings, because spectrogram rendering is much slower in R than in Praat (you may also notice that the spectrograms don't look quite as smooth as they do in Praat). Here is a broadband spectrogram using a Hamming window with a lower frequency range, just to show how this is implemented:
+You can also change the shape and length of windows used for the Fourier transformations, and the number of time steps at which spectra are generated. Note that not all window shapes offered by Praat are available in `phonTools`. Here is a broadband spectrogram using a Hamming window, just to show how this is implemented:
 
 ```{r}
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(40,60),
-             spec_timeStep=200, spec_windowShape='Hamming', 
-             spec_windowLength=0.015)
+             spec_windowShape='Hamming', spec_windowLength=0.03)
+```
+
+Spectrogram colors can be controlled with the `spec_color` argument which takes two or more strings giving the colors of low, high, and optionally in-between frequencies: 
+
+```{r}
+praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+             frames=c('sound', 'spectrogram'), proportion=c(40,60),
+             spec_color=c('darkblue', 'blue', 'cyan', 'yellow', 'orange', 
+                          'brown', 'red'))
 ```
 
 ## Pitch
@@ -183,12 +197,13 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
              formant_dynamicRange=40)
 ```
  
-A special argument is the logical `formant_plotOnSpec`, which when used in combination with a spectrogram will plot formants on top of the spectrogram, like so:
+A special argument is the logical `formant_plotOnSpec`, which when used in combination with a spectrogram will plot formants on top of the spectrogram. Formant colors can be controlled with the `formant_color` argument, which is either a single string or a vector; in the latter case, different formants will have different colors. This applies whether formants are plotted on their own or with a spectrogram.
 
 ```{r}
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(40,60),
-             formant_plotOnSpec=TRUE)
+             formant_plotOnSpec=TRUE, 
+             formant_color=c('red', 'blue', 'white', 'green'))
 ```
  
 As we saw with pitch above, these formant tracks all come from a Praat file. If there wasn't one available, formants would be tracked using the `forest()` function from the `wrassp()` package: 
