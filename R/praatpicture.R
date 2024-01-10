@@ -294,7 +294,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   }
   tseq <- seq(tstart, tstart+nsamp/sr, by=1/sr)
 
-  fn <- unlist(strsplit(sound, '[.]'))[1]
+  spl <- unlist(strsplit(sound, '[.]'))
+  fn <- paste(spl[1:(length(spl)-1)], collapse='.')
 
   if ('TextGrid' %in% frames) {
     tgfn <- paste0(fn, '.TextGrid')
