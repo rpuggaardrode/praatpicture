@@ -13,6 +13,14 @@
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
 #' a TextGrid to be plotted with dotted lines. Default is `NULL`.
+#' @param focusTierColor String or vector of strings giving the color(s) to
+#' use for plotting focus tier lines. If multiple tiers are focused, a vector
+#' of the same length can be passed, and the nth tier will be plotted in the
+#' nth color. Default is `'black'`.
+#' @param focusTierLineType String or vector of strings giving the line
+#' type(s) for plotting focus tier lines. If multiple tiers are focused, a
+#' vector of the same length can be passed, and the nth tier will be plotted in
+#' the nth line type. Default is `'dotted'`.
 #' @param plotType String giving the type of pitch plot to produce; default
 #' is `draw` (a line plot), the only other option is `speckle` (a point plot).
 #' @param scale String giving the frequency scale to use when producing
@@ -47,6 +55,7 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='pitch')
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
+                      focusTierColor='black', focusTierLineType='dotted',
                       plotType='draw', scale='hz', freqRange=c(50,500),
                       semitonesRe=100, color='black', ind=NULL, nframe=NULL,
                       start_end_only=TRUE, min_max_only=TRUE,
@@ -143,7 +152,12 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
         graphics::lines(sep_lines_t[[i]], sep_lines_f[[i]], col=color)
       }
     }
-    if (tgbool) graphics::abline(v=lines, lty='dotted')
+    if (tgbool) {
+      for (i in 1:length(lines)) {
+        graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                         lty=focusTierLineType[i])
+      }
+    }
     graphics::mtext(axlab, side=2, line=3.5, cex=0.8)
   }
 
@@ -156,7 +170,12 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,1),
                                           tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
-    if (tgbool) graphics::abline(v=lines, lty='dotted')
+    if (tgbool) {
+      for (i in 1:length(lines)) {
+        graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                         lty=focusTierLineType[i])
+      }
+    }
     graphics::mtext(axlab, side=2, line=3.5, cex=0.8)
   }
 }

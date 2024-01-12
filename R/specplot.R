@@ -47,6 +47,14 @@
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
 #' a TextGrid to be plotted with dotted lines. Default is `NULL`.
+#' @param focusTierColor String or vector of strings giving the color(s) to
+#' use for plotting focus tier lines. If multiple tiers are focused, a vector
+#' of the same length can be passed, and the nth tier will be plotted in the
+#' nth color. Default is `'black'`.
+#' @param focusTierLineType String or vector of strings giving the line
+#' type(s) for plotting focus tier lines. If multiple tiers are focused, a
+#' vector of the same length can be passed, and the nth tier will be plotted in
+#' the nth line type. Default is `'dotted'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
@@ -71,7 +79,8 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                      formant_plotOnSpec=FALSE, fm=NULL,
                      formant_plotType='draw', formant_dynamicRange=30,
                      formant_color='black',
-                     tgbool=FALSE, lines=NULL, ind=NULL, nframe=NULL,
+                     tgbool=FALSE, lines=NULL, focusTierColor='black',
+                     focusTierLineType='dotted', ind=NULL, nframe=NULL,
                      start_end_only=TRUE, min_max_only=TRUE,
                      axisLabel='Frequency (Hz)') {
 
@@ -161,8 +170,6 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
         col=fillCol, useRaster=TRUE, add=TRUE)
   graphics::box()
 
-  if (tgbool) graphics::abline(v=lines, lty='dotted')
-
   if (formant_plotOnSpec) {
     nf <- fm$maxnFormants
     if (length(formant_color) == 1) formant_color <- rep(formant_color, nf)
@@ -193,4 +200,12 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
       }
     }
   }
+
+  if (tgbool) {
+    for (i in 1:length(lines)) {
+      graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                       lty=focusTierLineType[i])
+    }
+  }
+
 }

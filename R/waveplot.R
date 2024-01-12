@@ -14,6 +14,14 @@
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
 #' a TextGrid to be plotted with dotted lines. Default is `NULL`.
+#' @param focusTierColor String or vector of strings giving the color(s) to
+#' use for plotting focus tier lines. If multiple tiers are focused, a vector
+#' of the same length can be passed, and the nth tier will be plotted in the
+#' nth color. Default is `'black'`.
+#' @param focusTierLineType String or vector of strings giving the line
+#' type(s) for plotting focus tier lines. If multiple tiers are focused, a
+#' vector of the same length can be passed, and the nth tier will be plotted in
+#' the nth line type. Default is `'dotted'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
 #' @param nframe Integer giving the number of plot components. Default is `NULL`.
@@ -43,7 +51,8 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='sound')
 waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
-                     lines=NULL, ind=NULL, nframe=NULL,
+                     lines=NULL, focusTierColor='black',
+                     focusTierLineType='dotted', ind=NULL, nframe=NULL,
                      rect_comp=NULL, arr_comp=NULL,
                      draw_rectangle=NULL, draw_arrow=NULL,
                      channelNames=FALSE, cn=NULL,
@@ -84,7 +93,12 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,0.5,1),
                                           tick=F)
     if (channelNames) graphics::mtext(cn[i], side=2, las=2, line=3.5, cex=0.8)
-    if (tgbool) graphics::abline(v=lines, lty='dotted')
+    if (tgbool) {
+      for (i in 1:length(lines)) {
+        graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                       lty=focusTierLineType[i])
+      }
+    }
 
     if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)
     if ('sound' %in% arr_comp) draw_arrow('sound', draw_arrow)

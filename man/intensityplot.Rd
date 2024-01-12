@@ -11,6 +11,8 @@ intensityplot(
   tfrom0 = TRUE,
   tgbool = FALSE,
   lines = NULL,
+  focusTierColor = "black",
+  focusTierLineType = "dotted",
   range = NULL,
   color = "black",
   ind = NULL,
@@ -35,6 +37,16 @@ locations in a TextGrid? Default is \code{FALSE}.}
 
 \item{lines}{Numeric vector giving locations in seconds of locations from
 a TextGrid to be plotted with dotted lines. Default is \code{NULL}.}
+
+\item{focusTierColor}{String or vector of strings giving the color(s) to
+use for plotting focus tier lines. If multiple tiers are focused, a vector
+of the same length can be passed, and the nth tier will be plotted in the
+nth color. Default is \code{'black'}.}
+
+\item{focusTierLineType}{String or vector of strings giving the line
+type(s) for plotting focus tier lines. If multiple tiers are focused, a
+vector of the same length can be passed, and the nth tier will be plotted in
+the nth line type. Default is \code{'dotted'}.}
 
 \item{range}{Vector of two integers giving the intensity range to be
 used for producing intensity plots. Default is \code{NULL}, in which case the

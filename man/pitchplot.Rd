@@ -11,6 +11,8 @@ pitchplot(
   tfrom0 = TRUE,
   tgbool = FALSE,
   lines = NULL,
+  focusTierColor = "black",
+  focusTierLineType = "dotted",
   plotType = "draw",
   scale = "hz",
   freqRange = c(50, 500),
@@ -38,6 +40,16 @@ locations in a TextGrid? Default is \code{FALSE}.}
 
 \item{lines}{Numeric vector giving locations in seconds of locations from
 a TextGrid to be plotted with dotted lines. Default is \code{NULL}.}
+
+\item{focusTierColor}{String or vector of strings giving the color(s) to
+use for plotting focus tier lines. If multiple tiers are focused, a vector
+of the same length can be passed, and the nth tier will be plotted in the
+nth color. Default is \code{'black'}.}
+
+\item{focusTierLineType}{String or vector of strings giving the line
+type(s) for plotting focus tier lines. If multiple tiers are focused, a
+vector of the same length can be passed, and the nth tier will be plotted in
+the nth line type. Default is \code{'dotted'}.}
 
 \item{plotType}{String giving the type of pitch plot to produce; default
 is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}

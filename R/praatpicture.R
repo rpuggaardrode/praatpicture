@@ -43,14 +43,22 @@
 #' @param tg_tiers Vector of numbers or strings giving either numeric identifiers
 #' of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
 #' understands `'all'`, which plots all tiers and is the default.
-#' @param tg_focusTier For which tier(s) should dotted lines be shown on all
+#' @param tg_focusTier For which tier(s) should lines be shown on all
 #' acoustic plots giving the locations of boundaries? Vector of number or
 #' strings giving either numeric identifiers
 #' of TextGrid tiers or the names of TextGrid tiers to plot. Default is
 #' `tg_tiers[1]`, i.e. the first tier given in the `tg_tiers` argument.
 #' Additionally accepts the string `none`,
-#' in which case no dotted lines are shown on acoustic plots, and `all`, in
-#' which case dotted lines from all tiers are shown on acoustic plots.
+#' in which case no lines are shown on acoustic plots, and `all`, in
+#' which case lines from all tiers are shown on acoustic plots.
+#' @param tg_focusTierColor String or vector of strings giving the color(s) to
+#' use for plotting focus tier lines. If multiple tiers are focused, a vector
+#' of the same length can be passed, and the nth tier will be plotted in the
+#' nth color. Default is `'black'`.
+#' @param tg_focusTierLineType String or vector of strings giving the line
+#' type(s) for plotting focus tier lines. If multiple tiers are focused, a
+#' vector of the same length can be passed, and the nth tier will be plotted in
+#' the nth line type. Default is `'dotted'`.
 #' @param tg_alignment String giving the desired alignment of text in the
 #' TextGrids. Default is `central`; other options are `left` and `right`.
 #' Alternatively, a vector of strings if different alignments are needed.
@@ -207,7 +215,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                          wave_channels='all', wave_channelNames=FALSE,
                          wave_color='black',
                          tg_tiers='all',tg_focusTier=tg_tiers[1],
-                         tg_tierNames=TRUE,
+                         tg_focusTierColor='black',
+                         tg_focusTierLineType='dotted', tg_tierNames=TRUE,
                          tg_alignment='central', tg_specialChar=TRUE,
                          tg_color='black',
                          spec_channel=1, spec_freqRange=c(0,5000),
@@ -318,23 +327,27 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     }
 
     if (any(tg_focusTier == 'all')) tg_focusTier <- tg_tiers
+    if (length(tg_focusTierColor) == 1) {
+      tg_focusTierColor <- rep(tg_focusTierColor, length(tg_focusTier))
+    }
+    if (length(tg_focusTierLineType) == 1) {
+      tg_focusTierLineType <- rep(tg_focusTierLineType, length(tg_focusTier))
+    }
     if (any(tg_focusTier != 'none')) {
       tgbool <- TRUE
-      focus_linevec <- c()
+      focus_linevec <- list()
+      j <- 1
       for (i in tg_focusTier) {
         if (tfrom0) {
-          if (tg[[i]]$type == 'point') focus_linevec <-
-              c(focus_linevec, tg[[i]]$t - start)
-          if (tg[[i]]$type == 'interval') focus_linevec <-
-              c(focus_linevec, tg[[i]]$t1[-1] - start)
+          if (tg[[i]]$type == 'point') focus_linevec[[j]] <- tg[[i]]$t - start
+          if (tg[[i]]$type == 'interval') focus_linevec[[j]] <-
+              tg[[i]]$t1[-1] - start
         } else {
-          if (tg[[i]]$type == 'point') focus_linevec <-
-              c(focus_linevec, tg[[i]]$t)
-          if (tg[[i]]$type == 'interval') focus_linevec <-
-              focus_linevec <- c(focus_linevec, tg[[i]]$t1[-1])
+          if (tg[[i]]$type == 'point') focus_linevec[[j]] <- tg[[i]]$t
+          if (tg[[i]]$type == 'interval') focus_linevec[[j]] <- tg[[i]]$t1[-1]
         }
+        j <- j + 1
       }
-
     } else {
       tgbool <- FALSE
       focus_linevec <- NULL
@@ -478,7 +491,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   for (i in 1:nframe) {
     if (frames[i] == 'sound') {
       ind <- which(frames == 'sound')
-      waveplot(sig, bit, t, nchan, wave_color, tgbool, focus_linevec, ind,
+      waveplot(sig, bit, t, nchan, wave_color, tgbool, focus_linevec,
+               tg_focusTierColor, tg_focusTierLineType, ind,
                nframe, rect_comp, arr_comp, draw_rectangle, draw_arrow,
                wave_channelNames, cn, start_end_only, min_max_only)
     } else if (frames[i] == 'spectrogram') {
@@ -488,7 +502,8 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
                spec_freqRange, spec_windowLength, spec_dynamicRange,
                spec_timeStep, spec_windowShape, spec_colors,
                formant_plotOnSpec, fm, formant_plotType, formant_dynamicRange,
-               formant_color, tgbool, focus_linevec, ind, nframe,
+               formant_color, tgbool, focus_linevec, tg_focusTierColor,
+               tg_focusTierLineType, ind, nframe,
                start_end_only, min_max_only, spec_axisLabel)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram', draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
@@ -501,6 +516,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
+                tg_focusTierColor, tg_focusTierLineType,
                 pitch_plotType, pitch_scale, pitch_freqRange,
                 pitch_semitonesRe, pitch_color, ind, nframe, start_end_only,
                 min_max_only, pitch_axisLabel)
@@ -509,6 +525,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
+                  tg_focusTierColor, tg_focusTierLineType,
                   formant_dynamicRange, formant_freqRange, formant_plotType,
                   formant_color, formant_dottedLines, ind,
                   nframe, start_end_only, min_max_only, formant_axisLabel)
@@ -517,6 +534,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
+                    tg_focusTierColor, tg_focusTierLineType,
                     intensity_range, intensity_color, ind, nframe,
                     start_end_only, min_max_only, intensity_axisLabel)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity', draw_rectangle)

@@ -13,6 +13,14 @@
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
 #' a TextGrid to be plotted with dotted lines. Default is `NULL`.
+#' @param focusTierColor String or vector of strings giving the color(s) to
+#' use for plotting focus tier lines. If multiple tiers are focused, a vector
+#' of the same length can be passed, and the nth tier will be plotted in the
+#' nth color. Default is `'black'`.
+#' @param focusTierLineType String or vector of strings giving the line
+#' type(s) for plotting focus tier lines. If multiple tiers are focused, a
+#' vector of the same length can be passed, and the nth tier will be plotted in
+#' the nth line type. Default is `'dotted'`.
 #' @param dynamicRange Dynamic range in dB for producing formant plots.
 #' When a formant plot of `plotType='speckle'` is drawn, no formants are
 #' shown in frames with intensity level `dynamicRange` below the maximum
@@ -47,6 +55,7 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='formant')
 formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
+                        focusTierColor='black', focusTierLineType='dotted',
                         dynamicRange=30, freqRange=c(0,5500),
                         plotType='speckle', color='black', dottedLines=TRUE,
                         ind=NULL, nframe=NULL,
@@ -115,7 +124,12 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                                           tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (dottedLines) graphics::abline(h=freql, lty='dotted')
-    if (tgbool) graphics::abline(v=lines, lty='dotted')
+    if (tgbool) {
+      for (i in 1:length(lines)) {
+        graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                         lty=focusTierLineType[i])
+      }
+    }
     graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
@@ -132,7 +146,12 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                                           tick=F)
     if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (dottedLines) graphics::abline(h=freql, lty='dotted')
-    if (tgbool) graphics::abline(v=lines, lty='dotted')
+    if (tgbool) {
+      for (i in 1:length(lines)) {
+        graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                         lty=focusTierLineType[i])
+      }
+    }
     graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 

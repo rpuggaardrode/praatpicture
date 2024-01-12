@@ -18,6 +18,8 @@ praatpicture(
   wave_color = "black",
   tg_tiers = "all",
   tg_focusTier = tg_tiers[1],
+  tg_focusTierColor = "black",
+  tg_focusTierLineType = "dotted",
   tg_tierNames = TRUE,
   tg_alignment = "central",
   tg_specialChar = TRUE,
@@ -115,14 +117,24 @@ the waveform. Default is \code{'black'}.}
 of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
 understands \code{'all'}, which plots all tiers and is the default.}
 
-\item{tg_focusTier}{For which tier(s) should dotted lines be shown on all
+\item{tg_focusTier}{For which tier(s) should lines be shown on all
 acoustic plots giving the locations of boundaries? Vector of number or
 strings giving either numeric identifiers
 of TextGrid tiers or the names of TextGrid tiers to plot. Default is
 \code{tg_tiers[1]}, i.e. the first tier given in the \code{tg_tiers} argument.
 Additionally accepts the string \code{none},
-in which case no dotted lines are shown on acoustic plots, and \code{all}, in
-which case dotted lines from all tiers are shown on acoustic plots.}
+in which case no lines are shown on acoustic plots, and \code{all}, in
+which case lines from all tiers are shown on acoustic plots.}
+
+\item{tg_focusTierColor}{String or vector of strings giving the color(s) to
+use for plotting focus tier lines. If multiple tiers are focused, a vector
+of the same length can be passed, and the nth tier will be plotted in the
+nth color. Default is \code{'black'}.}
+
+\item{tg_focusTierLineType}{String or vector of strings giving the line
+type(s) for plotting focus tier lines. If multiple tiers are focused, a
+vector of the same length can be passed, and the nth tier will be plotted in
+the nth line type. Default is \code{'dotted'}.}
 
 \item{tg_tierNames}{Logical; should TextGrid tier names be printed along the
 y-axis? Default is \code{TRUE}.}

@@ -13,6 +13,14 @@
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
 #' a TextGrid to be plotted with dotted lines. Default is `NULL`.
+#' @param focusTierColor String or vector of strings giving the color(s) to
+#' use for plotting focus tier lines. If multiple tiers are focused, a vector
+#' of the same length can be passed, and the nth tier will be plotted in the
+#' nth color. Default is `'black'`.
+#' @param focusTierLineType String or vector of strings giving the line
+#' type(s) for plotting focus tier lines. If multiple tiers are focused, a
+#' vector of the same length can be passed, and the nth tier will be plotted in
+#' the nth line type. Default is `'dotted'`.
 #' @param range Vector of two integers giving the intensity range to be
 #' used for producing intensity plots. Default is `NULL`, in which case the
 #' range is simply the minimum and maximum levels in the curve.
@@ -37,6 +45,7 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' praatpicture(paste0(datapath, '/1.wav'), frames='intensity')
 intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
+                          focusTierColor='black', focusTierLineType='dotted',
                           range=NULL, color='black', ind=NULL, nframe=NULL,
                           start_end_only=TRUE, min_max_only=TRUE,
                           axisLabel='Intensity (dB)') {
@@ -80,7 +89,12 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                         tick=F)
-  if (tgbool) graphics::abline(v=lines, lty='dotted')
+  if (tgbool) {
+    for (i in 1:length(lines)) {
+      graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                       lty=focusTierLineType[i])
+    }
+  }
   graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
 
 }
