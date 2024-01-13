@@ -8,7 +8,7 @@
 #' @param sound String giving the file name of a sound file with the .wav
 #' extension.
 #' @param start Start time (in seconds) of desired plotted area. Default is `0`.
-#' @param end End time (in seconds) of desired plotted area. Default is `Inf`
+#' @param end End time (in seconds) of desired plotted area. Default is `0`
 #' (= the entire file).
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
 #' original time? Default is `TRUE`.
@@ -23,6 +23,8 @@
 #' Default is `c(30,50,20)`. If more or less than three
 #' frames are plotted and no proportions are given, frames will be of equal
 #' size.
+#' @param mainTitle String giving a title to print at the top left.
+#' The default is an empty string, i.e. no title.
 #' @param start_end_only Logical; should there only be ticks on the x-axis
 #' for start and end times? Default is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
@@ -82,8 +84,7 @@
 #' maximum intensity minus `spec_dynamicRange` will all be printed in white.
 #' Default is `50`.
 #' @param spec_timeStep How many time steps should be calculated for spectrograms?
-#' Default is `1000`. Note that this takes a while to plot, so for fiddling with
-#' plotting parameters it is a good idea to choose a smaller value.
+#' Default is `1000`.
 #' @param spec_windowShape String giving the name of the window shape to be
 #' applied to the signal when generating spectrograms. Default is `Gaussian`;
 #' other options are `square`, `Hamming`, `Bartlett`, or `Hanning`.
@@ -208,9 +209,9 @@
 #'
 #' @examples
 #' praatpicture('inst/extdata/1.wav')
-praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
+praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          frames=c('sound', 'spectrogram', 'TextGrid'),
-                         proportion=c(30,50,20),
+                         proportion=c(30,50,20), mainTitle='',
                          start_end_only=TRUE, min_max_only=TRUE,
                          wave_channels='all', wave_channelNames=FALSE,
                          wave_color='black',
@@ -270,7 +271,12 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
   if (class(draw_arrow) != 'list') draw_arrow <- list(draw_arrow)
   arr_comp <- sapply(draw_arrow, '[[', 1)
 
-  snd <- tuneR::readWave(sound, from=start, to=end, units='seconds', toWaveMC=T)
+  if (end == 0) {
+    tend <- Inf
+  } else {
+    tend <- end
+  }
+  snd <- tuneR::readWave(sound, from=start, to=tend, units='seconds', toWaveMC=T)
 
   sr <- snd@samp.rate
   bit <- snd@bit
@@ -356,8 +362,6 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     tgbool <- FALSE
     focus_linevec <- NULL
   }
-
-  if (end == Inf) end <- 0
 
   if ('pitch' %in% frames) {
     if (file.exists(paste0(fn, '.PitchTier'))) {
@@ -542,6 +546,7 @@ praatpicture <- function(sound, start=0, end=Inf, tfrom0=TRUE,
     }
   }
   graphics::mtext(time_axisLabel, side=1, line=3, outer=T, cex=0.8)
+  graphics::mtext(mainTitle, side=3, line=2, adj=0, outer=T)
 
   graphics::par(p)
 }

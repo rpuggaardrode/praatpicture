@@ -7,10 +7,11 @@
 praatpicture(
   sound,
   start = 0,
-  end = Inf,
+  end = 0,
   tfrom0 = TRUE,
   frames = c("sound", "spectrogram", "TextGrid"),
   proportion = c(30, 50, 20),
+  mainTitle = "",
   start_end_only = TRUE,
   min_max_only = TRUE,
   wave_channels = "all",
@@ -72,7 +73,7 @@ extension.}
 
 \item{start}{Start time (in seconds) of desired plotted area. Default is \code{0}.}
 
-\item{end}{End time (in seconds) of desired plotted area. Default is \code{Inf}
+\item{end}{End time (in seconds) of desired plotted area. Default is \code{0}
 (= the entire file).}
 
 \item{tfrom0}{Logical; should time on the x-axis run from 0 or from the
@@ -90,6 +91,9 @@ individual frames. The numbers should sum up to 100.
 Default is \code{c(30,50,20)}. If more or less than three
 frames are plotted and no proportions are given, frames will be of equal
 size.}
+
+\item{mainTitle}{String giving a title to print at the top left.
+The default is an empty string, i.e. no title.}
 
 \item{start_end_only}{Logical; should there only be ticks on the x-axis
 for start and end times? Default is \code{TRUE}.}
@@ -167,8 +171,7 @@ maximum intensity minus \code{spec_dynamicRange} will all be printed in white.
 Default is \code{50}.}
 
 \item{spec_timeStep}{How many time steps should be calculated for spectrograms?
-Default is \code{1000}. Note that this takes a while to plot, so for fiddling with
-plotting parameters it is a good idea to choose a smaller value.}
+Default is \code{1000}.}
 
 \item{spec_windowShape}{String giving the name of the window shape to be
 applied to the signal when generating spectrograms. Default is \code{Gaussian};
