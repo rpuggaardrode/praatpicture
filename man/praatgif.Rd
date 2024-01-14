@@ -9,7 +9,7 @@ praatgif(
   width = 800,
   height = 500,
   frameRate = 20,
-  frames = 100,
+  n_frames = 50,
   loop = TRUE,
   outputFile = "praatgif.gif",
   verbose = TRUE,
@@ -47,8 +47,8 @@ pixels; default is \code{500}.}
 \item{frameRate}{Number giving the desired frame rate of the resulting
 GIF-file in Hz; default is \code{20}, i.e. 20 frames per second.}
 
-\item{frames}{Number giving the desired number of frames of the resulting
-GIF-file; default is \code{100}.}
+\item{n_frames}{Number giving the desired number of frames of the resulting
+GIF-file; default is \code{50}.}
 
 \item{loop}{Logical; should the GIF be looped? Default is \code{TRUE}.}
 

@@ -11,8 +11,8 @@
 #' pixels; default is `500`.
 #' @param frameRate Number giving the desired frame rate of the resulting
 #' GIF-file in Hz; default is `20`, i.e. 20 frames per second.
-#' @param frames Number giving the desired number of frames of the resulting
-#' GIF-file; default is `100`.
+#' @param n_frames Number giving the desired number of frames of the resulting
+#' GIF-file; default is `50`.
 #' @param loop Logical; should the GIF be looped? Default is `TRUE`.
 #' @param outputFile String giving the desired name of the GIF-file.
 #' Default is `'praatgif.gif'`.
@@ -103,7 +103,7 @@
 #'
 #' @examples
 #' #not now
-praatgif <- function(sound, width=800, height=500, frameRate=20, frames=100,
+praatgif <- function(sound, width=800, height=500, frameRate=20, n_frames=50,
                      loop=TRUE, outputFile='praatgif.gif', verbose=TRUE,
                      start=0, end=0, spec_freqRange=c(0,5000),
                      spec_windowLength=0.0025, spec_dynamicRange=50,
@@ -114,56 +114,56 @@ praatgif <- function(sound, width=800, height=500, frameRate=20, frames=100,
                      formant_freqRange=c(50,5500), intensity_timeStep=NULL,
                      intensity_minPitch=100, intensity_range=NULL, ...) {
 
-  makeseq <- function(vec, frames) {
-    newseq <- seq(head(vec, 1), tail(vec, 1), length.out=frames)
+  makeseq <- function(vec, n_frames) {
+    newseq <- seq(head(vec, 1), tail(vec, 1), length.out=n_frames)
     return(newseq)
   }
 
-  start <- makeseq(start, frames); end <- makeseq(end, frames)
-  spec_windowLength <- makeseq(spec_windowLength, frames)
-  spec_dynamicRange <- makeseq(spec_dynamicRange, frames)
-  spec_timeStep <- makeseq(spec_timeStep, frames)
+  start <- makeseq(start,n_frames); end <- makeseq(end,n_frames)
+  spec_windowLength <- makeseq(spec_windowLength,n_frames)
+  spec_dynamicRange <- makeseq(spec_dynamicRange,n_frames)
+  spec_timeStep <- makeseq(spec_timeStep,n_frames)
   if (!is.null(pitch_timeStep)) pitch_timeStep <-
-    makeseq(pitch_timeStep, frames)
-  pitch_floor <- makeseq(pitch_floor, frames)
-  pitch_ceiling <- makeseq(pitch_ceiling, frames)
-  pitch_semitonesRe <- makeseq(pitch_semitonesRe, frames)
+    makeseq(pitch_timeStep,n_frames)
+  pitch_floor <- makeseq(pitch_floor,n_frames)
+  pitch_ceiling <- makeseq(pitch_ceiling,n_frames)
+  pitch_semitonesRe <- makeseq(pitch_semitonesRe,n_frames)
   if (!is.null(formant_timeStep)) formant_timeStep <-
-    makeseq(formant_timeStep, frames)
-  formant_windowLength <- makeseq(formant_windowLength, frames)
-  formant_dynamicRange <- makeseq(formant_dynamicRange, frames)
+    makeseq(formant_timeStep,n_frames)
+  formant_windowLength <- makeseq(formant_windowLength,n_frames)
+  formant_dynamicRange <- makeseq(formant_dynamicRange,n_frames)
   if (!is.null(intensity_timeStep)) intensity_timeStep <-
-    makeseq(intensity_timeStep, frames)
-  intensity_minPitch <- makeseq(intensity_minPitch, frames)
+    makeseq(intensity_timeStep,n_frames)
+  intensity_minPitch <- makeseq(intensity_minPitch,n_frames)
 
   if (length(spec_freqRange) == 4) {
-    spec_freqRangeLow <- makeseq(spec_freqRange[1:2], frames)
-    spec_freqRangeUpp <- makeseq(spec_freqRange[3:4], frames)
+    spec_freqRangeLow <- makeseq(spec_freqRange[1:2],n_frames)
+    spec_freqRangeUpp <- makeseq(spec_freqRange[3:4],n_frames)
   } else {
-    spec_freqRangeLow <- makeseq(spec_freqRange[1], frames)
-    spec_freqRangeUpp <- makeseq(spec_freqRange[2], frames)
+    spec_freqRangeLow <- makeseq(spec_freqRange[1],n_frames)
+    spec_freqRangeUpp <- makeseq(spec_freqRange[2],n_frames)
   }
   if (length(pitch_freqRange) == 4) {
-    pitch_freqRangeLow <- makeseq(pitch_freqRange[1:2], frames)
-    pitch_freqRangeUpp <- makeseq(pitch_freqRange[3:4], frames)
+    pitch_freqRangeLow <- makeseq(pitch_freqRange[1:2],n_frames)
+    pitch_freqRangeUpp <- makeseq(pitch_freqRange[3:4],n_frames)
   } else {
-    pitch_freqRangeLow <- makeseq(pitch_freqRange[1], frames)
-    pitch_freqRangeUpp <- makeseq(pitch_freqRange[2], frames)
+    pitch_freqRangeLow <- makeseq(pitch_freqRange[1],n_frames)
+    pitch_freqRangeUpp <- makeseq(pitch_freqRange[2],n_frames)
   }
   if (length(formant_freqRange) == 4) {
-    formant_freqRangeLow <- makeseq(formant_freqRange[1:2], frames)
-    formant_freqRangeUpp <- makeseq(formant_freqRange[3:4], frames)
+    formant_freqRangeLow <- makeseq(formant_freqRange[1:2],n_frames)
+    formant_freqRangeUpp <- makeseq(formant_freqRange[3:4],n_frames)
   } else {
-    formant_freqRangeLow <- makeseq(formant_freqRange[1], frames)
-    formant_freqRangeUpp <- makeseq(formant_freqRange[2], frames)
+    formant_freqRangeLow <- makeseq(formant_freqRange[1],n_frames)
+    formant_freqRangeUpp <- makeseq(formant_freqRange[2],n_frames)
   }
   if (!is.null(intensity_range)) {
     if (length(intensity_range == 4)) {
-      intensity_rangeLow <- makeseq(intensity_range[1:2], frames)
-      intensity_rangeUpp <- makeseq(intensity_range[3:4], frames)
+      intensity_rangeLow <- makeseq(intensity_range[1:2],n_frames)
+      intensity_rangeUpp <- makeseq(intensity_range[3:4],n_frames)
     } else {
-      intensity_rangeLow <- makeseq(intensity_range[1], frames)
-      intensity_rangeUpp <- makeseq(intensity_range[2], frames)
+      intensity_rangeLow <- makeseq(intensity_range[1],n_frames)
+      intensity_rangeUpp <- makeseq(intensity_range[2],n_frames)
     }
   } else {
     intensity_rangeLow <- NULL; intensity_rangeUpp <- NULL
