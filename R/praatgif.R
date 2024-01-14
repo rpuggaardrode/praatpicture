@@ -171,7 +171,7 @@ praatgif <- function(sound, width=800, height=500, frameRate=20, n_frames=50,
 
 
   gifski::save_gif(
-    for (i in 1:frames) {
+    for (i in 1:n_frames) {
       praatpicture(sound, start=start[i], end=end[i],
                    spec_freqRange=c(spec_freqRangeLow[i], spec_freqRangeUpp[i]),
                    spec_windowLength=spec_windowLength[i],
