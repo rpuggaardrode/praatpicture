@@ -25,7 +25,7 @@ praatgif(
   pitch_freqRange = c(50, 500),
   pitch_semitonesRe = 100,
   formant_timeStep = NULL,
-  formant_windowLength = 0.025,
+  formant_windowLength = 0.005,
   formant_dynamicRange = 30,
   formant_freqRange = c(50, 5500),
   intensity_timeStep = NULL,

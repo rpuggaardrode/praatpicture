@@ -115,7 +115,7 @@ praatgif <- function(sound, width=800, height=500, frameRate=20, n_frames=50,
                      intensity_minPitch=100, intensity_range=NULL, ...) {
 
   makeseq <- function(vec, n_frames) {
-    newseq <- seq(head(vec, 1), tail(vec, 1), length.out=n_frames)
+    newseq <- seq(utils::head(vec, 1), utils::tail(vec, 1), length.out=n_frames)
     return(newseq)
   }
 

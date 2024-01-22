@@ -17,6 +17,7 @@ praatpicture(
   wave_channels = "all",
   wave_channelNames = FALSE,
   wave_color = "black",
+  tg_obj = NULL,
   tg_tiers = "all",
   tg_focusTier = tg_tiers[1],
   tg_focusTierColor = "black",
@@ -116,6 +117,8 @@ a vector of strings can be provided with channel names. Default is \code{FALSE}.
 
 \item{wave_color}{String giving the name of the color to be used for plotting
 the waveform. Default is \code{'black'}.}
+
+\item{tg_obj}{A TextGrid object returned by the \code{\link[=make_TextGrid]{make_TextGrid()}} function.}
 
 \item{tg_tiers}{Vector of numbers or strings giving either numeric identifiers
 of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also

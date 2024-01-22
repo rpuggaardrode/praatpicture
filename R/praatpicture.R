@@ -42,6 +42,7 @@
 #' a vector of strings can be provided with channel names. Default is `FALSE`.
 #' @param wave_color String giving the name of the color to be used for plotting
 #' the waveform. Default is `'black'`.
+#' @param tg_obj A TextGrid object returned by the [make_TextGrid()] function.
 #' @param tg_tiers Vector of numbers or strings giving either numeric identifiers
 #' of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
 #' understands `'all'`, which plots all tiers and is the default.
@@ -215,7 +216,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          start_end_only=TRUE, min_max_only=TRUE,
                          wave_channels='all', wave_channelNames=FALSE,
                          wave_color='black',
-                         tg_tiers='all',tg_focusTier=tg_tiers[1],
+                         tg_obj=NULL, tg_tiers='all',tg_focusTier=tg_tiers[1],
                          tg_focusTierColor='black',
                          tg_focusTierLineType='dotted', tg_tierNames=TRUE,
                          tg_alignment='central', tg_specialChar=TRUE,
@@ -265,10 +266,10 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                                                'frames argument'))
   if (nframe > length(min_max_only)) min_max_only <- rep(min_max_only, nframe)
 
-  if (class(draw_rectangle) != 'list') draw_rectangle <- list(draw_rectangle)
+  if (!is.list(draw_rectangle)) draw_rectangle <- list(draw_rectangle)
   rect_comp <- sapply(draw_rectangle, '[[', 1)
 
-  if (class(draw_arrow) != 'list') draw_arrow <- list(draw_arrow)
+  if (!is.list(draw_arrow)) draw_arrow <- list(draw_arrow)
   arr_comp <- sapply(draw_arrow, '[[', 1)
 
   if (end == 0) {
@@ -287,7 +288,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   if (any(class(sig) == 'integer')) sig <- as.matrix(sig)
   nchan <- dim(sig)[2]
 
-  if (class(wave_channelNames) == 'logical' & isTRUE(wave_channelNames)) {
+  if (is.logical(wave_channelNames) & isTRUE(wave_channelNames)) {
     if (length(colnames(sig)) > 0) {
       cn <- colnames(sig)
     } else if (nchan == 2) {
@@ -295,7 +296,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
     } else {
       cn <- paste0('C', 1:nchan)
     }
-  } else if (class(wave_channelNames) == 'character') {
+  } else if (is.character(wave_channelNames)) {
     cn <- wave_channelNames
     wave_channelNames <- TRUE
   } else {
@@ -314,7 +315,19 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
 
   if ('TextGrid' %in% frames) {
     tgfn <- paste0(fn, '.TextGrid')
-    tg <- rPraat::tg.read(tgfn)
+    if (!is.null(tg_obj)) {
+      tg <- tg_obj
+    } else if (file.exists(tgfn)) {
+      tg <- rPraat::tg.read(tgfn)
+    } else {
+      stop(paste('There is no TextGrid file available for this sound file.',
+                 'Either create the plot without a TextGrid by using the',
+                 'frames argument, create a TextGrid object using the',
+                 'make_TextGrid() function and pass it to the tg_obj argument,',
+                 'or create a TextGrid using Praat',
+                 'or the functionality available in the rPraat package.'))
+    }
+
     tgind <- which(frames == 'TextGrid')
     if (any(tg_tiers == 'all')) tg_tiers <- 1:length(tg)
     if (length(tg_tiers) > 1) {
