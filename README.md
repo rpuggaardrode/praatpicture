@@ -8,14 +8,14 @@
 
 If you’ve ever had to fiddle around with getting a Praat Picture to look
 and export just right in order to insert it in an R markdown file or
-slide deck, then this package is for you! It’s a simple set of functions
-designed to emulate some common plots made in Praat Picture with base R
-plotting. It allows for flexibly combining waveforms, spectrograms,
-TextGrids, pitch tracks, formant tracks, and intensity tracks in a
-single plot. Waveforms and spectrograms are generated directly in R (the
-latter using the function `phonTools::spectrogram()`, which takes some
-time to plot and looks a little different from an equivalent Praat
-spectrogram, but still looks quite nice!).
+slide deck, then this package is for you! Even if this isn’t the case,
+the package offers some very useful flexibility. It’s a simple set of
+functions designed to emulate some common plots made in Praat Picture
+with base R plotting. It allows for flexibly combining waveforms,
+spectrograms, TextGrids, pitch tracks, formant tracks, and intensity
+tracks in a single plot. The derived acoustic plots can all be generated
+directly in R, or (except in the case of spectrograms) generated in
+Praat.
 
 TextGrids can be plotted as long as there is a file with the `.TextGrid`
 extension in the same directory and with the same base name as the sound
@@ -23,11 +23,12 @@ file. If there are files with the `.PitchTier`, `.Formant`, and
 `.IntensityTier` extensions generated in Praat, these are loaded in
 using the `rPraat` package and used for plotting. Otherwise, signal
 processing functions from the `wrassp` package are used in a way that
-emulates Praat default settings as closely as possible.
+emulates Praat default settings as closely as possible. Spectrograms are
+generated with the `phonTools` package.
 
-Alternatively, if you are an `emuR` user, the `emupicture` function will
-help make Praat Picture style plots of sound files, annotations, and
-possibly SSFF files from an EMU-database.
+If you are an `emuR` user, the `emupicture` function will help make
+Praat Picture style plots of sound files, annotations, and possibly SSFF
+files from an EMU-database.
 
 If you run into bugs or have suggested changes, please let me know!
 
@@ -112,7 +113,7 @@ waveform in a different color than black, this is controlled with the
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(20,80),
-             wave_color='lightgrey')
+             wave_color='grey')
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="80%" />
@@ -143,10 +144,7 @@ of the tiers in the above plot. This should be `b_<`, which is the SAMPA
 character for a bilabial implosive, but Praat usually interprets a `_`
 as meaning that the following character should be subscripted, so
 `praatpicture` emulates this behavior by default. You can override this
-using the `tg_specialChar` argument as below. Text color can be
-controlled with the `tg_color` argument, which takes either a single
-string or a vector of strings, if you want different tiers to have
-different colors.
+using the `tg_specialChar` argument as below.
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
@@ -154,36 +152,54 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
              tg_alignment=c('right', 'left'), tg_specialChar=FALSE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="80%" /> Text
+color can be controlled with the `tg_color` argument, which takes either
+a single string or a vector of strings, if you want different tiers to
+have different colors. Focus tiers are shown as dotted black lines
+throughout all plot components by default, but the color and line type
+can be controlled with the `tg_focusTierColor` and
+`tg_focusTierLineType` arguments – if there are multiple focus tiers,
+line type and color can be varied. Below, we have dashed orange lines on
+top of black solid lines when segment and word boundaries coincide,
+using the same color scheme in the TextGrid itself.
+
+``` r
+praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+             tg_tiers=c(2,3), tg_focusTier='all', tg_specialChar=FALSE,
+             tg_focusTierColor=c('black', 'orange'), tg_color=c('black', 'orange'),
+             tg_focusTierLineType=c('solid', 'aa'))
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="80%" />
 
 ## The spectrogram
 
 Spectrograms are generated in R using the `phonTools` package. Default
-settings (and the settings that can be changed) are as close as possible
-to those in Praat. You can change frequency range with `spec_freqRange`
-and dynamic range with `spec_dynamicRange`:
+settings (and the other various possible settings) are as close as
+possible to those in Praat. You can change frequency range with
+`spec_freqRange` and dynamic range with `spec_dynamicRange`:
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'spectrogram'), proportion=c(40,60),
+             frames=c('sound', 'spectrogram'), proportion=c(30,70),
              spec_freqRange=c(0,8000), spec_dynamicRange=70)
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="80%" />
 
 You can also change the shape and length of windows used for the Fourier
 transformations, and the number of time steps at which spectra are
 generated. Note that not all window shapes offered by Praat are
 available in `phonTools`. Here is a broadband spectrogram using a
-Hamming window, just to show how this is implemented:
+Bartlett window:
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'spectrogram'), proportion=c(40,60),
-             spec_windowShape='Hamming', spec_windowLength=0.03)
+             frames=c('sound', 'spectrogram'), proportion=c(30,70),
+             spec_windowShape='Bartlett', spec_windowLength=0.03)
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="80%" />
 
 Spectrogram colors can be controlled with the `spec_color` argument
 which takes two or more strings giving the colors of low, high, and
@@ -191,12 +207,12 @@ optionally in-between frequencies:
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'spectrogram'), proportion=c(40,60),
+             frames=c('sound', 'spectrogram'), proportion=c(30,70),
              spec_color=c('darkblue', 'blue', 'cyan', 'yellow', 'orange', 
                           'brown', 'red'))
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="80%" />
 
 ## Pitch
 
@@ -207,7 +223,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
              frames=c('sound', 'pitch'), proportion=c(40,60))
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="80%" />
 
 As in Praat, we can change the plot type (line or speckle?), scale, and
 frequency range. Here is the same contour with a much narrower frequency
@@ -220,7 +236,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
              pitch_plotType='speckle')
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="80%" />
 
 If we want to use semitones instead of Hz, we can set a reference level
 with `pitch_semitonesRe`:
@@ -232,7 +248,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
              pitch_plotType='speckle', pitch_freqRange=c(-5,5))
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="80%" />
 
 In all the above pitch plots, the pitch tracks themselves have been
 taken from a Praat file called `1.PitchTier`. R knows that it should do
@@ -241,9 +257,8 @@ there is no equivalent `PitchTier` file available, namely `2.wav`:
 
 ``` r
 list.files('inst/extdata')
-#> [1] "1.Formant"         "1.IntensityTier"   "1.PitchTier"      
-#> [4] "1.TextGrid"        "1.wav"             "1_stereo.TextGrid"
-#> [7] "1_stereo.wav"      "2.fms"             "2.wav"
+#> [1] "1.Formant"       "1.IntensityTier" "1.PitchTier"     "1.TextGrid"     
+#> [5] "1.wav"           "2.wav"
 ```
 
 ``` r
@@ -253,11 +268,11 @@ praatpicture('inst/extdata/2.wav', start=0.7, end=1.2,
              pitch_plotType='speckle')
 ```
 
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-19-1.png" width="80%" />
 
 No complaints from `praatpicture`! In this case the pitch track is
 simply generated using the R-internal function `ksvF0()` from the
-`wrassp` package. Results won’t be identical to praat, because the
+`wrassp` package. Results won’t be identical to Praat, because the
 algorithms used to track pitch are different, but it should be
 reasonably close – parameters are set to mimic those of Praat as closely
 as possible, including using a Gaussian-like window shape. As in Praat,
@@ -273,7 +288,7 @@ praatpicture('inst/extdata/2.wav', start=0.7, end=1.2,
              pitch_plotType='speckle', pitch_floor=120, pitch_timeStep=0.005)
 ```
 
-<img src="man/figures/README-unnamed-chunk-19-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="80%" />
 
 ## Formants
 
@@ -281,7 +296,7 @@ Formants can be plotted like so:
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'formant'), proportion=c(40,60))
+             frames=c('sound', 'formant'), proportion=c(30,70))
 #> Registered S3 methods overwritten by 'gsignal':
 #>   method         from  
 #>   plot.grpdelay  signal
@@ -292,30 +307,32 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 #>   print.specgram signal
 ```
 
-<img src="man/figures/README-unnamed-chunk-20-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-21-1.png" width="80%" />
 
 As above, we can vary the plot type and frequency range like so:
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'formant'), proportion=c(40,60),
+             frames=c('sound', 'formant'), proportion=c(30,70),
              formant_plotType='draw', formant_freqRange=c(0,3000))
 ```
 
-<img src="man/figures/README-unnamed-chunk-21-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-22-1.png" width="80%" />
 
 If formants are speckled, we can also adjust the dynamic range, such
 that formants in frames with intensity below a certain threshold are not
 plotted. The default (as in Praat) is 30 dB, let’s try with 40, which
-should show more ‘hallucinated’ formants:
+should show more ‘hallucinated’ formants. This also shows how the dotted
+lines indicating multiples of 1,000 Hz can be omitted with the
+`formant_dottedLines` argument.
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'formant'), proportion=c(40,60),
-             formant_dynamicRange=40)
+             frames=c('sound', 'formant'), proportion=c(30,70),
+             formant_dynamicRange=40, formant_dottedLines = FALSE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-23-1.png" width="80%" />
 
 A special argument is the logical `formant_plotOnSpec`, which when used
 in combination with a spectrogram will plot formants on top of the
@@ -326,12 +343,12 @@ whether formants are plotted on their own or with a spectrogram.
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'spectrogram'), proportion=c(40,60),
+             frames=c('sound', 'spectrogram'), proportion=c(30,70),
              formant_plotOnSpec=TRUE, 
              formant_color=c('red', 'blue', 'white', 'green'))
 ```
 
-<img src="man/figures/README-unnamed-chunk-23-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-24-1.png" width="80%" />
 
 As we saw with pitch above, these formant tracks all come from a Praat
 file. If there wasn’t one available, formants would be tracked using the
@@ -339,10 +356,10 @@ file. If there wasn’t one available, formants would be tracked using the
 
 ``` r
 praatpicture('inst/extdata/2.wav', start=0.7, end=1.2, 
-             frames=c('sound', 'formant'), proportion=c(40,60))
+             frames=c('sound', 'formant'), proportion=c(30,70))
 ```
 
-<img src="man/figures/README-unnamed-chunk-24-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-25-1.png" width="80%" />
 
 Most of the arguments that can be changed in Praat can also be changed
 here, including the time step, maximum number of formants, and window
@@ -351,12 +368,12 @@ levels for the individual formants.
 
 ``` r
 praatpicture('inst/extdata/2.wav', start=0.7, end=1.2, 
-             frames=c('sound', 'formant'), proportion=c(40,60),
-             formant_maxN = 4, formant_timeStep=0.01,
+             frames=c('sound', 'formant'), proportion=c(30,70),
+             formant_maxN=4, formant_timeStep=0.01,
              formant_windowLength=0.05)
 ```
 
-<img src="man/figures/README-unnamed-chunk-25-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-26-1.png" width="80%" />
 
 In lieu of changing reference levels, a useful `forest()` argument which
 we can also set with `praatpicture` is `gender`, set here to reflect
@@ -364,12 +381,12 @@ that this is a female speaker:
 
 ``` r
 praatpicture('inst/extdata/2.wav', start=0.7, end=1.2, 
-             frames=c('sound', 'formant'), proportion=c(40,60),
-             formant_maxN = 4, formant_timeStep=0.01,
+             frames=c('sound', 'formant'), proportion=c(30,70),
+             formant_maxN=4, formant_timeStep=0.01,
              formant_windowLength=0.05, gender='f')
 ```
 
-<img src="man/figures/README-unnamed-chunk-26-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-27-1.png" width="80%" />
 
 ## Intensity
 
@@ -377,10 +394,10 @@ Intensity can be plotted like so:
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'intensity'), proportion=c(40,60))
+             frames=c('sound', 'intensity'), proportion=c(30,70))
 ```
 
-<img src="man/figures/README-unnamed-chunk-27-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-28-1.png" width="80%" />
 
 The plotting range can be changed with `intensity_range`. This is
 plotted from an `IntensityTier` Praat file – if one isn’t available, it
@@ -388,21 +405,21 @@ is calculated using the `rmsana()` function from `wrassp`:
 
 ``` r
 praatpicture('inst/extdata/2.wav', start=0.7, end=1.2, 
-             frames=c('sound', 'intensity'), proportion=c(40,60))
+             frames=c('sound', 'intensity'), proportion=c(30,70))
 ```
 
-<img src="man/figures/README-unnamed-chunk-28-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-29-1.png" width="80%" />
 
 As in Praat, we can edit time step and minimum pitch values. Here I’ve
 plotted it with a very low resolution just to demonstrate:
 
 ``` r
 praatpicture('inst/extdata/2.wav', start=0.7, end=1.2, 
-             frames=c('sound', 'intensity'), proportion=c(40,60),
+             frames=c('sound', 'intensity'), proportion=c(30,70),
              intensity_timeStep=0.05)
 ```
 
-<img src="man/figures/README-unnamed-chunk-29-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-30-1.png" width="80%" />
 
 ## Drawing rectangles and arrows
 
@@ -412,23 +429,25 @@ This is done using the base R plotting functions `rect()` and
 `arrows()`. It works like this: You pass the argument a vector
 containing first the plot component to draw on, and then further
 arguments you want to pass on to `rect()` or `arrows()`; the first four
-of these should be coordinates on the x and y axis. Here’s an example:
+of these should be coordinates on the x and y axis. Here’s an example
+which draws a rectangle on the spectrogram between 0.15–0.2 seconds, and
+between 500–4000 Hz.
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'spectrogram'), proportion=c(40,60),
+             frames=c('sound', 'spectrogram'), proportion=c(30,70),
              start_end_only=FALSE, min_max_only=FALSE,
              draw_rectangle=c('spectrogram', 0.15, 500, 0.2, 4000))
 ```
 
-<img src="man/figures/README-unnamed-chunk-30-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-31-1.png" width="80%" />
 
 If you want to draw multiple rectangles or multiple arrows, you can pass
 a list containing vectors with plotting information.
 
 ``` r
 praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
-             frames=c('sound', 'spectrogram'), proportion=c(40,60),
+             frames=c('sound', 'spectrogram'), proportion=c(30,70),
              start_end_only=FALSE, min_max_only=FALSE,
              draw_rectangle=list(
                c('spectrogram', 0.15, 500, 0.2, 4000, border='blue'),
@@ -437,7 +456,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
                           lwd=3))
 ```
 
-<img src="man/figures/README-unnamed-chunk-31-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-32-1.png" width="80%" />
 
 ## Plotting EMU data
 
@@ -456,7 +475,7 @@ library(emuR)
 create_emuRdemoData(tempdir())
 db_path <- paste0(tempdir(), '/emuR_demoData/ae_emuDB')
 db <- load_emuDB(db_path)
-#> INFO: Loading EMU database from C:\Users\RASMUS~1\AppData\Local\Temp\RtmpO4Ya4T/emuR_demoData/ae_emuDB... (7 bundles found)
+#> INFO: Loading EMU database from C:\Users\RASMUS~1\AppData\Local\Temp\Rtmp6l2ven/emuR_demoData/ae_emuDB... (7 bundles found)
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==========                                                            |  14%  |                                                                              |====================                                                  |  29%  |                                                                              |==============================                                        |  43%  |                                                                              |========================================                              |  57%  |                                                                              |==================================================                    |  71%  |                                                                              |============================================================          |  86%  |                                                                              |======================================================================| 100%
 ```
 
@@ -476,15 +495,15 @@ list_bundles(db)
 #> 7 0000    msajc057
 ```
 
-We can create a Praat Picture style plot of `msajc003` like so
-(selecting just a snippet of the file, and showing just two tiers,
+We can create a Praat Picture style plot of the bundle `msajc003` like
+so (selecting just a snippet of the file, and showing just two tiers,
 because there are a *lot* of annotation levels in this database)
 
 ``` r
 emupicture(db, bundle='msajc003', tg_tiers=c('Text', 'Tone'), start=0.2, end=1.2)
 ```
 
-<img src="man/figures/README-unnamed-chunk-34-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-35-1.png" width="80%" />
 
 All the plotting options we’ve seen above are also available with
 `emupicture()`. Additionally, if you have track data for pitch,
@@ -506,8 +525,8 @@ plot from an EMU-DB sound file using SSFF track data! Neat!
 
 ``` r
 emupicture(db, bundle='msajc003', frames=c('sound', 'formant'), 
-           proportion=c(40,60), start=0.2, end=1.2,
+           proportion=c(30,70), start=0.2, end=1.2,
            formant_ssffExt='fms')
 ```
 
-<img src="man/figures/README-unnamed-chunk-36-1.png" width="80%" />
+<img src="man/figures/README-unnamed-chunk-37-1.png" width="80%" />

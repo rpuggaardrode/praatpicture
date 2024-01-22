@@ -110,7 +110,7 @@ praatgif <- function(sound, width=800, height=500, frameRate=20, n_frames=50,
                      spec_timeStep=1000, pitch_timeStep=NULL, pitch_floor=50,
                      pitch_ceiling=600, pitch_freqRange=c(50,500),
                      pitch_semitonesRe=100, formant_timeStep=NULL,
-                     formant_windowLength=0.025, formant_dynamicRange=30,
+                     formant_windowLength=0.005, formant_dynamicRange=30,
                      formant_freqRange=c(50,5500), intensity_timeStep=NULL,
                      intensity_minPitch=100, intensity_range=NULL, ...) {
 
