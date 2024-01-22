@@ -27,7 +27,7 @@ praatpicture(
   tg_color = "black",
   spec_channel = 1,
   spec_freqRange = c(0, 5000),
-  spec_windowLength = 0.0025,
+  spec_windowLength = 0.005,
   spec_dynamicRange = 50,
   spec_timeStep = 1000,
   spec_windowShape = "Gaussian",

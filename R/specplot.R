@@ -130,7 +130,8 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
 
   spec <- phonTools::spectrogram(sig, sr, colors=F, show=F, timestep=ts,
                                  windowlength=wl, window=ws,
-                                 dynamicrange=dynamicRange)
+                                 dynamicrange=dynamicRange,
+                                 windowparameter=0.4)
 
   freqdom <- as.numeric(unlist(dimnames(spec$spectrogram)[2]))
   within_freqran <- which(freqdom < freqRange[2])
