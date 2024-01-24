@@ -19,6 +19,6 @@ May not work for all font families. Note that there's no Unicode small cap
 'X', so 'X' will just be converted to 'x'.
 }
 \examples{
-my_string <- 'ABCDEFGHIJKLM'
+my_string <- 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 conv2sc(my_string)
 }

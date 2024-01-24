@@ -24,7 +24,7 @@
 #' @param specialChar Logical; should Praat typesetting for special font types
 #' such as italic, bold, and small caps be converted into corresponding
 #' R-readable special font types. Default is `TRUE`.
-#' See [https://www.fon.hum.uva.nl/praat/manual/Text_styles.html].
+#' See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.
 #' @param color String or vector of strings giving the name of the color(s)
 #' to be used for the text in TextGrids. Default is `'black'`. If a vector is
 #' provided, different colors are used for different tiers.
@@ -34,9 +34,10 @@
 #' @export
 #'
 #' @examples
-#' #dont use directly
+#' # Don't use directly
 #' datapath <- system.file('extdata', package='praatpicture')
-#' praatpicture(paste0(datapath, '/1.wav'), frames='TextGrid')
+#' soundFile <- paste0(datapath, '/1.wav')
+#' praatpicture(soundFile, frames='TextGrid')
 tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
                    ind=NULL, nframe=NULL, alignment='central',
                    specialChar=TRUE, color='black', start_end_only=TRUE) {

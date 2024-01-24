@@ -20,7 +20,13 @@ this function directly, just use
 \code{praatpicture('my_sound_file', frames='TextGrid', tg_specialchar=TRUE)}.
 }
 \examples{
-#dont use directly
+# Don't use directly
 datapath <- system.file('extdata', package='praatpicture')
-praatpicture(paste0(datapath, '/1.wav'), frames='TextGrid')
+soundFile <- paste0(datapath, '/1.wav')
+
+# With stylized text
+praatpicture(soundFile, frames='TextGrid')
+
+# Without stylized text
+praatpicture(soundFile, frames='TextGrid', tg_specialChar=FALSE)
 }

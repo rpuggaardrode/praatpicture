@@ -41,9 +41,10 @@
 #' @export
 #'
 #' @examples
-#' #dont use directly
+#' # Don't use directly
 #' datapath <- system.file('extdata', package='praatpicture')
-#' praatpicture(paste0(datapath, '/1.wav'), frames='intensity')
+#' soundFile <- paste0(datapath, '/1.wav')
+#' praatpicture(soundFile, frames='intensity')
 intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                           focusTierColor='black', focusTierLineType='dotted',
                           range=NULL, color='black', ind=NULL, nframe=NULL,

@@ -19,8 +19,8 @@ praatpicture. Do not use directly, instead use \link{praatpicture} with the
 \code{draw_arrow} argument.
 }
 \examples{
-#dont use directly
+# Don't use directly
 datapath <- system.file('extdata', package='praatpicture')
-praatpicture(paste0(datapath, '/1.wav'), draw_arrow=c('spectrogram',
-0.1, 500, 0.4, 2000))
+soundFile <- paste0(datapath, '/1.wav')
+praatpicture(soundFile, draw_arrow=c('spectrogram', 0.1, 500, 0.4, 2000))
 }

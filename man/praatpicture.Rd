@@ -153,7 +153,7 @@ Alternatively, a vector of strings if different alignments are needed.}
 \item{tg_specialChar}{Logical; should Praat typesetting for special font types
 such as italic, bold, and small caps be converted into corresponding
 R-readable special font types. Default is \code{TRUE}.
-See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
+See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.}
 
 \item{tg_color}{String or vector of strings giving the name of the color(s)
 to be used for the text in TextGrids. Default is \code{'black'}. If a vector is
@@ -336,7 +336,11 @@ code portion that actually adds the spectrogram to a plot is based on
 \link[phonTools:spectrogram]{phonTools::plot.spectrogram} but rewritten to use a bitmap raster for
 rendering the image if the graphics device allows for it, which
 significantly speeds up rendering the spectrogram.
+
+For
 }
 \examples{
-praatpicture('inst/extdata/1.wav')
+datapath <- system.file('extdata', package='praatpicture')
+soundFile <- paste0(datapath, '/1.wav')
+praatpicture(soundFile)
 }

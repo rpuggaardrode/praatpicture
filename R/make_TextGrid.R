@@ -15,6 +15,10 @@
 #' another option is `spectrogram`. Note that spectrogram plotting is relatively
 #' slow within this function.
 #' @param channel Number indicating which audio channel to show. Default is `1`.
+#' @param sampa2ipa Logical; should SAMPA transcriptions be converted to IPA?
+#' Default is `FALSE`.
+#' @param audioInViewer Logical; should audio be playable from the Viewer pane
+#' in RStudio?
 #'
 #' @details Running this function will show either a waveform or a spectrogram
 #' in a separate `X11` graphics device window. Click on this figure in the
@@ -40,12 +44,34 @@
 #' @export
 #'
 #' @examples
-#' #not now
-make_TextGrid <- function(sound, tierNames, start=0, end=0,
-                          show='wave', channel=1) {
+#' \dontrun{
+#' datapath <- system.file('extdata', package='praatpicture')
+#' soundFile <- paste0(datapath, '/2.wav')
+#' tg <- make_TextGrid(soundFile, tierNames=c('Mary', 'John', 'Bell'))
+#' # Follow the steps shown in the console
+#'
+#' praatpicture(soundFile, tg_obj=tg)
+#' }
+make_TextGrid <- function(sound, tierNames, start=0, end=0, audioInViewer=TRUE,
+                          show='wave', channel=1, sampa2ipa=FALSE) {
+
+  if (audioInViewer) {
+    if (end == 0) end <- Inf
+    snd <- tuneR::readWave(sound, from=start, to=end, units='seconds')
+    tempDir <- tempfile()
+    dir.create(tempDir)
+    htmlFile <- file.path(tempDir, 'index.html')
+    wavFile <- file.path(tempDir, 'tmp.wav')
+    tuneR::writeWave(snd, filename=wavFile, extensible=FALSE)
+    writeLines(
+      text='<audio controls>\n<source src="tmp.wav" type="audio/wav">\n</audio>',
+      con=htmlFile)
+    rstudioapi::viewer(htmlFile)
+  }
+
   tg <- list()
   for (t in tierNames) {
-    tg[[t]] <- tg_createTier(sound, t, start, end, show, channel)
+    tg[[t]] <- tg_createTier(sound, t, start, end, show, channel, sampa2ipa)
   }
   return(tg)
 }

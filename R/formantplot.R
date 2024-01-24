@@ -51,9 +51,10 @@
 #' @export
 #'
 #' @examples
-#' #dont use directly
+#' # Don't use directly
 #' datapath <- system.file('extdata', package='praatpicture')
-#' praatpicture(paste0(datapath, '/1.wav'), frames='formant')
+#' soundFile <- paste0(datapath, '/1.wav')
+#' praatpicture(soundFile, frames='formant')
 formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         focusTierColor='black', focusTierLineType='dotted',
                         dynamicRange=30, freqRange=c(0,5500),

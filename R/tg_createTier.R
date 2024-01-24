@@ -13,6 +13,8 @@
 #' another option is `spectrogram`. Note that spectrogram plotting is relatively
 #' slow within this function.
 #' @param channel Number indicating which audio channel to show. Default is `1`.
+#' @param sampa2ipa Logical; should SAMPA transcriptions be converted to IPA?
+#' Default is `FALSE`.
 #'
 #' @return A list object identical to a single tier created by
 #' [rPraat::tg.read()] when
@@ -20,9 +22,18 @@
 #' @export
 #'
 #' @examples
-#' #not now
-tg_createTier <- function(sound, tierName, start=0, end=0,
-                          show='wave', channel=1) {
+#' \dontrun{
+#' # Don't use directly
+#' datapath <- system.file('extdata', package='praatpicture')
+#' soundFile <- paste0(datapath, '/2.wav')
+#' tg <- make_TextGrid(soundFile, tierNames='Mary')
+#' # Follow the steps shown in the console
+#'
+#' praatpicture(soundFile, tg_obj=tg)
+#' }
+tg_createTier <- function(sound, tierName, start=0, end=0, show='wave',
+                          channel=1, sampa2ipa=FALSE) {
+
   if (end == 0) end <- Inf
   snd <- tuneR::readWave(sound, from=start, to=end, units='seconds', toWaveMC=T)
   sig <- snd@.Data[,channel]
@@ -61,6 +72,7 @@ tg_createTier <- function(sound, tierName, start=0, end=0,
                                        length(tier$t1)-2, ': '))
     }
     tier$label <- c('', tier$label, '')
+    if (sampa2ipa) tier$label <- ipa::sampa(tier$label)
     if (show == 'wave') graphics::text(tier$t1+(tier$t2-tier$t1)/2, max(sig)*1.1,
                                        tier$label, font=2)
     if (show == 'spectrogram') graphics::text(tier$t1+(tier$t2-tier$t1)/2, 4500,
@@ -78,6 +90,7 @@ tg_createTier <- function(sound, tierName, start=0, end=0,
       tier$label[i] <- readline(paste0('Label ', i, ' of ',
                                        length(tier$t), ': '))
     }
+    if (sampa2ipa) tier$label <- ipa::sampa(tier$label)
     if (show == 'wave') graphics::text(tier$t, max(sig)*1.1, tier$label, font=2)
     if (show == 'spectrogram') graphics::text(tier$t, 4500, tier$label, font=2,
                                               col='blue')

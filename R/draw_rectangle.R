@@ -12,15 +12,15 @@
 #' @export
 #'
 #' @examples
-#' #dont use directly
+#' # Don't use directly
 #' datapath <- system.file('extdata', package='praatpicture')
-#' praatpicture(paste0(datapath, '/1.wav'), draw_rectangle=c('spectrogram',
-#' 0.1, 500, 0.4, 2000))
+#' soundFile <- paste0(datapath, '/1.wav')
+#' praatpicture(soundFile, draw_rectangle=c('spectrogram', 0.1, 500, 0.4, 2000))
 draw_rectangle <- function(plot_component, args) {
   r <- which(sapply(args, '[[', 1) == plot_component)
   for (i in r) {
     params <- args[[i]]
     params <- as.list(params[2:length(params)])
-    do.call(rect, params)
+    do.call(eval(parse(text='graphics::rect')), params)
   }
 }

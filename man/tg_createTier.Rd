@@ -4,7 +4,15 @@
 \alias{tg_createTier}
 \title{Interactively create a TextGrid tier}
 \usage{
-tg_createTier(sound, tierName, start = 0, end = 0, show = "wave", channel = 1)
+tg_createTier(
+  sound,
+  tierName,
+  start = 0,
+  end = 0,
+  show = "wave",
+  channel = 1,
+  sampa2ipa = FALSE
+)
 }
 \arguments{
 \item{sound}{String giving the file name of a sound file with the .wav
@@ -22,6 +30,9 @@ another option is \code{spectrogram}. Note that spectrogram plotting is relative
 slow within this function.}
 
 \item{channel}{Number indicating which audio channel to show. Default is \code{1}.}
+
+\item{sampa2ipa}{Logical; should SAMPA transcriptions be converted to IPA?
+Default is \code{FALSE}.}
 }
 \value{
 A list object identical to a single tier created by
@@ -33,5 +44,13 @@ Function for creating TextGrid tiers called by \link{make_TextGrid}. Instead of
 using this function directly, use \link{make_TextGrid}.
 }
 \examples{
-#not now
+\dontrun{
+# Don't use directly
+datapath <- system.file('extdata', package='praatpicture')
+soundFile <- paste0(datapath, '/2.wav')
+tg <- make_TextGrid(soundFile, tierNames='Mary')
+# Follow the steps shown in the console
+
+praatpicture(soundFile, tg_obj=tg)
+}
 }

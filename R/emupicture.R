@@ -21,7 +21,21 @@
 #' @export
 #'
 #' @examples
-#' #not now
+#' \dontrun{
+#' # Create demo data and load demo database
+#' emuR::create_emuRdemoData(tempdir())
+#' db_path <- paste0(tempdir(), '/emuR_demoData/ae_emuDB')
+#' db <- emuR::load_emuDB(db_path)
+#'
+#' emuR::list_bundles(db)
+#' emupicture(db, bundle='msajc003', tg_tiers=c('Text', 'Tone'))
+#'
+#' # Plot SSFF track data
+#'
+#' emuR::list_ssffTrackDefinitions(db)
+#' emupicture(db, bundle='msajc003', frames=c('sound', 'formant'),
+#' proportion=c(30,70), formant_ssffExt='fms')
+#' }
 emupicture <- function(db_handle, session='0000', bundle,
                        pitch_ssffExt=NULL, formant_ssffExt=NULL,
                        intensity_ssffExt=NULL, ...) {

@@ -68,7 +68,7 @@
 #' @param tg_specialChar Logical; should Praat typesetting for special font types
 #' such as italic, bold, and small caps be converted into corresponding
 #' R-readable special font types. Default is `TRUE`.
-#' See [https://www.fon.hum.uva.nl/praat/manual/Text_styles.html].
+#' See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.
 #' @param tg_tierNames Logical; should TextGrid tier names be printed along the
 #' y-axis? Default is `TRUE`.
 #' @param tg_color String or vector of strings giving the name of the color(s)
@@ -206,10 +206,14 @@
 #' rendering the image if the graphics device allows for it, which
 #' significantly speeds up rendering the spectrogram.
 #'
+#' For
+#'
 #' @export
 #'
 #' @examples
-#' praatpicture('inst/extdata/1.wav')
+#' datapath <- system.file('extdata', package='praatpicture')
+#' soundFile <- paste0(datapath, '/1.wav')
+#' praatpicture(soundFile)
 praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          frames=c('sound', 'spectrogram', 'TextGrid'),
                          proportion=c(30,50,20), mainTitle='',

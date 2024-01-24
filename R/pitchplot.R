@@ -51,9 +51,10 @@
 #' @export
 #'
 #' @examples
-#' #dont use directly
+#' # Don't use directly
 #' datapath <- system.file('extdata', package='praatpicture')
-#' praatpicture(paste0(datapath, '/1.wav'), frames='pitch')
+#' soundFile <- paste0(datapath, '/1.wav')
+#' praatpicture(soundFile, frames='pitch')
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       focusTierColor='black', focusTierLineType='dotted',
                       plotType='draw', scale='hz', freqRange=c(50,500),

@@ -77,7 +77,8 @@ using this function directly, just use
 \code{praatpicture('my_sound_file', frames='intensity')}.
 }
 \examples{
-#dont use directly
+# Don't use directly
 datapath <- system.file('extdata', package='praatpicture')
-praatpicture(paste0(datapath, '/1.wav'), frames='intensity')
+soundFile <- paste0(datapath, '/1.wav')
+praatpicture(soundFile, frames='intensity')
 }

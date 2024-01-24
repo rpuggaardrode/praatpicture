@@ -51,7 +51,7 @@ Alternatively, a vector of strings if different alignments are needed.}
 \item{specialChar}{Logical; should Praat typesetting for special font types
 such as italic, bold, and small caps be converted into corresponding
 R-readable special font types. Default is \code{TRUE}.
-See \link{https://www.fon.hum.uva.nl/praat/manual/Text_styles.html}.}
+See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.}
 
 \item{color}{String or vector of strings giving the name of the color(s)
 to be used for the text in TextGrids. Default is \code{'black'}. If a vector is
@@ -66,7 +66,8 @@ this function directly, just use
 \code{praatpicture('my_sound_file', frames='TextGrid')}.
 }
 \examples{
-#dont use directly
+# Don't use directly
 datapath <- system.file('extdata', package='praatpicture')
-praatpicture(paste0(datapath, '/1.wav'), frames='TextGrid')
+soundFile <- paste0(datapath, '/1.wav')
+praatpicture(soundFile, frames='TextGrid')
 }

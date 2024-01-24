@@ -4,7 +4,16 @@
 \alias{make_TextGrid}
 \title{Interactively create a TextGrid object}
 \usage{
-make_TextGrid(sound, tierNames, start = 0, end = 0, show = "wave", channel = 1)
+make_TextGrid(
+  sound,
+  tierNames,
+  start = 0,
+  end = 0,
+  audioInViewer = TRUE,
+  show = "wave",
+  channel = 1,
+  sampa2ipa = FALSE
+)
 }
 \arguments{
 \item{sound}{String giving the file name of a sound file with the .wav
@@ -18,11 +27,17 @@ the new TextGrid object.}
 \item{end}{End time (in seconds) of desired plotted area. Default is \code{0}
 (= the entire file).}
 
+\item{audioInViewer}{Logical; should audio be playable from the Viewer pane
+in RStudio?}
+
 \item{show}{String giving the type of plot to show. Default is \code{wave},
 another option is \code{spectrogram}. Note that spectrogram plotting is relatively
 slow within this function.}
 
 \item{channel}{Number indicating which audio channel to show. Default is \code{1}.}
+
+\item{sampa2ipa}{Logical; should SAMPA transcriptions be converted to IPA?
+Default is \code{FALSE}.}
 }
 \value{
 A list object identical to those created by \code{\link[rPraat:tg.read]{rPraat::tg.read()}} when
@@ -52,7 +67,14 @@ If you are creating a TextGrid with multiple tiers (i.e., if \code{tierNames}
 is longer than 1), this process will be repeated for all tiers.
 }
 \examples{
-#not now
+\dontrun{
+datapath <- system.file('extdata', package='praatpicture')
+soundFile <- paste0(datapath, '/2.wav')
+tg <- make_TextGrid(soundFile, tierNames=c('Mary', 'John', 'Bell'))
+# Follow the steps shown in the console
+
+praatpicture(soundFile, tg_obj=tg)
+}
 }
 \seealso{
 \code{make_TextGrid()} is largely a wrapper around the function

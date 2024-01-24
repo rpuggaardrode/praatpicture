@@ -39,7 +39,21 @@ Generate plots in the style of Praat Pictures from sound files and annotations
 in an EMU database.
 }
 \examples{
-#not now
+\dontrun{
+# Create demo data and load demo database
+emuR::create_emuRdemoData(tempdir())
+db_path <- paste0(tempdir(), '/emuR_demoData/ae_emuDB')
+db <- emuR::load_emuDB(db_path)
+
+emuR::list_bundles(db)
+emupicture(db, bundle='msajc003', tg_tiers=c('Text', 'Tone'))
+
+# Plot SSFF track data
+
+emuR::list_ssffTrackDefinitions(db)
+emupicture(db, bundle='msajc003', frames=c('sound', 'formant'),
+proportion=c(30,70), formant_ssffExt='fms')
+}
 }
 \seealso{
 See \link{praatpicture} for more details on how to customize plots.

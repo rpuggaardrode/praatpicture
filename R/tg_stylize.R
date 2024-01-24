@@ -12,12 +12,17 @@
 #' @export
 #'
 #' @examples
-#' #dont use directly
+#' # Don't use directly
 #' datapath <- system.file('extdata', package='praatpicture')
-#' praatpicture(paste0(datapath, '/1.wav'), frames='TextGrid')
+#' soundFile <- paste0(datapath, '/1.wav')
+#'
+#' # With stylized text
+#' praatpicture(soundFile, frames='TextGrid')
+#'
+#' # Without stylized text
+#' praatpicture(soundFile, frames='TextGrid', tg_specialChar=FALSE)
 tg_stylize <- function(lab) {
   x <- list()
-
 
   for (l in 1:length(lab)) {
     if (lab[l] != '') {
