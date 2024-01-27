@@ -27,10 +27,10 @@
 #' pitch plots. Default is `hz`; other options are `logarithmic` (also in Hz),
 #' `semitones`, `erb`, and `mel`.
 #' @param freqRange Vector of two integers giving the frequency range to be
-#' used for producing pitch plots. Default is `c(50,500)`. If the frequency
-#' scales `semitones` or `erb` are used, the pitch range is automatically reset
-#' to the Praat defaults for these scales (`c(-12,30)` and `c(0,10)`,
-#' respectively).
+#' used for producing pitch plots. Default is `NULL`, in which case the pitch
+#' range is automatically reset to `c(-12,30)` for the `semitones` scale,
+#' `c(0,10)` for the `erb` scale, and `c(50,500)` for the Hz-based scales,
+#' following Praat defaults.
 #' @param semitonesRe Frequency in Hz giving the reference level for converting
 #' pitch frequency to semitones. Default is `100`.
 #' @param color String giving the name of the color to be used for
@@ -57,7 +57,7 @@
 #' praatpicture(soundFile, frames='pitch')
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       focusTierColor='black', focusTierLineType='dotted',
-                      plotType='draw', scale='hz', freqRange=c(50,500),
+                      plotType='draw', scale='hz', freqRange=NULL,
                       semitonesRe=100, color='black', ind=NULL, nframe=NULL,
                       start_end_only=TRUE, min_max_only=TRUE,
                       axisLabel=NULL) {
@@ -66,34 +66,10 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     stop('Please select either draw or speckle as the pitch plot type')
   }
 
-  legal_scales <- c('hz', 'logarithmic', 'semitones', 'erb', 'mel')
-  if (!scale %in% legal_scales) {
-    stop('Possible pitch scales are hz, logarithmic, semitones, erb, and mel')
-  }
-
-  axlab <- 'Frequency (Hz)'
-
   if (scale == 'logarithmic') {
     logsc <- 'y'
   } else {
     logsc <- ''
-  }
-
-  if (scale == 'semitones') {
-    pt <- rPraat::pt.Hz2ST(pt, ref=semitonesRe)
-    frequencyRange <- c(-12,30)
-    axlab <- paste('Frequency (semitones re ', semitonesRe, ')')
-  }
-
-  if (scale == 'mel') {
-    pt$f <- emuR::mel(pt$f)
-    axlab <- 'Frequency (mel)'
-  }
-
-  if (scale == 'erb') {
-    pt$f <- soundgen::HzToERB(pt$f)
-    freqRange <- c(0,10)
-    axlab <- 'Frequency (ERB)'
   }
 
   if (!min_max_only[ind]) {
@@ -124,8 +100,6 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   } else {
     xax <- 'n'
   }
-
-  if (!is.null(axisLabel)) axlab <- axisLabel
 
   if (plotType == 'draw') {
     diffs <- diff(pt$t) - min(diff(pt$t))
@@ -159,7 +133,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                          lty=focusTierLineType[i])
       }
     }
-    graphics::mtext(axlab, side=2, line=3.5, cex=0.8)
+    graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
   if (plotType == 'speckle') {
@@ -177,6 +151,6 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                          lty=focusTierLineType[i])
       }
     }
-    graphics::mtext(axlab, side=2, line=3.5, cex=0.8)
+    graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 }

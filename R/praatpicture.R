@@ -109,10 +109,10 @@
 #' pitch plots. Default is `hz`; other options are `logarithmic` (also in Hz),
 #' `semitones`, `erb`, and `mel`.
 #' @param pitch_freqRange Vector of two integers giving the frequency range to be
-#' used for producing pitch plots. Default is `c(50,500)`. If the frequency
-#' scales `semitones` or `erb` are used, the pitch range is automatically reset
-#' to the Praat defaults for these scales (`c(-12,30)` and `c(0,10)`,
-#' respectively).
+#' used for producing pitch plots. Default is `NULL`, in which case the pitch
+#' range is automatically reset to `c(-12,30)` for the `semitones` scale,
+#' `c(0,10)` for the `erb` scale, and `c(50,500)` for the Hz-based scales,
+#' following Praat defaults.
 #' @param pitch_semitonesRe Frequency in Hz giving the reference level for
 #' converting pitch frequency to semitones. Default is `100`.
 #' @param pitch_color String giving the name of the color to be used for
@@ -232,7 +232,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          spec_axisLabel='Frequency (Hz)',
                          pitch_timeStep=NULL, pitch_floor=75, pitch_ceiling=600,
                          pitch_plotType='draw', pitch_scale='hz',
-                         pitch_freqRange=c(50,500), pitch_semitonesRe=100,
+                         pitch_freqRange=NULL, pitch_semitonesRe=100,
                          pitch_color='black', pitch_ssff=NULL,
                          pitch_axisLabel=NULL,
                          formant_timeStep=NULL, formant_maxN=5,
@@ -256,6 +256,13 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   if (any(!frames %in% legal_frames)) {
     stop('Currently available frames are sound, TextGrid, spectrogram, formant, ',
          'pitch, and intensity')
+  }
+  legal_scales <- c('hz', 'logarithmic', 'semitones', 'erb', 'mel')
+  if (!pitch_scale %in% legal_scales) {
+    stop('Possible pitch scales are hz, logarithmic, semitones, erb, and mel')
+  }
+  if (!pitch_plotType %in% c('draw', 'speckle')) {
+    stop('Please select either draw or speckle as the pitch plot type')
   }
   if (sum(proportion) != 100) {
     stop('The numbers in proportion should sum up to 100')
@@ -381,6 +388,23 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   }
 
   if ('pitch' %in% frames) {
+    if (is.null(pitch_freqRange)) {
+      if (pitch_scale == 'erb') {
+        pitch_freqRange <- c(0,10)
+      } else if (pitch_scale == 'semitones') {
+        pitch_freqRange <- c(-12,30)
+      } else {
+        pitch_freqRange <- c(50,500)
+      }
+    }
+    if (is.null(pitch_axisLabel)) {
+      if (pitch_scale == 'hz') pitch_axisLabel <- 'Frequency (Hz)'
+      if (pitch_scale == 'logarithmic') pitch_axisLabel <- 'Frequency (log Hz)'
+      if (pitch_scale == 'mel') pitch_axisLabel <- 'Frequency (mel)'
+      if (pitch_scale == 'erb') pitch_axisLabel <- 'Frequency (ERB)'
+      if (pitch_scale == 'semitones') pitch_axisLabel <-
+          paste0('Frequency (semitones re ', pitch_semitonesRe, ')')
+    }
     if (file.exists(paste0(fn, '.PitchTier'))) {
       ptfn <- paste0(fn, '.PitchTier')
       pt <- rPraat::pt.read(ptfn)
@@ -406,6 +430,10 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       f <- f[-del]
       t <- t[-del]
       pt <- list(t = t, f = f)
+
+      if (scale == 'semitones') pt <- rPraat::pt.Hz2ST(pt, ref=semitonesRe)
+      if (scale == 'mel') pt$f <- emuR::mel(pt$f)
+      if (scale == 'erb') pt$f <- soundgen::HzToERB(pt$f)
     }
   }
 
