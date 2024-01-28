@@ -39,9 +39,10 @@ praatpicture(
   pitch_ceiling = 600,
   pitch_plotType = "draw",
   pitch_scale = "hz",
-  pitch_freqRange = c(50, 500),
+  pitch_freqRange = NULL,
   pitch_semitonesRe = 100,
   pitch_color = "black",
+  pitch_plotOnSpec = FALSE,
   pitch_ssff = NULL,
   pitch_axisLabel = NULL,
   formant_timeStep = NULL,
@@ -59,11 +60,13 @@ praatpicture(
   intensity_minPitch = 100,
   intensity_range = NULL,
   intensity_color = "black",
+  intensity_plotOnSpec = FALSE,
   intensity_ssff = NULL,
   intensity_axisLabel = "Intensity (dB)",
   time_axisLabel = "Time (s)",
   draw_rectangle = NULL,
   draw_arrow = NULL,
+  annotate = NULL,
   gender = "u",
   ...
 )
@@ -207,23 +210,28 @@ pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in
 \code{semitones}, \code{erb}, and \code{mel}.}
 
 \item{pitch_freqRange}{Vector of two integers giving the frequency range to be
-used for producing pitch plots. Default is \code{c(50,500)}. If the frequency
-scales \code{semitones} or \code{erb} are used, the pitch range is automatically reset
-to the Praat defaults for these scales (\code{c(-12,30)} and \code{c(0,10)},
-respectively).}
+used for producing pitch plots. Default is \code{NULL}, in which case the pitch
+range is automatically reset to \code{c(-12,30)} for the \code{semitones} scale,
+\code{c(0,10)} for the \code{erb} scale, and \code{c(50,500)} for the Hz-based scales,
+following Praat defaults.}
 
 \item{pitch_semitonesRe}{Frequency in Hz giving the reference level for
 converting pitch frequency to semitones. Default is \code{100}.}
 
 \item{pitch_color}{String giving the name of the color to be used for
-plotting pitch. Default is \code{'black'}.}
+plotting pitch. Default is \code{'black'}. If \code{pitch_plotOnSpec=TRUE}, axes will
+follow the same color scheme.}
+
+\item{pitch_plotOnSpec}{Boolean; should pitch be plotted on top of
+spectrogram? Default is \code{FALSE}.}
 
 \item{pitch_ssff}{An object of class \code{AsspDataObj} containing a pitch track.
 Default is \code{NULL}.}
 
 \item{pitch_axisLabel}{String giving the name of the label to print along the
 y-axis when printing a pitch track. Default is \code{NULL}, in which case the
-axis label will depend on the scale.}
+axis label will depend on the scale. If \code{pitch_plotOnSpec=TRUE}, this label
+will be printed on the right-hand y-axis label.}
 
 \item{formant_timeStep}{Measurement interval in seconds for tracking formants.
 Default is \code{NULL}, in which case the measurement interval is equal to
@@ -277,13 +285,20 @@ used for producing intensity plots. Default is \code{NULL}, in which case the
 range is simply the minimum and maximum levels in the curve.}
 
 \item{intensity_color}{String giving the name of the color to be used for
-plotting intensity. Default is \code{'black'}.}
+plotting intensity. Default is \code{'black'}.
+If \code{intensity_plotOnSpec=TRUE}, axes will
+follow the same color scheme.}
+
+\item{intensity_plotOnSpec}{Boolean; should intensity be plotted on top of
+spectrogram? Default is \code{FALSE}.}
 
 \item{intensity_ssff}{An object of class \code{AsspDataObj} containing intensity
 tracks. Default is \code{NULL}.}
 
 \item{intensity_axisLabel}{String giving the name of the label to print along
-the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
+the y-axis when plotting intensity. Default is \code{Intensity (dB)}.
+If \code{intensity_plotOnSpec=TRUE}, this label
+will be printed on the right-hand y-axis label.}
 
 \item{time_axisLabel}{String giving the name of the label to print along
 the x-axis. Default is \code{Time (s)}.}
@@ -300,6 +315,13 @@ containing a) a string giving the plot component to draw an arrow on, and
 b) arguments to pass on to \link[graphics:arrows]{graphics::arrows}. Alternatively a list of
 such vectors, if more arrows should be drawn. If multiple audio
 channels are plotted and an arrow should be added to one of these,
+use the channel identifier instead of a string giving the frame to draw on.}
+
+\item{annotate}{Use for annotating plot components. A vector containing
+a) a string giving the plot component to annotate, and
+b) arguments to pass on to \link[graphics:text]{graphics::text}. Alternatively a list of
+such vectors, if more annotations should be made. If multiple audio
+channels are plotted and annotations should be added to one of these,
 use the channel identifier instead of a string giving the frame to draw on.}
 
 \item{gender}{String indicating the gender of the speaker; default is

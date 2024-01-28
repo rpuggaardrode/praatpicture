@@ -51,10 +51,6 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                           start_end_only=TRUE, min_max_only=TRUE,
                           axisLabel='Intensity (dB)') {
 
-  if (is.null(range)) {
-    range <- c(min(it$i), max(it$i))
-  }
-
   if (!min_max_only[ind]) {
     if (ind == 1) {
       yax <- 's'

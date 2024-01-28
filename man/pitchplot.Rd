@@ -15,7 +15,7 @@ pitchplot(
   focusTierLineType = "dotted",
   plotType = "draw",
   scale = "hz",
-  freqRange = c(50, 500),
+  freqRange = NULL,
   semitonesRe = 100,
   color = "black",
   ind = NULL,
@@ -59,10 +59,10 @@ pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in
 \code{semitones}, \code{erb}, and \code{mel}.}
 
 \item{freqRange}{Vector of two integers giving the frequency range to be
-used for producing pitch plots. Default is \code{c(50,500)}. If the frequency
-scales \code{semitones} or \code{erb} are used, the pitch range is automatically reset
-to the Praat defaults for these scales (\code{c(-12,30)} and \code{c(0,10)},
-respectively).}
+used for producing pitch plots. Default is \code{NULL}, in which case the pitch
+range is automatically reset to \code{c(-12,30)} for the \code{semitones} scale,
+\code{c(0,10)} for the \code{erb} scale, and \code{c(50,500)} for the Hz-based scales,
+following Praat defaults.}
 
 \item{semitonesRe}{Frequency in Hz giving the reference level for converting
 pitch frequency to semitones. Default is \code{100}.}

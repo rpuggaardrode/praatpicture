@@ -18,8 +18,10 @@ waveplot(
   nframe = NULL,
   rect_comp = NULL,
   arr_comp = NULL,
+  annot_comp = NULL,
   draw_rectangle = NULL,
   draw_arrow = NULL,
+  annotate = NULL,
   channelNames = FALSE,
   cn = NULL,
   start_end_only = TRUE,
@@ -60,16 +62,22 @@ Default is \code{NULL}.}
 \item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
 
 \item{rect_comp}{Vector of strings or numbers giving plot components to draw
-rectangles on.}
+rectangles on. Default is \code{NULL}.}
 
 \item{arr_comp}{Vector of strings of numbers giving plot components to draw
-arrows on.}
+arrows on. Default is \code{NULL}.}
+
+\item{annot_comp}{Vector of strings of numbers giving plot components to
+annotate. Default is \code{NULL}.}
 
 \item{draw_rectangle}{List of arguments for drawing rectangles passed from
-\code{praatpicture()}.}
+\code{praatpicture()}. Default is \code{NULL}.}
 
 \item{draw_arrow}{List of arguments for drawing arrows passed from
-\code{praatpicture()}.}
+\code{praatpicture()}. Default is \code{NULL}.}
+
+\item{annotate}{List of arguments for annotating passed from
+\code{praatpicture()}. Default is \code{NULL}.}
 
 \item{channelNames}{Logical; should names of audio channels be printed on
 the y-axis? Default is \code{FALSE}.}

@@ -17,11 +17,23 @@ specplot(
   timeStep = 1000,
   windowShape = "Gaussian",
   colors = c("white", "black"),
+  pitch_plotOnSpec = FALSE,
+  pt = NULL,
+  pitch_plotType = "draw",
+  pitch_scale = "hz",
+  pitch_freqRange = NULL,
+  pitch_axisLabel = NULL,
+  pitch_color = "black",
   formant_plotOnSpec = FALSE,
   fm = NULL,
-  formant_plotType = "draw",
+  formant_plotType = "speckle",
   formant_dynamicRange = 30,
   formant_color = "black",
+  intensity_plotOnSpec = FALSE,
+  it = NULL,
+  intensity_range = NULL,
+  intensity_axisLabel = "Intensity (dB)",
+  intensity_color = "black",
   tgbool = FALSE,
   lines = NULL,
   focusTierColor = "black",
@@ -71,10 +83,36 @@ value is used for plotting the lowest visible amplitude, and the last for
 plotting the highest visible amplitude. Vectors with more than two color
 names can be used for plotting values in between in different colors.}
 
+\item{pitch_plotOnSpec}{Boolean; should pitch be plotted on top of
+spectrogram? Default is \code{FALSE}.}
+
+\item{pt}{Pitch object loaded using \link[rPraat:formant.read]{rPraat::formant.read} or similar object.}
+
+\item{pitch_plotType}{String giving the type of pitch plot to produce; default
+is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}
+
+\item{pitch_scale}{String giving the frequency scale to use when producing
+pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in Hz),
+\code{semitones}, \code{erb}, and \code{mel}.}
+
+\item{pitch_freqRange}{Vector of two integers giving the frequency range to be
+used for producing pitch plots. Default is \code{NULL}, in which case the pitch
+range is automatically reset to \code{c(-12,30)} for the \code{semitones} scale,
+\code{c(0,10)} for the \code{erb} scale, and \code{c(50,500)} for the Hz-based scales,
+following Praat defaults.}
+
+\item{pitch_axisLabel}{String giving the name of the label to print along the
+y-axis when printing a pitch track. Default is \code{NULL}, in which case the
+axis label will depend on the scale.}
+
+\item{pitch_color}{String giving the name of the color to be used for
+plotting pitch. Default is \code{'black'}.}
+
 \item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
-\item{fm}{Formant object loaded using \link[rPraat:formant.read]{rPraat::formant.read}}
+\item{fm}{Formant object loaded using \link[rPraat:formant.read]{rPraat::formant.read} or similar
+object.}
 
 \item{formant_plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
@@ -89,6 +127,21 @@ intensity. Default is \code{30}. If set to \code{0}, all formants are shown.}
 colors to be used for plotting formants. If one color is provided, all
 formants will be plotted in this color. If multiple colors are provided,
 different formants will be shown in different colors. Default is \code{'black'}.}
+
+\item{intensity_plotOnSpec}{Boolean; should intensity be plotted on top of
+spectrogram? Default is \code{FALSE}.}
+
+\item{it}{Intensity object loaded using \link[rPraat:it.read]{rPraat::it.read} or similar object.}
+
+\item{intensity_range}{Vector of two integers giving the intensity range to be
+used for producing intensity plots. Default is \code{NULL}, in which case the
+range is simply the minimum and maximum levels in the curve.}
+
+\item{intensity_axisLabel}{String giving the name of the label to print along
+the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
+
+\item{intensity_color}{String giving the name of the color to be used for
+plotting intensity. Default is \code{'black'}.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}
@@ -128,7 +181,8 @@ this function directly, just use
 \code{praatpicture('my_sound_file', frames='spectrogram')}.
 }
 \examples{
-#dont use directly
+# Don't use directly
 datapath <- system.file('extdata', package='praatpicture')
-praatpicture(paste0(datapath, '/1.wav'), frames='spectrogram')
+soundFile <- paste0(datapath, '/1.wav')
+praatpicture(soundFile, frames='spectrogram')
 }

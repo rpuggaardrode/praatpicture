@@ -29,9 +29,28 @@
 #' value is used for plotting the lowest visible amplitude, and the last for
 #' plotting the highest visible amplitude. Vectors with more than two color
 #' names can be used for plotting values in between in different colors.
+#' @param pitch_plotOnSpec Boolean; should pitch be plotted on top of
+#' spectrogram? Default is `FALSE`.
+#' @param pt Pitch object loaded using [rPraat::formant.read] or similar object.
+#' @param pitch_plotType String giving the type of pitch plot to produce; default
+#' is `draw` (a line plot), the only other option is `speckle` (a point plot).
+#' @param pitch_scale String giving the frequency scale to use when producing
+#' pitch plots. Default is `hz`; other options are `logarithmic` (also in Hz),
+#' `semitones`, `erb`, and `mel`.
+#' @param pitch_freqRange Vector of two integers giving the frequency range to be
+#' used for producing pitch plots. Default is `NULL`, in which case the pitch
+#' range is automatically reset to `c(-12,30)` for the `semitones` scale,
+#' `c(0,10)` for the `erb` scale, and `c(50,500)` for the Hz-based scales,
+#' following Praat defaults.
+#' @param pitch_axisLabel String giving the name of the label to print along the
+#' y-axis when printing a pitch track. Default is `NULL`, in which case the
+#' axis label will depend on the scale.
+#' @param pitch_color String giving the name of the color to be used for
+#' plotting pitch. Default is `'black'`.
 #' @param formant_plotOnSpec Boolean; should formants be plotted on top of
 #' spectrogram? Default is `FALSE`.
-#' @param fm Formant object loaded using [rPraat::formant.read]
+#' @param fm Formant object loaded using [rPraat::formant.read] or similar
+#' object.
 #' @param formant_plotType String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
 #' plot).
@@ -43,6 +62,16 @@
 #' colors to be used for plotting formants. If one color is provided, all
 #' formants will be plotted in this color. If multiple colors are provided,
 #' different formants will be shown in different colors. Default is `'black'`.
+#' @param intensity_plotOnSpec Boolean; should intensity be plotted on top of
+#' spectrogram? Default is `FALSE`.
+#' @param it Intensity object loaded using [rPraat::it.read] or similar object.
+#' @param intensity_range Vector of two integers giving the intensity range to be
+#' used for producing intensity plots. Default is `NULL`, in which case the
+#' range is simply the minimum and maximum levels in the curve.
+#' @param intensity_axisLabel String giving the name of the label to print along
+#' the y-axis when plotting intensity. Default is `Intensity (dB)`.
+#' @param intensity_color String giving the name of the color to be used for
+#' plotting intensity. Default is `'black'`.
 #' @param tgbool Logical; should dotted lines be plotted corresponding to
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
@@ -70,15 +99,23 @@
 #' @export
 #'
 #' @examples
-#' #dont use directly
+#' # Don't use directly
 #' datapath <- system.file('extdata', package='praatpicture')
-#' praatpicture(paste0(datapath, '/1.wav'), frames='spectrogram')
+#' soundFile <- paste0(datapath, '/1.wav')
+#' praatpicture(soundFile, frames='spectrogram')
 specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                      windowLength=0.005, dynamicRange=60, timeStep=1000,
                      windowShape='Gaussian', colors=c('white', 'black'),
+                     pitch_plotOnSpec=FALSE, pt=NULL,
+                     pitch_plotType='draw', pitch_scale='hz',
+                     pitch_freqRange=NULL, pitch_axisLabel=NULL,
+                     pitch_color='black',
                      formant_plotOnSpec=FALSE, fm=NULL,
-                     formant_plotType='draw', formant_dynamicRange=30,
+                     formant_plotType='speckle', formant_dynamicRange=30,
                      formant_color='black',
+                     intensity_plotOnSpec=FALSE, it=NULL, intensity_range=NULL,
+                     intensity_axisLabel='Intensity (dB)',
+                     intensity_color='black',
                      tgbool=FALSE, lines=NULL, focusTierColor='black',
                      focusTierLineType='dotted', ind=NULL, nframe=NULL,
                      start_end_only=TRUE, min_max_only=TRUE,
@@ -168,7 +205,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
   yVals <- seq(freqRange[1], freqRange[2], length.out=specDims[2])
 
   graphics::image(x=xVals, y=yVals, z=spec$spectrogram,
-        col=fillCol, useRaster=TRUE, add=TRUE)
+                  col=fillCol, useRaster=TRUE, add=TRUE)
   graphics::box()
 
   if (formant_plotOnSpec) {
@@ -199,6 +236,89 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
         graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
                          col=formant_color[i])
       }
+    }
+  }
+
+  if (pitch_plotOnSpec) {
+    pfr <- pitch_freqRange
+    if (tfrom0) pt$t <- pt$t - org_start
+    if (pitch_scale == 'logarithmic') {
+      pt$f <- log(pt$f)
+      pfr <- log(pitch_freqRange)
+    }
+    sRan <- freqRange[2] - freqRange[1]
+    pRan <- pfr[2] - pfr[1]
+    multiplier <- sRan / pRan
+    pt$f <- (pt$f - pfr[1]) * multiplier
+
+    if (pitch_plotType == 'draw') {
+      diffs <- diff(pt$t) - min(diff(pt$t))
+      gaps <- which(diffs > min(diff(pt$t)))
+      gaps <- c(gaps, length(pt$t))
+      sep_lines_t <- list()
+      sep_lines_f <- list()
+      i <- 1
+      for (g in 1:length(gaps)) {
+        sep_lines_t[[g]] <- pt$t[i:gaps[g]]
+        sep_lines_f[[g]] <- pt$f[i:gaps[g]]
+        i <- 1 + gaps[g]
+      }
+
+      graphics::lines(sep_lines_t[[1]], sep_lines_f[[1]], col=pitch_color)
+      if (length(sep_lines_t) > 1) {
+        for (i in 2:length(sep_lines_t)) {
+          graphics::lines(sep_lines_t[[i]], sep_lines_f[[i]], col=pitch_color)
+        }
+      }
+    }
+
+    if (pitch_plotType == 'speckle') {
+      graphics::points(pt$t, pt$f,  pch=20, col=pitch_color)
+    }
+
+    pline <- c(3.5,1)
+    if (intensity_plotOnSpec) pline <- c(1,1)
+
+    graphics::mtext(pitch_axisLabel, side=4, line=pline[1], cex=0.8, las=3,
+                    col=pitch_color)
+
+    if (min_max_only[ind]) {
+      graphics::mtext(pitch_freqRange[1], side=4, line=pline[2],
+                      at=freqRange[1], padj=0, las=2, cex=0.7, col=pitch_color)
+      graphics::mtext(pitch_freqRange[2], side=4, line=pline[2],
+                      at=freqRange[2], padj=1, las=2, cex=0.7, col=pitch_color)
+    } else {
+      rtix <- pretty(pfr[1]:pfr[2])
+      graphics::axis(4, at=(rtix-pfr[1])*multiplier, labels=rtix,
+                     col.ticks=pitch_color, col.axis=pitch_color)
+    }
+  }
+
+  if (intensity_plotOnSpec) {
+    if (tfrom0) it$t <- it$t - org_start
+    sRan <- freqRange[2] - freqRange[1]
+    iRan <- intensity_range[2] - intensity_range[1]
+    multiplier <- sRan / iRan
+    it$i <- (it$i - intensity_range[1]) * multiplier
+
+    graphics::lines(it$t, it$i, col=intensity_color)
+    iline <- c(3.5,1)
+    if (pitch_plotOnSpec) iline <- c(3.5,3.5)
+
+    graphics::mtext(intensity_axisLabel, side=4, line=iline[1], cex=0.8, las=3,
+                    col=intensity_color)
+
+    if (min_max_only[ind]) {
+      graphics::mtext(round(intensity_range[1], 0),
+                      side=4, line=iline[2], at=freqRange[1],
+                      padj=0, las=2, cex=0.7, col=intensity_color)
+      graphics::mtext(round(intensity_range[2]),
+                      side=4, line=iline[2], at=freqRange[2],
+                      padj=1, las=2, cex=0.7, col=intensity_color)
+    } else {
+      rtix <- pretty(intensity_range[1]:intensity_range[2])
+      graphics::axis(4, at=(rtix-intensity_range[1])*multiplier, labels=rtix,
+                     col.ticks=intensity_color, col.axis=intensity_color)
     }
   }
 

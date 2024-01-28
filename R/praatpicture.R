@@ -116,12 +116,16 @@
 #' @param pitch_semitonesRe Frequency in Hz giving the reference level for
 #' converting pitch frequency to semitones. Default is `100`.
 #' @param pitch_color String giving the name of the color to be used for
-#' plotting pitch. Default is `'black'`.
+#' plotting pitch. Default is `'black'`. If `pitch_plotOnSpec=TRUE`, axes will
+#' follow the same color scheme.
+#' @param pitch_plotOnSpec Boolean; should pitch be plotted on top of
+#' spectrogram? Default is `FALSE`.
 #' @param pitch_ssff An object of class `AsspDataObj` containing a pitch track.
 #' Default is `NULL`.
 #' @param pitch_axisLabel String giving the name of the label to print along the
 #' y-axis when printing a pitch track. Default is `NULL`, in which case the
-#' axis label will depend on the scale.
+#' axis label will depend on the scale. If `pitch_plotOnSpec=TRUE`, this label
+#' will be printed on the right-hand y-axis label.
 #' @param formant_timeStep Measurement interval in seconds for tracking formants.
 #' Default is `NULL`, in which case the measurement interval is equal to
 #' `formant_windowLength` / 4.
@@ -161,10 +165,16 @@
 #' range is simply the minimum and maximum levels in the curve.
 #' @param intensity_color String giving the name of the color to be used for
 #' plotting intensity. Default is `'black'`.
+#' If `intensity_plotOnSpec=TRUE`, axes will
+#' follow the same color scheme.
+#' @param intensity_plotOnSpec Boolean; should intensity be plotted on top of
+#' spectrogram? Default is `FALSE`.
 #' @param intensity_ssff An object of class `AsspDataObj` containing intensity
 #' tracks. Default is `NULL`.
 #' @param intensity_axisLabel String giving the name of the label to print along
 #' the y-axis when plotting intensity. Default is `Intensity (dB)`.
+#' If `intensity_plotOnSpec=TRUE`, this label
+#' will be printed on the right-hand y-axis label.
 #' @param time_axisLabel String giving the name of the label to print along
 #' the x-axis. Default is `Time (s)`.
 #' @param draw_rectangle Use for drawing rectangles on plot components. A
@@ -178,6 +188,12 @@
 #' b) arguments to pass on to [graphics::arrows]. Alternatively a list of
 #' such vectors, if more arrows should be drawn. If multiple audio
 #' channels are plotted and an arrow should be added to one of these,
+#' use the channel identifier instead of a string giving the frame to draw on.
+#' @param annotate Use for annotating plot components. A vector containing
+#' a) a string giving the plot component to annotate, and
+#' b) arguments to pass on to [graphics::text]. Alternatively a list of
+#' such vectors, if more annotations should be made. If multiple audio
+#' channels are plotted and annotations should be added to one of these,
 #' use the channel identifier instead of a string giving the frame to draw on.
 #' @param gender String indicating the gender of the speaker; default is
 #' `u` for unknown, other legal values are `m` and `f`. Used to tweak pitch
@@ -233,8 +249,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          pitch_timeStep=NULL, pitch_floor=75, pitch_ceiling=600,
                          pitch_plotType='draw', pitch_scale='hz',
                          pitch_freqRange=NULL, pitch_semitonesRe=100,
-                         pitch_color='black', pitch_ssff=NULL,
-                         pitch_axisLabel=NULL,
+                         pitch_color='black', pitch_plotOnSpec=FALSE,
+                         pitch_ssff=NULL, pitch_axisLabel=NULL,
                          formant_timeStep=NULL, formant_maxN=5,
                          formant_windowLength=0.025, formant_dynamicRange=30,
                          formant_freqRange=c(50, 5500),
@@ -243,10 +259,10 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          formant_ssff=NULL, formant_axisLabel='Frequency (Hz)',
                          intensity_timeStep=NULL, intensity_minPitch=100,
                          intensity_range=NULL, intensity_color='black',
-                         intensity_ssff=NULL,
+                         intensity_plotOnSpec=FALSE, intensity_ssff=NULL,
                          intensity_axisLabel='Intensity (dB)',
                          time_axisLabel='Time (s)',
-                         draw_rectangle=NULL, draw_arrow=NULL,
+                         draw_rectangle=NULL, draw_arrow=NULL, annotate=NULL,
                          gender='u', ...) {
 
   p <- graphics::par(no.readonly=TRUE)
@@ -257,6 +273,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
     stop('Currently available frames are sound, TextGrid, spectrogram, formant, ',
          'pitch, and intensity')
   }
+  if (pitch_scale == 'log') pitch_scale <- 'logarithmic'
   legal_scales <- c('hz', 'logarithmic', 'semitones', 'erb', 'mel')
   if (!pitch_scale %in% legal_scales) {
     stop('Possible pitch scales are hz, logarithmic, semitones, erb, and mel')
@@ -282,6 +299,9 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
 
   if (!is.list(draw_arrow)) draw_arrow <- list(draw_arrow)
   arr_comp <- sapply(draw_arrow, '[[', 1)
+
+  if (!is.list(annotate)) annotate <- list(annotate)
+  annot_comp <- sapply(annotate, '[[', 1)
 
   if (end == 0) {
     tend <- Inf
@@ -387,7 +407,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
     focus_linevec <- NULL
   }
 
-  if ('pitch' %in% frames) {
+  if ('pitch' %in% frames | pitch_plotOnSpec) {
     if (is.null(pitch_freqRange)) {
       if (pitch_scale == 'erb') {
         pitch_freqRange <- c(0,10)
@@ -430,11 +450,11 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       f <- f[-del]
       t <- t[-del]
       pt <- list(t = t, f = f)
-
-      if (scale == 'semitones') pt <- rPraat::pt.Hz2ST(pt, ref=semitonesRe)
-      if (scale == 'mel') pt$f <- emuR::mel(pt$f)
-      if (scale == 'erb') pt$f <- soundgen::HzToERB(pt$f)
     }
+    if (pitch_scale == 'semitones') pt <-
+        rPraat::pt.Hz2ST(pt, ref=pitch_semitonesRe)
+    if (pitch_scale == 'mel') pt$f <- emuR::mel(pt$f)
+    if (pitch_scale == 'erb') pt$f <- soundgen::HzToERB(pt$f)
   }
 
   if ('formant' %in% frames | formant_plotOnSpec) {
@@ -481,7 +501,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
     fm <- NULL
   }
 
-  if ('intensity' %in% frames) {
+  if ('intensity' %in% frames | intensity_plotOnSpec) {
     if (file.exists(paste0(fn, '.IntensityTier'))) {
       itfn <- paste0(fn, '.IntensityTier')
       it <- rPraat::it.read(itfn)
@@ -505,6 +525,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       t <- seq(a$startTime, a$endRecord/a$sampleRate, by=1/a$sampleRate)
       it <- list(t = t, i = db)
     }
+    if (is.null(intensity_range)) intensity_range <-
+        c(min(it$i), max(it$i))
   }
 
   if (tfrom0) {
@@ -542,7 +564,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       ind <- which(frames == 'sound')
       waveplot(sig, bit, t, nchan, wave_color, tgbool, focus_linevec,
                tg_focusTierColor, tg_focusTierLineType, ind,
-               nframe, rect_comp, arr_comp, draw_rectangle, draw_arrow,
+               nframe, rect_comp, arr_comp, annot_comp,
+               draw_rectangle, draw_arrow, annotate,
                wave_channelNames, cn, start_end_only, min_max_only)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
@@ -550,18 +573,22 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                max(tseq)-start, tfrom0,
                spec_freqRange, spec_windowLength, spec_dynamicRange,
                spec_timeStep, spec_windowShape, spec_colors,
+               pitch_plotOnSpec, pt, pitch_plotType, pitch_scale,
+               pitch_freqRange, pitch_axisLabel, pitch_color,
                formant_plotOnSpec, fm, formant_plotType, formant_dynamicRange,
-               formant_color, tgbool, focus_linevec, tg_focusTierColor,
+               formant_color,  intensity_plotOnSpec, it, intensity_range,
+               intensity_axisLabel, intensity_color,
+               tgbool, focus_linevec, tg_focusTierColor,
                tg_focusTierLineType, ind, nframe,
                start_end_only, min_max_only, spec_axisLabel)
-      if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram', draw_rectangle)
+      if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram',
+                                                       draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
+      if ('spectrogram' %in% annot_comp) annotate('spectrogram', annotate)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tg_tiers, tfrom0, tg_tierNames, ind, nframe,
              tg_alignment, tg_specialChar, tg_color, start_end_only)
-      if ('TextGrid' %in% rect_comp) draw_rectangle('TextGrid', draw_rectangle)
-      if ('TextGrid' %in% arr_comp) draw_arrow('TextGrid', draw_arrow)
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
@@ -571,6 +598,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                 min_max_only, pitch_axisLabel)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
+      if ('pitch' %in% annot_comp) annotate('pitch', annotate)
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
@@ -580,14 +608,17 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                   nframe, start_end_only, min_max_only, formant_axisLabel)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
+      if ('formant' %in% annot_comp) annotate('formant', annotate)
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                     tg_focusTierColor, tg_focusTierLineType,
                     intensity_range, intensity_color, ind, nframe,
                     start_end_only, min_max_only, intensity_axisLabel)
-      if ('intensity' %in% rect_comp) draw_rectangle('intensity', draw_rectangle)
+      if ('intensity' %in% rect_comp) draw_rectangle('intensity',
+                                                     draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
+      if ('intensity' %in% annot_comp) annotate('intensity', annotate)
     }
   }
   graphics::mtext(time_axisLabel, side=1, line=3, outer=T, cex=0.8)
