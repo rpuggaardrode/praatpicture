@@ -445,10 +445,13 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       }
       f <- wpt[[1]][,1]
       a <- attributes(wpt)
-      t <- seq(a$startTime, a$endRecord/a$sampleRate, by=1/a$sampleRate)
-      del <- which(f == 0)
-      f <- f[-del]
-      t <- t[-del]
+      t <- seq(a$startRecord/a$sampleRate, a$endRecord/a$sampleRate,
+               by=1/a$sampleRate)
+      if (any(f==0)) {
+        del <- which(f == 0)
+        f <- f[-del]
+        t <- t[-del]
+      }
       pt <- list(t = t, f = f)
     }
     if (pitch_scale == 'semitones') pt <-

@@ -1,6 +1,6 @@
 Package: praatpicture
 Title: Make Praat Picture style plots of acoustic data
-Version: 0.5.2
+Version: 0.5.3
 Authors@R: 
     person("Rasmus", "Puggaard-Rode", , "r.puggaard@phonetik.uni-muenchen.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4522-9987"))
