@@ -88,30 +88,13 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   }
 
   if (plotType == 'draw') {
-    diffs <- diff(pt$t) - min(diff(pt$t))
-    gaps <- which(diffs > min(diff(pt$t)))
-    gaps <- c(gaps, length(pt$t))
-    sep_lines_t <- list()
-    sep_lines_f <- list()
-    i <- 1
-    for (g in 1:length(gaps)) {
-      sep_lines_t[[g]] <- pt$t[i:gaps[g]]
-      sep_lines_f[[g]] <- pt$f[i:gaps[g]]
-      i <- 1 + gaps[g]
-    }
-
-    plot(sep_lines_t[[1]], sep_lines_f[[1]], xlim=c(start, end+start), xaxt='n',
-         ylim=freqRange, yaxt=yax, type='l', log=logsc, col=color)
+    plot(pt$t, pt$f, xlim=c(start, end+start), xaxt='n', ylim=freqRange,
+         yaxt=yax, type='l', log=logsc, col=color)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
       graphics::axis(2, at=ytix)
     }
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,1),
                                           tick=F)
-    if (length(sep_lines_t) > 1) {
-      for (i in 2:length(sep_lines_t)) {
-        graphics::lines(sep_lines_t[[i]], sep_lines_f[[i]], col=color)
-      }
-    }
     if (tgbool) {
       for (i in 1:length(lines)) {
         graphics::abline(v=lines[[i]], col=focusTierColor[i],

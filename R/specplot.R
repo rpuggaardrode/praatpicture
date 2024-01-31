@@ -31,7 +31,7 @@
 #' names can be used for plotting values in between in different colors.
 #' @param pitch_plotOnSpec Boolean; should pitch be plotted on top of
 #' spectrogram? Default is `FALSE`.
-#' @param pt Pitch object loaded using [rPraat::formant.read] or similar object.
+#' @param pt Pitch object loaded using [rPraat::pt.read] or similar object.
 #' @param pitch_plotType String giving the type of pitch plot to produce; default
 #' is `draw` (a line plot), the only other option is `speckle` (a point plot).
 #' @param pitch_scale String giving the frequency scale to use when producing
@@ -236,30 +236,9 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     multiplier <- sRan / pRan
     pt$f <- (pt$f - pfr[1]) * multiplier
 
-    if (pitch_plotType == 'draw') {
-      diffs <- diff(pt$t) - min(diff(pt$t))
-      gaps <- which(diffs > min(diff(pt$t)))
-      gaps <- c(gaps, length(pt$t))
-      sep_lines_t <- list()
-      sep_lines_f <- list()
-      i <- 1
-      for (g in 1:length(gaps)) {
-        sep_lines_t[[g]] <- pt$t[i:gaps[g]]
-        sep_lines_f[[g]] <- pt$f[i:gaps[g]]
-        i <- 1 + gaps[g]
-      }
-
-      graphics::lines(sep_lines_t[[1]], sep_lines_f[[1]], col=pitch_color)
-      if (length(sep_lines_t) > 1) {
-        for (i in 2:length(sep_lines_t)) {
-          graphics::lines(sep_lines_t[[i]], sep_lines_f[[i]], col=pitch_color)
-        }
-      }
-    }
-
-    if (pitch_plotType == 'speckle') {
-      graphics::points(pt$t, pt$f,  pch=20, col=pitch_color)
-    }
+    if (pitch_plotType == 'draw') graphics::lines(pt$t, pt$f, col=pitch_color)
+    if (pitch_plotType == 'speckle') graphics::points(pt$t, pt$f,
+                                                      pch=20, col=pitch_color)
 
     pline <- c(3.5,1)
     if (intensity_plotOnSpec) pline <- c(1,1)

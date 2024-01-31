@@ -84,7 +84,7 @@ names can be used for plotting values in between in different colors.}
 \item{pitch_plotOnSpec}{Boolean; should pitch be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
-\item{pt}{Pitch object loaded using \link[rPraat:formant.read]{rPraat::formant.read} or similar object.}
+\item{pt}{Pitch object loaded using \link[rPraat:pt.read]{rPraat::pt.read} or similar object.}
 
 \item{pitch_plotType}{String giving the type of pitch plot to produce; default
 is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}
