@@ -86,9 +86,6 @@
 #' the nth line type. Default is `'dotted'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
-#' @param nframe Integer giving the number of plot components. Default is `NULL`.
-#' @param start_end_only Logical; should there only be ticks on the x-axis
-#' for start and end times? Default is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
@@ -117,8 +114,8 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                      intensity_axisLabel='Intensity (dB)',
                      intensity_color='black',
                      tgbool=FALSE, lines=NULL, focusTierColor='black',
-                     focusTierLineType='dotted', ind=NULL, nframe=NULL,
-                     start_end_only=TRUE, min_max_only=TRUE,
+                     focusTierLineType='dotted', ind=NULL,
+                     min_max_only=TRUE,
                      axisLabel='Frequency (Hz)') {
 
   wl <- windowLength*1000
@@ -140,17 +137,6 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
   if (windowShape == 'Bartlett') ws <- 'bartlett'
   if (windowShape == 'Hanning') ws <- 'hann'
   if (windowShape == 'Gaussian') ws <- 'gaussian'
-
-  if (ind==nframe) {
-    if (!start_end_only) {
-      xax <- 's'
-    } else {
-      xax <- 'n'
-      xtix <- c(round(min(t), 3), round(max(t), 3), 0)
-    }
-  } else {
-    xax <- 'n'
-  }
 
   if (!min_max_only[ind]) {
     if (ind == 1) {
@@ -184,9 +170,8 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     useRaster <- FALSE
   }
 
-  plot(NULL, xaxt=xax, xlim=c(start, end+start),
+  plot(NULL, xaxt='n', xlim=c(start, end+start),
        ylim=freqRange, yaxs='i', yaxt=yax)
-  if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                         tick=F)
@@ -205,7 +190,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
   yVals <- seq(freqRange[1], freqRange[2], length.out=specDims[2])
 
   graphics::image(x=xVals, y=yVals, z=spec$spectrogram,
-                  col=fillCol, useRaster=TRUE, add=TRUE)
+                  col=fillCol, useRaster=useRaster, add=TRUE)
   graphics::box()
 
   if (formant_plotOnSpec) {

@@ -38,9 +38,6 @@
 #' locations of frequency multiples of 1000 as in Praat? Default is `TRUE`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
-#' @param nframe Integer giving the number of plot components. Default is `NULL`.
-#' @param start_end_only Logical; should there only be ticks on the x-axis
-#' for start and end times? Default is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `FALSE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
@@ -59,8 +56,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         focusTierColor='black', focusTierLineType='dotted',
                         dynamicRange=30, freqRange=c(0,5500),
                         plotType='speckle', color='black', dottedLines=TRUE,
-                        ind=NULL, nframe=NULL,
-                        start_end_only=TRUE, min_max_only=FALSE,
+                        ind=NULL, min_max_only=FALSE,
                         axisLabel='Frequency (Hz)') {
 
   if (!plotType %in% c('draw', 'speckle')) {
@@ -88,17 +84,6 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
-  if (ind==nframe) {
-    if (!start_end_only) {
-      xax <- 's'
-    } else {
-      xax <- 'n'
-      xtix <- c(round(start, 3), round(end, 3), 0)
-    }
-  } else {
-    xax <- 'n'
-  }
-
   if (fm$conv2db) {
     db <- gsignal::pow2db(fm$intensityVector)
   } else {
@@ -116,14 +101,13 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if (plotType == 'draw') {
     plot(fm$t, fm$frequencyArray[1,], xlim=c(start, end+start),
-         xaxt=xax, ylim=freqRange, yaxt=yax, type='l', col=color[1])
+         xaxt='n', ylim=freqRange, yaxt=yax, type='l', col=color[1])
     for (i in 2:nf) {
       graphics::lines(fm$t, fm$frequencyArray[i,], col=color[i])
     }
     if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                           tick=F)
-    if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (dottedLines) graphics::abline(h=freql, lty='dotted')
     if (tgbool) {
       for (i in 1:length(lines)) {
@@ -136,7 +120,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if (plotType == 'speckle') {
     plot(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
-         xlim=c(start, end+start), xaxt=xax,
+         xlim=c(start, end+start), xaxt='n',
          ylim=freqRange, yaxt=yax, col=color[1])
     for (i in 2:nf) {
       graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
@@ -145,7 +129,6 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                           tick=F)
-    if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (dottedLines) graphics::abline(h=freql, lty='dotted')
     if (tgbool) {
       for (i in 1:length(lines)) {

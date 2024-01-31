@@ -15,9 +15,6 @@
 #' original time? Default is `TRUE`.
 #' @param tierNames Logical; should TextGrid tier names be printed along the
 #' y-axis? Default is `TRUE`.
-#' @param ind Integer indexing waveform relative to other plot components.
-#' Default is `NULL`.
-#' @param nframe Integer giving the number of plot components. Default is `NULL`.
 #' @param alignment String giving the desired alignment of text in the
 #' TextGrids. Default is `central`; other options are `left` and `right`.
 #' Alternatively, a vector of strings if different alignments are needed.
@@ -28,8 +25,6 @@
 #' @param color String or vector of strings giving the name of the color(s)
 #' to be used for the text in TextGrids. Default is `'black'`. If a vector is
 #' provided, different colors are used for different tiers.
-#' @param start_end_only Logical; should there only be ticks on the x-axis
-#' for start and end times? Default is `TRUE`.
 #'
 #' @export
 #'
@@ -39,8 +34,8 @@
 #' soundFile <- paste0(datapath, '/1.wav')
 #' praatpicture(soundFile, frames='TextGrid')
 tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
-                   ind=NULL, nframe=NULL, alignment='central',
-                   specialChar=TRUE, color='black', start_end_only=TRUE) {
+                   alignment='central',
+                   specialChar=TRUE, color='black') {
 
   if (length(alignment) != length(tiers)) {
     alignment <- rep(alignment, length(tiers))
@@ -76,25 +71,10 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
       x2 <- (length(t)/sr) + start
     }
 
-    if (ind == nframe) {
-      if (tier == utils::tail(tiers, n=1)) {
-        if (!start_end_only) {
-          xax <- 's'
-        } else {
-          xax <- 'n'
-          xtix <- c(round(min(t), 3), round(max(t), 3), 0)
-        }
-      } else {
-        xax <- 'n'
-      }
-    } else {
-      xax <- 'n'
-    }
-
     if (specialChar) lab <- tg_stylize(lab)
 
     plot(1, type='n', ylab='',
-         xlim=c(x1, x2), xaxt=xax,
+         xlim=c(x1, x2), xaxt='n',
          ylim=c(0,10), yaxt='n', yaxs='i')
     if (tg[[tier]]$type == 'interval') {
       graphics::abline(v=line_vec)
@@ -108,9 +88,6 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
       graphics::segments(x0=line_vec, x1=line_vec, y0=0, y1=2)
       graphics::segments(x0=line_vec, x1=line_vec, y0=8, y1=10)
       graphics::text(t0, 5, as.expression(lab), adj=0.5, col=color[i])
-    }
-    if (ind == nframe & start_end_only & tier == utils::tail(tiers, n=1)) {
-      graphics::axis(1, at=xtix)
     }
     if (tierNames) graphics::mtext(tname, side=2, las=2, line=0.6, cex=0.8)
   }

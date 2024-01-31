@@ -15,7 +15,6 @@ waveplot(
   focusTierColor = "black",
   focusTierLineType = "dotted",
   ind = NULL,
-  nframe = NULL,
   rect_comp = NULL,
   arr_comp = NULL,
   annot_comp = NULL,
@@ -24,7 +23,6 @@ waveplot(
   annotate = NULL,
   channelNames = FALSE,
   cn = NULL,
-  start_end_only = TRUE,
   min_max_only = TRUE
 )
 }
@@ -59,8 +57,6 @@ the nth line type. Default is \code{'dotted'}.}
 \item{ind}{Integer indexing waveform relative to other plot components.
 Default is \code{NULL}.}
 
-\item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
-
 \item{rect_comp}{Vector of strings or numbers giving plot components to draw
 rectangles on. Default is \code{NULL}.}
 
@@ -84,9 +80,6 @@ the y-axis? Default is \code{FALSE}.}
 
 \item{cn}{Vector of strings with channel names to be printed on the y-axis
 if \code{channelNames} is \code{TRUE}.}
-
-\item{start_end_only}{Logical; should there only be ticks on the x-axis
-for start and end times? Default is \code{TRUE}.}
 
 \item{min_max_only}{Logical; should only minimum and maximum values be given
 on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but

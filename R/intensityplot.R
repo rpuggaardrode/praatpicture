@@ -28,9 +28,6 @@
 #' plotting intensity. Default is `'black'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
-#' @param nframe Integer giving the number of plot components. Default is `NULL`.
-#' @param start_end_only Logical; should there only be ticks on the x-axis
-#' for start and end times? Default is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
@@ -47,8 +44,7 @@
 #' praatpicture(soundFile, frames='intensity')
 intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                           focusTierColor='black', focusTierLineType='dotted',
-                          range=NULL, color='black', ind=NULL, nframe=NULL,
-                          start_end_only=TRUE, min_max_only=TRUE,
+                          range=NULL, color='black', ind=NULL, min_max_only=TRUE,
                           axisLabel='Intensity (dB)') {
 
   if (!min_max_only[ind]) {
@@ -69,20 +65,8 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
-  if (ind==nframe) {
-    if (!start_end_only) {
-      xax <- 's'
-    } else {
-      xax <- 'n'
-      xtix <- c(round(start, 3), round(end, 3), 0)
-    }
-  } else {
-    xax <- 'n'
-  }
-
-  plot(it$t, it$i, xlim=c(start, end+start), xaxt=xax,
+  plot(it$t, it$i, xlim=c(start, end+start), xaxt='n',
        ylim=range, yaxt=yax, type='l', col=color)
-  if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                         tick=F)

@@ -19,8 +19,6 @@ formantplot(
   color = "black",
   dottedLines = TRUE,
   ind = NULL,
-  nframe = NULL,
-  start_end_only = TRUE,
   min_max_only = FALSE,
   axisLabel = "Frequency (Hz)"
 )
@@ -73,11 +71,6 @@ locations of frequency multiples of 1000 as in Praat? Default is \code{TRUE}.}
 
 \item{ind}{Integer indexing waveform relative to other plot components.
 Default is \code{NULL}.}
-
-\item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
-
-\item{start_end_only}{Logical; should there only be ticks on the x-axis
-for start and end times? Default is \code{TRUE}.}
 
 \item{min_max_only}{Logical; should only minimum and maximum values be given
 on the y-axis? Default is \code{FALSE}. Can also be a logical vector if some but

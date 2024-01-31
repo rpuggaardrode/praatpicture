@@ -567,9 +567,9 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       ind <- which(frames == 'sound')
       waveplot(sig, bit, t, nchan, wave_color, tgbool, focus_linevec,
                tg_focusTierColor, tg_focusTierLineType, ind,
-               nframe, rect_comp, arr_comp, annot_comp,
+               rect_comp, arr_comp, annot_comp,
                draw_rectangle, draw_arrow, annotate,
-               wave_channelNames, cn, start_end_only, min_max_only)
+               wave_channelNames, cn, min_max_only)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,
@@ -582,22 +582,22 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                formant_color,  intensity_plotOnSpec, it, intensity_range,
                intensity_axisLabel, intensity_color,
                tgbool, focus_linevec, tg_focusTierColor,
-               tg_focusTierLineType, ind, nframe,
-               start_end_only, min_max_only, spec_axisLabel)
+               tg_focusTierLineType, ind,
+               min_max_only, spec_axisLabel)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram',
                                                        draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
       if ('spectrogram' %in% annot_comp) annotate('spectrogram', annotate)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
-      tgplot(tg, t, sr, start, tg_tiers, tfrom0, tg_tierNames, ind, nframe,
-             tg_alignment, tg_specialChar, tg_color, start_end_only)
+      tgplot(tg, t, sr, start, tg_tiers, tfrom0, tg_tierNames,
+             tg_alignment, tg_specialChar, tg_color)
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                 tg_focusTierColor, tg_focusTierLineType,
                 pitch_plotType, pitch_scale, pitch_freqRange,
-                pitch_semitonesRe, pitch_color, ind, nframe, start_end_only,
+                pitch_semitonesRe, pitch_color, ind,
                 min_max_only, pitch_axisLabel)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
@@ -608,7 +608,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                   tg_focusTierColor, tg_focusTierLineType,
                   formant_dynamicRange, formant_freqRange, formant_plotType,
                   formant_color, formant_dottedLines, ind,
-                  nframe, start_end_only, min_max_only, formant_axisLabel)
+                  min_max_only, formant_axisLabel)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
       if ('formant' %in% annot_comp) annotate('formant', annotate)
@@ -616,14 +616,22 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                     tg_focusTierColor, tg_focusTierLineType,
-                    intensity_range, intensity_color, ind, nframe,
-                    start_end_only, min_max_only, intensity_axisLabel)
+                    intensity_range, intensity_color, ind,
+                    min_max_only, intensity_axisLabel)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity',
                                                      draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
       if ('intensity' %in% annot_comp) annotate('intensity', annotate)
     }
   }
+
+  if (!start_end_only) {
+    graphics::axis(1)
+  } else {
+    xtix <- c(round(min(t), 3), round(max(t), 3), 0)
+    graphics::axis(1, at=xtix)
+  }
+
   graphics::mtext(time_axisLabel, side=1, line=3, outer=T, cex=0.8)
   graphics::mtext(mainTitle, side=3, line=2, adj=0, outer=T)
 

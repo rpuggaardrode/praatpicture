@@ -24,7 +24,6 @@
 #' the nth line type. Default is `'dotted'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
-#' @param nframe Integer giving the number of plot components. Default is `NULL`.
 #' @param rect_comp Vector of strings or numbers giving plot components to draw
 #' rectangles on. Default is `NULL`.
 #' @param arr_comp Vector of strings of numbers giving plot components to draw
@@ -41,8 +40,6 @@
 #' the y-axis? Default is `FALSE`.
 #' @param cn Vector of strings with channel names to be printed on the y-axis
 #' if `channelNames` is `TRUE`.
-#' @param start_end_only Logical; should there only be ticks on the x-axis
-#' for start and end times? Default is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
@@ -57,23 +54,11 @@
 #' praatpicture(soundFile, frames='sound')
 waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
                      lines=NULL, focusTierColor='black',
-                     focusTierLineType='dotted', ind=NULL, nframe=NULL,
+                     focusTierLineType='dotted', ind=NULL,
                      rect_comp=NULL, arr_comp=NULL, annot_comp=NULL,
                      draw_rectangle=NULL, draw_arrow=NULL, annotate=NULL,
-                     channelNames=FALSE, cn=NULL,
-                     start_end_only=TRUE, min_max_only=TRUE) {
+                     channelNames=FALSE, cn=NULL, min_max_only=TRUE) {
   for (i in 1:nchan) {
-
-    if (ind==nframe & i==nchan) {
-      if (!start_end_only) {
-        xax <- 's'
-      } else {
-        xax <- 'n'
-        xtix <- c(round(min(t), 3), round(max(t), 3), 0)
-      }
-    } else {
-      xax <- 'n'
-    }
 
     sig[,i] <- sig[,i] / (2^(bit - 1) - 1)
 
@@ -90,10 +75,9 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
       ytix <- c(round(min(sig[,i]), 3), 0, round(max(sig[,i]), 2))
     }
 
-    plot(t[-1], sig[,i], type='l', xlab='', xaxt=xax, ylab='', yaxt=yax,
+    plot(t[-1], sig[,i], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
          col=color)
 
-    if (ind == nframe & i == nchan & start_end_only) graphics::axis(1, at=xtix)
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,0.5,1),
                                           tick=F)

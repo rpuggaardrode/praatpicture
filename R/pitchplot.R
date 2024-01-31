@@ -37,9 +37,6 @@
 #' plotting pitch. Default is `'black'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
-#' @param nframe Integer giving the number of plot components. Default is `NULL`.
-#' @param start_end_only Logical; should there only be ticks on the x-axis
-#' for start and end times? Default is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
@@ -58,8 +55,8 @@
 pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       focusTierColor='black', focusTierLineType='dotted',
                       plotType='draw', scale='hz', freqRange=NULL,
-                      semitonesRe=100, color='black', ind=NULL, nframe=NULL,
-                      start_end_only=TRUE, min_max_only=TRUE,
+                      semitonesRe=100, color='black', ind=NULL,
+                      min_max_only=TRUE,
                       axisLabel=NULL) {
 
   if (!plotType %in% c('draw', 'speckle')) {
@@ -90,17 +87,6 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
-  if (ind==nframe) {
-    if (!start_end_only) {
-      xax <- 's'
-    } else {
-      xax <- 'n'
-      xtix <- c(round(start, 3), round(end, 3), 0)
-    }
-  } else {
-    xax <- 'n'
-  }
-
   if (plotType == 'draw') {
     diffs <- diff(pt$t) - min(diff(pt$t))
     gaps <- which(diffs > min(diff(pt$t)))
@@ -114,14 +100,13 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       i <- 1 + gaps[g]
     }
 
-    plot(sep_lines_t[[1]], sep_lines_f[[1]], xlim=c(start, end+start), xaxt=xax,
+    plot(sep_lines_t[[1]], sep_lines_f[[1]], xlim=c(start, end+start), xaxt='n',
          ylim=freqRange, yaxt=yax, type='l', log=logsc, col=color)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
       graphics::axis(2, at=ytix)
     }
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,1),
                                           tick=F)
-    if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (length(sep_lines_t) > 1) {
       for (i in 2:length(sep_lines_t)) {
         graphics::lines(sep_lines_t[[i]], sep_lines_f[[i]], col=color)
@@ -137,14 +122,13 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   }
 
   if (plotType == 'speckle') {
-    plot(pt$t, pt$f, xlim=c(start, end+start), xaxt=xax, ylim=freqRange,
+    plot(pt$t, pt$f, xlim=c(start, end+start), xaxt='n', ylim=freqRange,
          yaxt=yax, type='p', pch=20, log=logsc, col=color)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
       graphics::axis(2, at=ytix)
     }
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,1),
                                           tick=F)
-    if (ind == nframe & start_end_only) graphics::axis(1, at=xtix)
     if (tgbool) {
       for (i in 1:length(lines)) {
         graphics::abline(v=lines[[i]], col=focusTierColor[i],

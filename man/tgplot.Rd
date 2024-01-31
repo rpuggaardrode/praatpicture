@@ -12,12 +12,9 @@ tgplot(
   tiers = 1,
   tfrom0 = TRUE,
   tierNames = TRUE,
-  ind = NULL,
-  nframe = NULL,
   alignment = "central",
   specialChar = TRUE,
-  color = "black",
-  start_end_only = TRUE
+  color = "black"
 )
 }
 \arguments{
@@ -39,11 +36,6 @@ original time? Default is \code{TRUE}.}
 \item{tierNames}{Logical; should TextGrid tier names be printed along the
 y-axis? Default is \code{TRUE}.}
 
-\item{ind}{Integer indexing waveform relative to other plot components.
-Default is \code{NULL}.}
-
-\item{nframe}{Integer giving the number of plot components. Default is \code{NULL}.}
-
 \item{alignment}{String giving the desired alignment of text in the
 TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
 Alternatively, a vector of strings if different alignments are needed.}
@@ -56,9 +48,6 @@ See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.}
 \item{color}{String or vector of strings giving the name of the color(s)
 to be used for the text in TextGrids. Default is \code{'black'}. If a vector is
 provided, different colors are used for different tiers.}
-
-\item{start_end_only}{Logical; should there only be ticks on the x-axis
-for start and end times? Default is \code{TRUE}.}
 }
 \description{
 Function for plotting TextGrids called by \link{praatpicture}. Instead of using
