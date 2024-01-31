@@ -49,7 +49,7 @@ talking_praatpicture <- function(sound, start=0, end=0,
   aend <- audio_end
   if (aend == 0) aend <- Inf
 
-  if (audio_start != start | audio_end != end) {
+  if (audio_start != 0 | audio_end != 0) {
     snd <- tuneR::readWave(sound, from=audio_start, to=aend, units='seconds')
     tuneR::writeWave(snd, filename='tmp.wav', extensible=FALSE)
     audioFile <- 'tmp.wav'
