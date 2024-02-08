@@ -349,7 +349,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
     if (!is.null(tg_obj)) {
       tg <- tg_obj
     } else if (file.exists(tgfn)) {
-      tg <- rPraat::tg.read(tgfn)
+      tg <- rPraat::tg.read(tgfn, encoding='auto')
     } else {
       stop(paste('There is no TextGrid file available for this sound file.',
                  'Either create the plot without a TextGrid by using the',
