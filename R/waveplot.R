@@ -91,10 +91,10 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
 
     if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)
     if ('sound' %in% arr_comp) draw_arrow('sound', draw_arrow)
-    if ('sound' %in% annot_comp) annotate('sound', annotate)
+    if ('sound' %in% annot_comp) make_annot('sound', annotate)
 
     if (i %in% rect_comp) draw_rectangle(i, draw_rectangle)
     if (i %in% arr_comp) draw_arrow(i, draw_arrow)
-    if (i %in% annot_comp) annotate(i, annotate)
+    if (i %in% annot_comp) make_annot(i, annotate)
   }
 }

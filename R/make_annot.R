@@ -17,7 +17,7 @@
 #' soundFile <- paste0(datapath, '/1.wav')
 #' praatpicture(soundFile, annotate=c('spectrogram', 0.25, 1500,
 #' 'An annotation'))
-annotate <- function(plot_component, args) {
+make_annot <- function(plot_component, args) {
   r <- which(sapply(args, '[[', 1) == plot_component)
   for (i in r) {
     params <- args[[i]]

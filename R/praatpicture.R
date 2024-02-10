@@ -583,7 +583,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram',
                                                        draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
-      if ('spectrogram' %in% annot_comp) annotate('spectrogram', annotate)
+      if ('spectrogram' %in% annot_comp) make_annot('spectrogram', annotate)
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tg_tiers, tfrom0, tg_tierNames,
@@ -597,7 +597,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                 min_max_only, pitch_axisLabel)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
-      if ('pitch' %in% annot_comp) annotate('pitch', annotate)
+      if ('pitch' %in% annot_comp) make_annot('pitch', annotate)
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
@@ -607,7 +607,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                   min_max_only, formant_axisLabel)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
-      if ('formant' %in% annot_comp) annotate('formant', annotate)
+      if ('formant' %in% annot_comp) make_annot('formant', annotate)
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
@@ -617,7 +617,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       if ('intensity' %in% rect_comp) draw_rectangle('intensity',
                                                      draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
-      if ('intensity' %in% annot_comp) annotate('intensity', annotate)
+      if ('intensity' %in% annot_comp) make_annot('intensity', annotate)
     }
   }
 
