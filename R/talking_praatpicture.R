@@ -51,10 +51,17 @@ talking_praatpicture <- function(sound, start=0, end=0,
 
   if (audio_start != 0 | audio_end != 0) {
     snd <- tuneR::readWave(sound, from=audio_start, to=aend, units='seconds')
+    sr <- snd@samp.rate
+    nsamp <- length(snd@left)
+    dur <- nsamp / sr
     tuneR::writeWave(snd, filename='tmp.wav', extensible=FALSE)
     audioFile <- 'tmp.wav'
   } else {
     audioFile <- sound
+    snd <- tuneR::readWave(sound, from=0, units='seconds', toWaveMC=T)
+    sr <- snd@samp.rate
+    nsamp <- snd@dim[1]
+    dur <- nsamp / sr
   }
 
   if (useViewer) {
@@ -66,7 +73,8 @@ talking_praatpicture <- function(sound, start=0, end=0,
 
   av::av_capture_graphics(praatpicture(sound, start, end, ...),
                           output=outputFile, audio=audioFile, verbose=FALSE,
-                          width=width, height=height, pointsize=pointsize)
+                          width=width, height=height, pointsize=pointsize,
+                          framerate=1/dur)
 
   if (audio_start != start | audio_end != end) unlink('tmp.wav', force=TRUE)
 
