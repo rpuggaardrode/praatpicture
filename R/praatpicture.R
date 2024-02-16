@@ -67,7 +67,8 @@
 #' Alternatively, a vector of strings if different alignments are needed.
 #' @param tg_specialChar Logical; should Praat typesetting for special font types
 #' such as italic, bold, and small caps be converted into corresponding
-#' R-readable special font types. Default is `TRUE`.
+#' R-readable special font types. Default is `FALSE`, since special characters
+#' can create unfortunate text alignment artefacts.
 #' See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.
 #' @param tg_tierNames Logical; should TextGrid tier names be printed along the
 #' y-axis? Default is `TRUE`.
@@ -239,7 +240,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          tg_obj=NULL, tg_tiers='all',tg_focusTier=tg_tiers[1],
                          tg_focusTierColor='black',
                          tg_focusTierLineType='dotted', tg_tierNames=TRUE,
-                         tg_alignment='central', tg_specialChar=TRUE,
+                         tg_alignment='central', tg_specialChar=FALSE,
                          tg_color='black',
                          spec_channel=1, spec_freqRange=c(0,5000),
                          spec_windowLength=0.005, spec_dynamicRange=50,

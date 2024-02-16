@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # praatpicture
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/rpuggaardrode/praatpicture/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpuggaardrode/praatpicture/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 If you've ever had to fiddle around with getting a Praat Picture to look and export just right in order to insert it in an R markdown file or slide deck, then this package is for you! Even if this isn't the case, the package offers some very useful flexibility. It's a simple set of functions designed to emulate some common plots made in Praat Picture with base R plotting. It allows for flexibly combining waveforms, spectrograms, TextGrids, pitch tracks, formant tracks, and intensity tracks in a single plot. The derived acoustic plots can all be generated directly in R, or (except in the case of spectrograms) generated in Praat.

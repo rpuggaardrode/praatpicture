@@ -24,7 +24,7 @@ praatpicture(
   tg_focusTierLineType = "dotted",
   tg_tierNames = TRUE,
   tg_alignment = "central",
-  tg_specialChar = TRUE,
+  tg_specialChar = FALSE,
   tg_color = "black",
   spec_channel = 1,
   spec_freqRange = c(0, 5000),
@@ -155,7 +155,8 @@ Alternatively, a vector of strings if different alignments are needed.}
 
 \item{tg_specialChar}{Logical; should Praat typesetting for special font types
 such as italic, bold, and small caps be converted into corresponding
-R-readable special font types. Default is \code{TRUE}.
+R-readable special font types. Default is \code{FALSE}, since special characters
+can create unfortunate text alignment artefacts.
 See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.}
 
 \item{tg_color}{String or vector of strings giving the name of the color(s)

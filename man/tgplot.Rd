@@ -13,7 +13,7 @@ tgplot(
   tfrom0 = TRUE,
   tierNames = TRUE,
   alignment = "central",
-  specialChar = TRUE,
+  specialChar = FALSE,
   color = "black"
 )
 }
@@ -42,7 +42,8 @@ Alternatively, a vector of strings if different alignments are needed.}
 
 \item{specialChar}{Logical; should Praat typesetting for special font types
 such as italic, bold, and small caps be converted into corresponding
-R-readable special font types. Default is \code{TRUE}.
+R-readable special font types. Default is \code{FALSE}, since special characters
+can create unfortunate text alignment artefacts.
 See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.}
 
 \item{color}{String or vector of strings giving the name of the color(s)

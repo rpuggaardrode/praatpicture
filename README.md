@@ -4,6 +4,8 @@
 # praatpicture
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/rpuggaardrode/praatpicture/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rpuggaardrode/praatpicture/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 If you’ve ever had to fiddle around with getting a Praat Picture to look
@@ -468,14 +470,14 @@ database here:
 ``` r
 library(emuR)
 #> 
-#> Attaching package: 'emuR'
-#> The following object is masked from 'package:base':
+#> Vedhæfter pakke: 'emuR'
+#> Det følgende objekt er maskeret fra 'package:base':
 #> 
 #>     norm
 create_emuRdemoData(tempdir())
 db_path <- paste0(tempdir(), '/emuR_demoData/ae_emuDB')
 db <- load_emuDB(db_path)
-#> INFO: Loading EMU database from C:\Users\RASMUS~1\AppData\Local\Temp\Rtmp6l2ven/emuR_demoData/ae_emuDB... (7 bundles found)
+#> INFO: Loading EMU database from C:\Users\rasmu\AppData\Local\Temp\RtmpcpxwYo/emuR_demoData/ae_emuDB... (7 bundles found)
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==========                                                            |  14%  |                                                                              |====================                                                  |  29%  |                                                                              |==============================                                        |  43%  |                                                                              |========================================                              |  57%  |                                                                              |==================================================                    |  71%  |                                                                              |============================================================          |  86%  |                                                                              |======================================================================| 100%
 ```
 

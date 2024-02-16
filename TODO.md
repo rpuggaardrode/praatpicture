@@ -12,6 +12,4 @@
 
 - Replace `*_plotOnSpec` arguments with `spec_overlay` argument?
 
-- Change `annotate` function name to something else to avoid `ggplot` issues.
-
 - Use `args` in some smart way to allow users to change `cex.*` arguments.
