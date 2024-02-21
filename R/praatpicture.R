@@ -623,10 +623,10 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   }
 
   if (!start_end_only) {
-    graphics::axis(1)
+    graphics::axis(1, ...)
   } else {
     xtix <- c(round(min(t), 3), round(max(t), 3), 0)
-    graphics::axis(1, at=xtix)
+    graphics::axis(1, at=xtix, ...)
   }
 
   graphics::mtext(time_axisLabel, side=1, line=3, outer=T, cex=0.8)
