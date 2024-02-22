@@ -1,6 +1,6 @@
 #' Convert capital letters to Unicode small caps
 #'
-#' Hacky helper function to convert capital letters into Unicode small caps.
+#' Helper function to convert capital letters into Unicode small caps.
 #' May not work for all font families. Note that there's no Unicode small cap
 #' 'X', so 'X' will just be converted to 'x'.
 #'

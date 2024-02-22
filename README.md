@@ -57,7 +57,7 @@ Simply pass the name of a sound file with the `.wav` extension to the
 function, and voila!
 
 ``` r
-praatpicture('inst/extdata/1.wav')
+praatpicture('inst/extdata/3.wav')
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="80%" />
@@ -69,7 +69,7 @@ plot the portion between 0.5–1.1 seconds of the above file, we do it
 like this:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1)
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1)
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="80%" />
@@ -82,7 +82,7 @@ frequencies are shown next to the spectrogram, etc. We can generate more
 x-axis, this can be controlled with the argument `tfrom0 = FALSE`.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, min_max_only=FALSE, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, min_max_only=FALSE, 
              start_end_only=FALSE, tfrom0=FALSE)
 ```
 
@@ -97,7 +97,7 @@ be done with e.g. `proportion=c(40,60)`, setting aside 40% of the
 plotting area for the waveform and 60% for the spectrogram.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(40,60))
 ```
 
@@ -113,7 +113,7 @@ waveform in a different color than black, this is controlled with the
 `wave_color` argument:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(20,80),
              wave_color='grey')
 ```
@@ -131,7 +131,7 @@ but could also be `'all'` or `'none'`. If we are not interested in
 having names next to the tiers, we can set `tg_tierNames=FALSE`.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              tg_tiers=c(2,3), tg_focusTier=3, tg_tierNames=FALSE)
 ```
 
@@ -141,17 +141,21 @@ By default, text is center aligned, but we can also align it to the left
 or to the right with the `tg_alignment` argument. This doesn’t have to
 be the same for all tiers!
 
-You may have noticed something strange going on in after the `b` in both
-of the tiers in the above plot. This should be `b_<`, which is the SAMPA
-character for a bilabial implosive, but Praat usually interprets a `_`
-as meaning that the following character should be subscripted, so
-`praatpicture` emulates this behavior by default. You can override this
-using the `tg_specialChar` argument as below.
+Praat usually interprets a `_` as meaning that the following character
+should be subscripted, along with a number of other formatting choices
+which can be checked
+[here](https://www.fon.hum.uva.nl/praat/manual/Text_styles.html). These
+are not emulated by default in `praatpicture` for a number of reasons,
+but can be emulated with the logical `tg_specialChar` argument, as shown
+below. Be aware that this does not work with Praat’s formatting for
+[special
+characters](https://www.fon.hum.uva.nl/praat/manual/Special_symbols.html),
+which `praatpicture` presently does not have any method for.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              tg_tiers=c(2,3), tg_focusTier=3, tg_tierNames=FALSE,
-             tg_alignment=c('right', 'left'), tg_specialChar=FALSE)
+             tg_alignment=c('right', 'left'), tg_specialChar=TRUE)
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="80%" /> Text
@@ -166,7 +170,7 @@ top of black solid lines when segment and word boundaries coincide,
 using the same color scheme in the TextGrid itself.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              tg_tiers=c(2,3), tg_focusTier='all', tg_specialChar=FALSE,
              tg_focusTierColor=c('black', 'orange'), tg_color=c('black', 'orange'),
              tg_focusTierLineType=c('solid', 'aa'))
@@ -182,7 +186,7 @@ possible to those in Praat. You can change frequency range with
 `spec_freqRange` and dynamic range with `spec_dynamicRange`:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              spec_freqRange=c(0,8000), spec_dynamicRange=70)
 ```
@@ -196,7 +200,7 @@ available in `phonTools`. Here is a broadband spectrogram using a
 Bartlett window:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              spec_windowShape='Bartlett', spec_windowLength=0.03)
 ```
@@ -208,7 +212,7 @@ which takes two or more strings giving the colors of low, high, and
 optionally in-between frequencies:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              spec_color=c('darkblue', 'blue', 'cyan', 'yellow', 'orange', 
                           'brown', 'red'))
@@ -221,7 +225,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 Pitch can be plotted like so:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'pitch'), proportion=c(40,60))
 ```
 
@@ -232,7 +236,7 @@ frequency range. Here is the same contour with a much narrower frequency
 range, speckled logarithmically:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'pitch'), proportion=c(40,60),
              pitch_scale='logarithmic', pitch_freqRange=c(100,200),
              pitch_plotType='speckle')
@@ -244,7 +248,7 @@ If we want to use semitones instead of Hz, we can set a reference level
 with `pitch_semitonesRe`:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'pitch'), proportion=c(40,60),
              pitch_scale='semitones', pitch_semitonesRe=120,
              pitch_plotType='speckle', pitch_freqRange=c(-5,5))
@@ -260,7 +264,7 @@ there is no equivalent `PitchTier` file available, namely `2.wav`:
 ``` r
 list.files('inst/extdata')
 #> [1] "1.Formant"       "1.IntensityTier" "1.PitchTier"     "1.TextGrid"     
-#> [5] "1.wav"           "2.wav"
+#> [5] "1.wav"           "2.wav"           "3.TextGrid"      "3.wav"
 ```
 
 ``` r
@@ -297,16 +301,8 @@ praatpicture('inst/extdata/2.wav', start=0.7, end=1.2,
 Formants can be plotted like so:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'formant'), proportion=c(30,70))
-#> Registered S3 methods overwritten by 'gsignal':
-#>   method         from  
-#>   plot.grpdelay  signal
-#>   plot.specgram  signal
-#>   print.freqz    signal
-#>   print.grpdelay signal
-#>   print.impz     signal
-#>   print.specgram signal
 ```
 
 <img src="man/figures/README-unnamed-chunk-21-1.png" width="80%" />
@@ -314,7 +310,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 As above, we can vary the plot type and frequency range like so:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'formant'), proportion=c(30,70),
              formant_plotType='draw', formant_freqRange=c(0,3000))
 ```
@@ -329,7 +325,7 @@ lines indicating multiples of 1,000 Hz can be omitted with the
 `formant_dottedLines` argument.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'formant'), proportion=c(30,70),
              formant_dynamicRange=40, formant_dottedLines = FALSE)
 ```
@@ -344,7 +340,7 @@ case, different formants will have different colors. This applies
 whether formants are plotted on their own or with a spectrogram.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              formant_plotOnSpec=TRUE, 
              formant_color=c('red', 'blue', 'white', 'green'))
@@ -395,7 +391,7 @@ praatpicture('inst/extdata/2.wav', start=0.7, end=1.2,
 Intensity can be plotted like so:
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'intensity'), proportion=c(30,70))
 ```
 
@@ -436,7 +432,7 @@ which draws a rectangle on the spectrogram between 0.15–0.2 seconds, and
 between 500–4000 Hz.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              start_end_only=FALSE, min_max_only=FALSE,
              draw_rectangle=c('spectrogram', 0.15, 500, 0.2, 4000))
@@ -448,7 +444,7 @@ If you want to draw multiple rectangles or multiple arrows, you can pass
 a list containing vectors with plotting information.
 
 ``` r
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              start_end_only=FALSE, min_max_only=FALSE,
              draw_rectangle=list(
@@ -477,7 +473,7 @@ library(emuR)
 create_emuRdemoData(tempdir())
 db_path <- paste0(tempdir(), '/emuR_demoData/ae_emuDB')
 db <- load_emuDB(db_path)
-#> INFO: Loading EMU database from C:\Users\rasmu\AppData\Local\Temp\RtmpcpxwYo/emuR_demoData/ae_emuDB... (7 bundles found)
+#> INFO: Loading EMU database from C:\Users\rasmu\AppData\Local\Temp\RtmpMtOtkH/emuR_demoData/ae_emuDB... (7 bundles found)
 #>   |                                                                              |                                                                      |   0%  |                                                                              |==========                                                            |  14%  |                                                                              |====================                                                  |  29%  |                                                                              |==============================                                        |  43%  |                                                                              |========================================                              |  57%  |                                                                              |==================================================                    |  71%  |                                                                              |============================================================          |  86%  |                                                                              |======================================================================| 100%
 ```
 

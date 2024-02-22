@@ -45,26 +45,26 @@ library('praatpicture')
 The Praat Picture I see (and use) most commonly simply consists of a relatively small waveform, a larger spectrogram, and an aligned TextGrid. Accordingly this is very simple to make with `praatpicture()`. Simply pass the name of a sound file with the `.wav`  extension to the function, and voila!
 
 ```{r}
-praatpicture('inst/extdata/1.wav')
+praatpicture('inst/extdata/3.wav')
 ```
 
 Often you won't want to plot an entire sound file, but only a small portion of it. This is no problem -- simply use the `start` and `end` arguments to tell R exactly what you want to plot. If we just want to plot the portion between 0.5--1.1 seconds of the above file, we do it like this:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1)
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1)
 ```
 
 Similar to the Praat defaults, only the start and end times are shown at the bottom of the plot, and only highest frequencies and lowest frequencies are shown next to the spectrogram, etc. We can generate more "R-like" axis ticks by setting the arguments `min_max_only = FALSE` and `start_end_only = FALSE`. If we want to keep the original time on the x-axis, this can be controlled with the argument `tfrom0 = FALSE`.
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, min_max_only=FALSE, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, min_max_only=FALSE, 
              start_end_only=FALSE, tfrom0=FALSE)
 ```
 
 The `frames` argument controls what kind of plot components we see. If we weren't interested in the TextGrid, we could set it to `frames=c('sound', 'spectrogram')`. The `proportion` argument controls how much space is taken up by each component; in this case, we probably want a spectrogram that's a little larger than the waveform, which can be done with e.g. `proportion=c(40,60)`, setting aside 40% of the plotting area for the waveform and 60% for the spectrogram.
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(40,60))
 ```
 
@@ -73,7 +73,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 By default, all channels of a sound file are plotted. This can be changed with the `wave_channels` argument. If you want names next to individual channels, this can be achieved with the `wave_channelNames` argument, which is set to `FALSE` by default. If you want to plot the waveform in a different color than black, this is controlled with the `wave_color` argument:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(20,80),
              wave_color='grey')
 ```
@@ -83,23 +83,24 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 By default, all tiers in the TextGrid are plotted. If we want to plot different tiers, we can tell R using the `tiers` argument. If we were only interested in the second and third tiers, we could call `tiers=c(2,3)`. The `tg_focusTier` argument controls for which tiers dotted lines are plotted on all plot components (this can be a number, but could also be `'all'` or `'none'`. If we are not interested in having names next to the tiers, we can set `tg_tierNames=FALSE`.
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              tg_tiers=c(2,3), tg_focusTier=3, tg_tierNames=FALSE)
 ```
 
 By default, text is center aligned, but we can also align it to the left or to the right with the `tg_alignment` argument. This doesn't have to be the same for all tiers! 
 
-You may have noticed something strange going on in after the `b` in both of the tiers in the above plot. This should be `b_<`, which is the SAMPA character for a bilabial implosive, but Praat usually interprets a `_` as meaning that the following character should be subscripted, so `praatpicture` emulates this behavior by default. You can override this using the `tg_specialChar` argument as below. 
+Praat usually interprets a `_` as meaning that the following character should be subscripted, along with a number of other formatting choices which can be checked [here](https://www.fon.hum.uva.nl/praat/manual/Text_styles.html). These are not emulated by default in `praatpicture` for a number of reasons, but can be emulated with the logical `tg_specialChar` argument, as shown below. Be aware that this does not work with Praat's formatting for [special characters](https://www.fon.hum.uva.nl/praat/manual/Special_symbols.html), which `praatpicture` presently does not have any method for. 
+
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              tg_tiers=c(2,3), tg_focusTier=3, tg_tierNames=FALSE,
-             tg_alignment=c('right', 'left'), tg_specialChar=FALSE)
+             tg_alignment=c('right', 'left'), tg_specialChar=TRUE)
 ```
 Text color can be controlled with the `tg_color` argument, which takes either a single string or a vector of strings, if you want different tiers to have different colors. Focus tiers are shown as dotted black lines throughout all plot components by default, but the color and line type can be controlled with the `tg_focusTierColor` and `tg_focusTierLineType` arguments -- if there are multiple focus tiers, line type and color can be varied. Below, we have dashed orange lines on top of black solid lines when segment and word boundaries coincide, using the same color scheme in the TextGrid itself.
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              tg_tiers=c(2,3), tg_focusTier='all', tg_specialChar=FALSE,
              tg_focusTierColor=c('black', 'orange'), tg_color=c('black', 'orange'),
              tg_focusTierLineType=c('solid', 'aa'))
@@ -110,7 +111,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 Spectrograms are generated in R using the `phonTools` package. Default settings (and the other various possible settings) are as close as possible to those in Praat. You can change frequency range with `spec_freqRange` and dynamic range with `spec_dynamicRange`:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              spec_freqRange=c(0,8000), spec_dynamicRange=70)
 ```
@@ -118,7 +119,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 You can also change the shape and length of windows used for the Fourier transformations, and the number of time steps at which spectra are generated. Note that not all window shapes offered by Praat are available in `phonTools`. Here is a broadband spectrogram using a Bartlett window:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              spec_windowShape='Bartlett', spec_windowLength=0.03)
 ```
@@ -126,7 +127,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 Spectrogram colors can be controlled with the `spec_color` argument which takes two or more strings giving the colors of low, high, and optionally in-between frequencies: 
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              spec_color=c('darkblue', 'blue', 'cyan', 'yellow', 'orange', 
                           'brown', 'red'))
@@ -137,14 +138,14 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 Pitch can be plotted like so:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'pitch'), proportion=c(40,60))
 ```
 
 As in Praat, we can change the plot type (line or speckle?), scale, and frequency range. Here is the same contour with a much narrower frequency range, speckled logarithmically:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'pitch'), proportion=c(40,60),
              pitch_scale='logarithmic', pitch_freqRange=c(100,200),
              pitch_plotType='speckle')
@@ -153,7 +154,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 If we want to use semitones instead of Hz, we can set a reference level with `pitch_semitonesRe`:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'pitch'), proportion=c(40,60),
              pitch_scale='semitones', pitch_semitonesRe=120,
              pitch_plotType='speckle', pitch_freqRange=c(-5,5))
@@ -186,14 +187,14 @@ praatpicture('inst/extdata/2.wav', start=0.7, end=1.2,
 Formants can be plotted like so:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'formant'), proportion=c(30,70))
 ```
  
 As above, we can vary the plot type and frequency range like so:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'formant'), proportion=c(30,70),
              formant_plotType='draw', formant_freqRange=c(0,3000))
 ```
@@ -201,7 +202,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 If formants are speckled, we can also adjust the dynamic range, such that formants in frames with intensity below a certain threshold are not plotted. The default (as in Praat) is 30 dB, let's try with 40, which should show more 'hallucinated' formants. This also shows how the dotted lines indicating multiples of 1,000 Hz can be omitted with the `formant_dottedLines` argument.
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'formant'), proportion=c(30,70),
              formant_dynamicRange=40, formant_dottedLines = FALSE)
 ```
@@ -209,7 +210,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 A special argument is the logical `formant_plotOnSpec`, which when used in combination with a spectrogram will plot formants on top of the spectrogram. Formant colors can be controlled with the `formant_color` argument, which is either a single string or a vector; in the latter case, different formants will have different colors. This applies whether formants are plotted on their own or with a spectrogram.
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              formant_plotOnSpec=TRUE, 
              formant_color=c('red', 'blue', 'white', 'green'))
@@ -245,7 +246,7 @@ praatpicture('inst/extdata/2.wav', start=0.7, end=1.2,
 Intensity can be plotted like so:
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'intensity'), proportion=c(30,70))
 ```
 
@@ -269,7 +270,7 @@ praatpicture('inst/extdata/2.wav', start=0.7, end=1.2,
 `praatpicture` allows you to draw arrows or rectangles on individual plot components using the `draw_rectangle` and `draw_arrow` arguments. This is done using the base R plotting functions `rect()` and `arrows()`. It works like this: You pass the argument a vector containing first the plot component to draw on, and then further arguments you want to pass on to `rect()` or `arrows()`; the first four of these should be coordinates on the x and y axis. Here's an example which draws a rectangle on the spectrogram between 0.15--0.2 seconds, and between 500--4000 Hz.
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              start_end_only=FALSE, min_max_only=FALSE,
              draw_rectangle=c('spectrogram', 0.15, 500, 0.2, 4000))
@@ -278,7 +279,7 @@ praatpicture('inst/extdata/1.wav', start=0.5, end=1.1,
 If you want to draw multiple rectangles or multiple arrows, you can pass a list containing vectors with plotting information. 
 
 ```{r}
-praatpicture('inst/extdata/1.wav', start=0.5, end=1.1, 
+praatpicture('inst/extdata/3.wav', start=0.5, end=1.1, 
              frames=c('sound', 'spectrogram'), proportion=c(30,70),
              start_end_only=FALSE, min_max_only=FALSE,
              draw_rectangle=list(
