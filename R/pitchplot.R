@@ -45,6 +45,8 @@
 #' y-axis when printing a pitch track. Default is `NULL`, in which case the
 #' axis label will depend on the scale.
 #'
+#' @return No return values, called internally by [praatpicture] and sibling
+#' functions.
 #' @export
 #'
 #' @examples

@@ -50,6 +50,10 @@ See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.}
 to be used for the text in TextGrids. Default is \code{'black'}. If a vector is
 provided, different colors are used for different tiers.}
 }
+\value{
+No return values, called internally by \link{praatpicture} and sibling
+functions.
+}
 \description{
 Function for plotting TextGrids called by \link{praatpicture}. Instead of using
 this function directly, just use

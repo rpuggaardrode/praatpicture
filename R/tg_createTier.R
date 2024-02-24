@@ -54,9 +54,10 @@ tg_createTier <- function(sound, tierName, start=0, end=0, show='wave',
     dur <- dur * 1000
   }
 
-  print(paste('Navigate to the graphics device window and click in the',
+  message(crayon::blue(paste('Navigate to the graphics device window and click',
+              'in the',
               'positions where you want TextGrid boundaries for tier',
-              tierName))
+              tierName)))
   l <- graphics::locator()
   t0 <- l$x
   graphics::abline(v=t0, lty='dotted')

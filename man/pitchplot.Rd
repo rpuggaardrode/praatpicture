@@ -80,6 +80,10 @@ Ignored for TextGrid component.}
 y-axis when printing a pitch track. Default is \code{NULL}, in which case the
 axis label will depend on the scale.}
 }
+\value{
+No return values, called internally by \link{praatpicture} and sibling
+functions.
+}
 \description{
 Function for plotting pitch objects called by \link{praatpicture}. Instead of
 using this function directly, just use

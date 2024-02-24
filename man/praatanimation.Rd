@@ -170,6 +170,9 @@ by the first and last highest level in the animation
 
 \item{...}{Further arguments passed to \code{praatpicture}.}
 }
+\value{
+No return value, produces an animated figure.
+}
 \description{
 Animate some aspect of a Praat Picture-style plot
 of acoustic data, potentially aligned with transcriptions.

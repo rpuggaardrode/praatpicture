@@ -32,6 +32,7 @@
 #' produce plots similar to those made with [praatpicture()] with embedded
 #' audio. For more detail on your
 #' options, see the `praatpicture()` help file.
+#' @return No return value, produces a video file.
 #' @export
 #'
 #' @examples

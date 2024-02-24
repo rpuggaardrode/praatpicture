@@ -35,6 +35,8 @@
 #' @param axisLabel String giving the name of the label to print along
 #' the y-axis when plotting intensity. Default is `Intensity (dB)`.
 #'
+#' @return No return values, called internally by [praatpicture] and sibling
+#' functions.
 #' @export
 #'
 #' @examples

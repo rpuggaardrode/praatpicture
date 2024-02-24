@@ -6,18 +6,14 @@ Authors@R:
     email = "r.puggaard@phonetik.uni-muenchen.de", 
     role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0003-4522-9987"))
-Description: Quickly and easily generate plots of acoustic data aligned with 
-  transcriptions similar to those made in 'Praat' using either derived signals
-  generated directly in R with 'wrassp' or imported derived signals from 'Praat'. 
-  Provides easy and fast out-of-the-box solutions but also a high extent of 
-  flexibility. Also provides options for embedding audio in figures and animating 
-  figures.
+Description: Quickly and easily generate plots of acoustic data aligned with transcriptions similar to those made in 'Praat' using either derived signals generated directly in R with 'wrassp' or imported derived signals from 'Praat'. Provides easy and fast out-of-the-box solutions but also a high extent of  flexibility. Also provides options for embedding audio in figures and animating figures.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
     av (>= 0.9.0),
+    crayon (>= 1.5.2),
     emuR (>= 2.4.2),
     gifski (>= 1.12.0.2),
     graphics (>= 4.3.2),

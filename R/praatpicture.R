@@ -223,8 +223,7 @@
 #' rendering the image if the graphics device allows for it, which
 #' significantly speeds up rendering the spectrogram.
 #'
-#' For
-#'
+#' @return No return value, produces a figure.
 #' @export
 #'
 #' @examples
@@ -267,6 +266,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          gender='u', ...) {
 
   p <- graphics::par(no.readonly=TRUE)
+  on.exit(graphics::par(p))
 
   legal_frames <- c('sound', 'TextGrid', 'spectrogram', 'pitch', 'formant',
                     'intensity')

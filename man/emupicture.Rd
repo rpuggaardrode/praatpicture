@@ -34,12 +34,15 @@ plot. Default is \code{NULL}.}
 
 \item{...}{Further arguments passed to \code{praatpicture}.}
 }
+\value{
+No return value, produces a plot.
+}
 \description{
 Generate plots in the style of Praat Pictures from sound files and annotations
 in an EMU database.
 }
 \examples{
-\dontrun{
+\donttest{
 # Create demo data and load demo database
 emuR::create_emuRdemoData(tempdir())
 db_path <- paste0(tempdir(), '/emuR_demoData/ae_emuDB')

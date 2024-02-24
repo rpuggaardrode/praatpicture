@@ -110,6 +110,7 @@
 #' or `av::av_capture_graphics()` used to
 #' produce animations based on `praatpicture()`. For more detail on your
 #' options, see the `praatpicture()` help file.
+#' @return No return value, produces an animated figure.
 #' @export
 #'
 #' @examples

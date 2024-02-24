@@ -80,6 +80,10 @@ Ignored for TextGrid component.}
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when plotting formants. Default is \code{Frequency (Hz)}.}
 }
+\value{
+No return values, called internally by \link{praatpicture} and sibling
+functions.
+}
 \description{
 Function for plotting formant objects called by \link{praatpicture}. Instead of
 using this function directly, just use

@@ -86,6 +86,10 @@ on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
 not all plot components should have minimum and maximum values on the y-axis.
 Ignored for TextGrid component.}
 }
+\value{
+No return values, called internally by \link{praatpicture} and sibling
+functions.
+}
 \description{
 Function for plotting waveforms called by \link{praatpicture}. Instead of using
 this function directly, just use

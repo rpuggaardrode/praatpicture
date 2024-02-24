@@ -93,6 +93,8 @@
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
 #'
+#' @return No return values, called internally by [praatpicture] and sibling
+#' functions.
 #' @export
 #'
 #' @examples

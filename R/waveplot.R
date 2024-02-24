@@ -45,6 +45,8 @@
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
 #'
+#' @return No return values, called internally by [praatpicture] and sibling
+#' functions.
 #' @export
 #'
 #' @examples

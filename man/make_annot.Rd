@@ -13,6 +13,10 @@ annotate.}
 \item{args}{A list of vectors giving arguments used for annotating.
 See \link{praatpicture} documentation.}
 }
+\value{
+No return values, called internally by \link{praatpicture} and sibling
+functions.
+}
 \description{
 Helper function for annotating plot components made with
 praatpicture. Do not use directly, instead use \link{praatpicture} with the

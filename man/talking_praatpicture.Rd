@@ -53,6 +53,9 @@ temporary directory, but can be downloaded from a browser.}
 
 \item{...}{Further arguments passed to \code{praatpicture}.}
 }
+\value{
+No return value, produces a video file.
+}
 \description{
 Generate simple MP4 video files with Praat Picture style plots of acoustic
 data with time-aligned transcriptions and embedded audio to use in

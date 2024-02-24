@@ -168,6 +168,10 @@ Ignored for TextGrid component.}
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when plotting a spectrogram. Default is \code{Frequency (Hz)}.}
 }
+\value{
+No return values, called internally by \link{praatpicture} and sibling
+functions.
+}
 \description{
 Function for plotting spectrograms called by \link{praatpicture}. Instead of using
 this function directly, just use

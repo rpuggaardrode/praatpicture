@@ -64,6 +64,10 @@ Ignored for TextGrid component.}
 \item{axisLabel}{String giving the name of the label to print along
 the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
 }
+\value{
+No return values, called internally by \link{praatpicture} and sibling
+functions.
+}
 \description{
 Function for plotting intensity objects called by \link{praatpicture}. Instead of
 using this function directly, just use

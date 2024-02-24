@@ -331,6 +331,9 @@ and formant tracking parameters.}
 
 \item{...}{Further global plotting arguments passed on to \code{par()}.}
 }
+\value{
+No return value, produces a figure.
+}
 \description{
 Generate plots of acoustic data aligned with transcriptions similar
 to those made with Praat Picture. The default is to produce a plot with a
@@ -359,8 +362,6 @@ code portion that actually adds the spectrogram to a plot is based on
 \link[phonTools:spectrogram]{phonTools::plot.spectrogram} but rewritten to use a bitmap raster for
 rendering the image if the graphics device allows for it, which
 significantly speeds up rendering the spectrogram.
-
-For
 }
 \examples{
 datapath <- system.file('extdata', package='praatpicture')

@@ -18,10 +18,11 @@
 #' @param ... Further arguments passed to `praatpicture`.
 #'
 #' @seealso See [praatpicture] for more details on how to customize plots.
+#' @return No return value, produces a plot.
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Create demo data and load demo database
 #' emuR::create_emuRdemoData(tempdir())
 #' db_path <- paste0(tempdir(), '/emuR_demoData/ae_emuDB')

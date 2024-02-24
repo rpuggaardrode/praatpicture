@@ -9,6 +9,8 @@
 #' @param args A list of vectors giving arguments used for drawing
 #' rectangles. See [praatpicture] documentation.
 #'
+#' @return No return values, called internally by [praatpicture] and sibling
+#' functions.
 #' @export
 #'
 #' @examples

@@ -27,6 +27,8 @@
 #' to be used for the text in TextGrids. Default is `'black'`. If a vector is
 #' provided, different colors are used for different tiers.
 #'
+#' @return No return values, called internally by [praatpicture] and sibling
+#' functions.
 #' @export
 #'
 #' @examples
