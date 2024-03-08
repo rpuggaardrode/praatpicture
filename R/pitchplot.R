@@ -23,6 +23,8 @@
 #' the nth line type. Default is `'dotted'`.
 #' @param plotType String giving the type of pitch plot to produce; default
 #' is `draw` (a line plot), the only other option is `speckle` (a point plot).
+#' Alternatively a vector `c('draw','speckle')` can be passed, in which case
+#' both are used.
 #' @param scale String giving the frequency scale to use when producing
 #' pitch plots. Default is `hz`; other options are `logarithmic` (also in Hz),
 #' `semitones`, `erb`, and `mel`.
@@ -61,10 +63,6 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       min_max_only=TRUE,
                       axisLabel=NULL) {
 
-  if (!plotType %in% c('draw', 'speckle')) {
-    stop('Please select either draw or speckle as the pitch plot type')
-  }
-
   if (scale == 'logarithmic') {
     logsc <- 'y'
   } else {
@@ -89,7 +87,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
-  if (plotType == 'draw') {
+  if ('draw' %in% plotType) {
     plot(pt$t, pt$f, xlim=c(start, end+start), xaxt='n', ylim=freqRange,
          yaxt=yax, type='l', log=logsc, col=color)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
@@ -103,23 +101,28 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                          lty=focusTierLineType[i])
       }
     }
+    if ('speckle' %in% plotType) {
+      graphics::points(pt$t, pt$f, pch=20, col=color)
+    }
     graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
-  if (plotType == 'speckle') {
-    plot(pt$t, pt$f, xlim=c(start, end+start), xaxt='n', ylim=freqRange,
-         yaxt=yax, type='p', pch=20, log=logsc, col=color)
-    if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
-      graphics::axis(2, at=ytix)
-    }
-    if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,1),
-                                          tick=F)
-    if (tgbool) {
-      for (i in 1:length(lines)) {
-        graphics::abline(v=lines[[i]], col=focusTierColor[i],
-                         lty=focusTierLineType[i])
+  if (length(plotType) == 1) {
+    if (plotType == 'speckle') {
+      plot(pt$t, pt$f, xlim=c(start, end+start), xaxt='n', ylim=freqRange,
+           yaxt=yax, type='p', pch=20, log=logsc, col=color)
+      if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
+        graphics::axis(2, at=ytix)
       }
+      if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,1),
+                                            tick=F)
+      if (tgbool) {
+        for (i in 1:length(lines)) {
+          graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                           lty=focusTierLineType[i])
+        }
+      }
+      graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
     }
-    graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 }

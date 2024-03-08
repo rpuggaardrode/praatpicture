@@ -50,7 +50,9 @@ vector of the same length can be passed, and the nth tier will be plotted in
 the nth line type. Default is \code{'dotted'}.}
 
 \item{plotType}{String giving the type of pitch plot to produce; default
-is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}
+is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).
+Alternatively a vector \code{c('draw','speckle')} can be passed, in which case
+both are used.}
 
 \item{scale}{String giving the frequency scale to use when producing
 pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in Hz),

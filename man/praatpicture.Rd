@@ -52,7 +52,6 @@ praatpicture(
   formant_freqRange = c(50, 5500),
   formant_plotType = "speckle",
   formant_color = "black",
-  formant_dottedLines = TRUE,
   formant_plotOnSpec = FALSE,
   formant_ssff = NULL,
   formant_axisLabel = "Frequency (Hz)",
@@ -64,6 +63,7 @@ praatpicture(
   intensity_ssff = NULL,
   intensity_axisLabel = "Intensity (dB)",
   time_axisLabel = "Time (s)",
+  draw_lines = list("formant", h = seq(0, 10000, by = 1000), lty = "dotted"),
   draw_rectangle = NULL,
   draw_arrow = NULL,
   annotate = NULL,
@@ -204,7 +204,9 @@ this frequency. Default is \code{75}.}
 this frequency. Default is \code{600}.}
 
 \item{pitch_plotType}{String giving the type of pitch plot to produce; default
-is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}
+is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).
+Alternatively a vector \code{c('draw','speckle')} can be passed, in which case
+both are used.}
 
 \item{pitch_scale}{String giving the frequency scale to use when producing
 pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in Hz),
@@ -221,7 +223,9 @@ converting pitch frequency to semitones. Default is \code{100}.}
 
 \item{pitch_color}{String giving the name of the color to be used for
 plotting pitch. Default is \code{'black'}. If \code{pitch_plotOnSpec=TRUE}, axes will
-follow the same color scheme.}
+follow the same color scheme. Also if \code{pitch_plotOnSpec=TRUE}, a vector of
+two strings can be passed, in which case the second color is used for
+background highlighting.}
 
 \item{pitch_plotOnSpec}{Boolean; should pitch be plotted on top of
 spectrogram? Default is \code{FALSE}.}
@@ -255,15 +259,19 @@ be used for producing formant plots. Default is \code{c(0,5500)}.}
 
 \item{formant_plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
-plot).}
+plot). Alternatively a vector \code{c('draw','speckle')} can be passed, in which
+case both are used.}
 
 \item{formant_color}{String or vector of strings giving the name(s) of
 colors to be used for plotting formants. If one color is provided, all
 formants will be plotted in this color. If multiple colors are provided,
-different formants will be shown in different colors. Default is \code{'black'}.}
-
-\item{formant_dottedLines}{Logical; should dotted lines indicate the
-locations of frequency multiples of 1000 as in Praat? Default is \code{TRUE}.}
+different formants will be shown in different colors. Default is \code{'black'}.
+If \code{formant_plotOnSpec=TRUE} and the length of this vector twice the number
+of formants plotted, the first
+half of strings will be used for the formants' primary colors and the second
+half will be used for background highlighting. If the length of this vector
+is one more than the number of formants plotted, the last string will
+be used for background highlighting.}
 
 \item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
@@ -286,9 +294,10 @@ used for producing intensity plots. Default is \code{NULL}, in which case the
 range is simply the minimum and maximum levels in the curve.}
 
 \item{intensity_color}{String giving the name of the color to be used for
-plotting intensity. Default is \code{'black'}.
-If \code{intensity_plotOnSpec=TRUE}, axes will
-follow the same color scheme.}
+plotting intensity. Default is \code{'black'}. If \code{intensity_plotOnSpec=TRUE},
+axes will follow the same color scheme. Also if \code{intensity_plotOnSpec=TRUE},
+a vector of two strings can be passed, in which case the second color is used
+for background highlighting.}
 
 \item{intensity_plotOnSpec}{Boolean; should intensity be plotted on top of
 spectrogram? Default is \code{FALSE}.}
@@ -303,6 +312,20 @@ will be printed on the right-hand y-axis label.}
 
 \item{time_axisLabel}{String giving the name of the label to print along
 the x-axis. Default is \code{Time (s)}.}
+
+\item{draw_lines}{Use for drawing straight lines on plot components. Takes
+an argument of type \code{list} which should contain a) a string giving the plot
+component to draw straight lines on, and b) arguments to pass on to
+\link[graphics:abline]{graphics::abline}. Should have a named argument \code{h} for horizontal lines,
+or \code{v} for vertical lines, or \code{a},\code{b} for the intercept and slope of the
+line otherwise. Alternatively a nested list can be passed if more (sets of)
+lines should be drawn. If multiple audio
+channels are plotted and lines should be added to one of these,
+use the channel identifier instead of a string giving the frame to draw on.
+The default value is \code{list('formant', h=seq(0,10000,by=1000), lty='dotted')}.
+According to Praat defaults, this means that if formants are plotted in a
+separate frame, horizontal dotted lines (\code{lty}) are shown at 1000 Hz
+intervals. To override this behavior, simply pass \code{draw_lines=NULL}.}
 
 \item{draw_rectangle}{Use for drawing rectangles on plot components. A
 vector containing a) a string giving the plot component to draw a rectangle

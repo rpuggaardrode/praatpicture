@@ -106,6 +106,8 @@
 #' this frequency. Default is `600`.
 #' @param pitch_plotType String giving the type of pitch plot to produce; default
 #' is `draw` (a line plot), the only other option is `speckle` (a point plot).
+#' Alternatively a vector `c('draw','speckle')` can be passed, in which case
+#' both are used.
 #' @param pitch_scale String giving the frequency scale to use when producing
 #' pitch plots. Default is `hz`; other options are `logarithmic` (also in Hz),
 #' `semitones`, `erb`, and `mel`.
@@ -118,7 +120,9 @@
 #' converting pitch frequency to semitones. Default is `100`.
 #' @param pitch_color String giving the name of the color to be used for
 #' plotting pitch. Default is `'black'`. If `pitch_plotOnSpec=TRUE`, axes will
-#' follow the same color scheme.
+#' follow the same color scheme. Also if `pitch_plotOnSpec=TRUE`, a vector of
+#' two strings can be passed, in which case the second color is used for
+#' background highlighting.
 #' @param pitch_plotOnSpec Boolean; should pitch be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param pitch_ssff An object of class `AsspDataObj` containing a pitch track.
@@ -143,13 +147,18 @@
 #' be used for producing formant plots. Default is `c(0,5500)`.
 #' @param formant_plotType String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
-#' plot).
+#' plot). Alternatively a vector `c('draw','speckle')` can be passed, in which
+#' case both are used.
 #' @param formant_color String or vector of strings giving the name(s) of
 #' colors to be used for plotting formants. If one color is provided, all
 #' formants will be plotted in this color. If multiple colors are provided,
 #' different formants will be shown in different colors. Default is `'black'`.
-#' @param formant_dottedLines Logical; should dotted lines indicate the
-#' locations of frequency multiples of 1000 as in Praat? Default is `TRUE`.
+#' If `formant_plotOnSpec=TRUE` and the length of this vector twice the number
+#' of formants plotted, the first
+#' half of strings will be used for the formants' primary colors and the second
+#' half will be used for background highlighting. If the length of this vector
+#' is one more than the number of formants plotted, the last string will
+#' be used for background highlighting.
 #' @param formant_plotOnSpec Boolean; should formants be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param formant_ssff An object of class `AsspDataObj` containing formant tracks.
@@ -165,9 +174,10 @@
 #' used for producing intensity plots. Default is `NULL`, in which case the
 #' range is simply the minimum and maximum levels in the curve.
 #' @param intensity_color String giving the name of the color to be used for
-#' plotting intensity. Default is `'black'`.
-#' If `intensity_plotOnSpec=TRUE`, axes will
-#' follow the same color scheme.
+#' plotting intensity. Default is `'black'`. If `intensity_plotOnSpec=TRUE`,
+#' axes will follow the same color scheme. Also if `intensity_plotOnSpec=TRUE`,
+#' a vector of two strings can be passed, in which case the second color is used
+#' for background highlighting.
 #' @param intensity_plotOnSpec Boolean; should intensity be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param intensity_ssff An object of class `AsspDataObj` containing intensity
@@ -178,6 +188,19 @@
 #' will be printed on the right-hand y-axis label.
 #' @param time_axisLabel String giving the name of the label to print along
 #' the x-axis. Default is `Time (s)`.
+#' @param draw_lines Use for drawing straight lines on plot components. Takes
+#' an argument of type `list` which should contain a) a string giving the plot
+#' component to draw straight lines on, and b) arguments to pass on to
+#' [graphics::abline]. Should have a named argument `h` for horizontal lines,
+#' or `v` for vertical lines, or `a`,`b` for the intercept and slope of the
+#' line otherwise. Alternatively a nested list can be passed if more (sets of)
+#' lines should be drawn. If multiple audio
+#' channels are plotted and lines should be added to one of these,
+#' use the channel identifier instead of a string giving the frame to draw on.
+#' The default value is `list('formant', h=seq(0,10000,by=1000), lty='dotted')`.
+#' According to Praat defaults, this means that if formants are plotted in a
+#' separate frame, horizontal dotted lines (`lty`) are shown at 1000 Hz
+#' intervals. To override this behavior, simply pass `draw_lines=NULL`.
 #' @param draw_rectangle Use for drawing rectangles on plot components. A
 #' vector containing a) a string giving the plot component to draw a rectangle
 #' on, and b) arguments to pass on to [graphics::rect]. Alternatively a list
@@ -255,13 +278,15 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          formant_windowLength=0.025, formant_dynamicRange=30,
                          formant_freqRange=c(50, 5500),
                          formant_plotType='speckle', formant_color='black',
-                         formant_dottedLines=TRUE, formant_plotOnSpec=FALSE,
+                         formant_plotOnSpec=FALSE,
                          formant_ssff=NULL, formant_axisLabel='Frequency (Hz)',
                          intensity_timeStep=NULL, intensity_minPitch=100,
                          intensity_range=NULL, intensity_color='black',
                          intensity_plotOnSpec=FALSE, intensity_ssff=NULL,
                          intensity_axisLabel='Intensity (dB)',
                          time_axisLabel='Time (s)',
+                         draw_lines=list('formant', h=seq(0,10000,by=1000),
+                                         lty='dotted'),
                          draw_rectangle=NULL, draw_arrow=NULL, annotate=NULL,
                          gender='u', ...) {
 
@@ -279,7 +304,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   if (!pitch_scale %in% legal_scales) {
     stop('Possible pitch scales are hz, logarithmic, semitones, erb, and mel')
   }
-  if (!pitch_plotType %in% c('draw', 'speckle')) {
+  if (!any(pitch_plotType %in% c('draw', 'speckle'))) {
     stop('Please select either draw or speckle as the pitch plot type')
   }
   if (sum(proportion) != 100) {
@@ -294,6 +319,9 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                                                'be the same length as the',
                                                'frames argument'))
   if (nframe > length(min_max_only)) min_max_only <- rep(min_max_only, nframe)
+
+  if (is.character(draw_lines[[1]])) draw_lines <- list(draw_lines)
+  line_comp <- sapply(draw_lines, '[[', 1)
 
   if (!is.list(draw_rectangle)) draw_rectangle <- list(draw_rectangle)
   rect_comp <- sapply(draw_rectangle, '[[', 1)
@@ -490,6 +518,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                               windowSize=(3.2/intensity_minPitch)*1000,
                               window='KAISER2_0')
       }
+      wfm$fm[which(wfm$fm==0)] <- NA
       a <- attributes(wfm)
       t <- seq(a$startTime, a$endRecord/a$sampleRate, by=1/a$sampleRate)
       fArray <- t(wfm[[1]])
@@ -564,8 +593,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       ind <- which(frames == 'sound')
       waveplot(sig, bit, t, nchan, wave_color, tgbool, focus_linevec,
                tg_focusTierColor, tg_focusTierLineType, ind,
-               rect_comp, arr_comp, annot_comp,
-               draw_rectangle, draw_arrow, annotate,
+               line_comp, rect_comp, arr_comp, annot_comp,
+               draw_lines, draw_rectangle, draw_arrow, annotate,
                wave_channelNames, cn, min_max_only)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
@@ -585,6 +614,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                                                        draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
       if ('spectrogram' %in% annot_comp) make_annot('spectrogram', annotate)
+      if ('spectrogram' %in% line_comp) draw_lines('spectrogram', draw_lines)
+      graphics::box()
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tg_tiers, tfrom0, tg_tierNames,
@@ -599,16 +630,20 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
       if ('pitch' %in% annot_comp) make_annot('pitch', annotate)
+      if ('pitch' %in% line_comp) draw_lines('pitch', draw_lines)
+      graphics::box()
     } else if (frames[i] == 'formant') {
       ind <- which(frames == 'formant')
       formantplot(fm, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                   tg_focusTierColor, tg_focusTierLineType,
                   formant_dynamicRange, formant_freqRange, formant_plotType,
-                  formant_color, formant_dottedLines, ind,
+                  formant_color, ind,
                   min_max_only, formant_axisLabel)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
       if ('formant' %in% annot_comp) make_annot('formant', annotate)
+      if ('formant' %in% line_comp) draw_lines('formant', draw_lines)
+      graphics::box()
     } else if (frames[i] == 'intensity') {
       ind <- which(frames == 'intensity')
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
@@ -619,6 +654,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                                                      draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
       if ('intensity' %in% annot_comp) make_annot('intensity', annotate)
+      if ('intensity' %in% line_comp) draw_lines('intensity', draw_lines)
+      graphics::box()
     }
   }
 

@@ -34,6 +34,8 @@
 #' @param pt Pitch object loaded using [rPraat::pt.read] or similar object.
 #' @param pitch_plotType String giving the type of pitch plot to produce; default
 #' is `draw` (a line plot), the only other option is `speckle` (a point plot).
+#' Alternatively a vector `c('draw','speckle')` can be passed, in which case
+#' both are used.
 #' @param pitch_scale String giving the frequency scale to use when producing
 #' pitch plots. Default is `hz`; other options are `logarithmic` (also in Hz),
 #' `semitones`, `erb`, and `mel`.
@@ -45,15 +47,17 @@
 #' @param pitch_axisLabel String giving the name of the label to print along the
 #' y-axis when printing a pitch track. Default is `NULL`, in which case the
 #' axis label will depend on the scale.
-#' @param pitch_color String giving the name of the color to be used for
-#' plotting pitch. Default is `'black'`.
+#' @param pitch_color String or vector of strings giving the name of the color
+#' to be used for plotting pitch. Default is `'black'`. If a vector of two
+#' strings is passed, the second color will be used for background highlighting.
 #' @param formant_plotOnSpec Boolean; should formants be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param fm Formant object loaded using [rPraat::formant.read] or similar
 #' object.
 #' @param formant_plotType String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
-#' plot).
+#' plot). Alternatively a vector `c('draw','speckle')` can be passed, in which
+#' case both are used.
 #' @param formant_dynamicRange Dynamic range in dB for producing formant plots.
 #' When a formant plot of `formant_plotType='speckle'` is drawn, no formants are
 #' shown in frames with intensity level `formant_dynamicRange` below the maximum
@@ -62,6 +66,11 @@
 #' colors to be used for plotting formants. If one color is provided, all
 #' formants will be plotted in this color. If multiple colors are provided,
 #' different formants will be shown in different colors. Default is `'black'`.
+#' If the length of this vector twice the number of formants plotted, the first
+#' half of strings will be used for the formants' primary colors and the second
+#' half will be used for background highlighting. If the length of this vector
+#' is one more than the number of formants plotted, the last string will
+#' be used for background highlighting.
 #' @param intensity_plotOnSpec Boolean; should intensity be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param it Intensity object loaded using [rPraat::it.read] or similar object.
@@ -70,8 +79,10 @@
 #' range is simply the minimum and maximum levels in the curve.
 #' @param intensity_axisLabel String giving the name of the label to print along
 #' the y-axis when plotting intensity. Default is `Intensity (dB)`.
-#' @param intensity_color String giving the name of the color to be used for
-#' plotting intensity. Default is `'black'`.
+#' @param intensity_color String or vector of strings giving the name of the
+#' color to be used for plotting intensity. Default is `'black'`. If a vector of
+#' two strings is passed, the second color will be used for background
+#' highlighting.
 #' @param tgbool Logical; should dotted lines be plotted corresponding to
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
@@ -193,11 +204,14 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
 
   graphics::image(x=xVals, y=yVals, z=spec$spectrogram,
                   col=fillCol, useRaster=useRaster, add=TRUE)
-  graphics::box()
 
   if (formant_plotOnSpec) {
     nf <- fm$maxnFormants
     if (length(formant_color) == 1) formant_color <- rep(formant_color, nf)
+    if (length(formant_color) == 2 & nf > 2) formant_color <- c(
+      rep(formant_color[1], nf), rep(formant_color[2], nf))
+    if (length(formant_color) == nf+1) formant_color <- c(
+      formant_color, rep(formant_color[nf+1], nf-1))
     if (tfrom0) fm$t <- fm$t - org_start
     if (fm$conv2db) {
       db <- gsignal::pow2db(fm$intensityVector)
@@ -210,16 +224,32 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     } else {
       subdr <- 1
     }
-    if (formant_plotType == 'draw') {
+    if ('draw' %in% formant_plotType) {
+      if (length(formant_color) == nf*2) {
+        graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[nf+1],
+                         lwd=3)
+      }
       graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[1])
       for (i in 2:nf) {
+        if (length(formant_color) == nf*2) {
+          graphics::lines(fm$t, fm$frequencyArray[i,], lwd=3,
+                          col=formant_color[nf+i])
+        }
         graphics::lines(fm$t, fm$frequencyArray[i,], col=formant_color[i])
       }
     }
-    if (formant_plotType == 'speckle') {
+    if ('speckle' %in% formant_plotType) {
+      if (length(formant_color) == nf*2) {
+        graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
+                         lwd=3, col=formant_color[nf+1])
+      }
       graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
                        col=formant_color[1])
       for (i in 2:nf) {
+        if (length(formant_color) == nf*2) {
+          graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
+                           lwd=3, col=formant_color[nf+i])
+        }
         graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
                          col=formant_color[i])
       }
@@ -238,25 +268,34 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     multiplier <- sRan / pRan
     pt$f <- (pt$f - pfr[1]) * multiplier
 
-    if (pitch_plotType == 'draw') graphics::lines(pt$t, pt$f, col=pitch_color)
-    if (pitch_plotType == 'speckle') graphics::points(pt$t, pt$f,
-                                                      pch=20, col=pitch_color)
+    if ('draw' %in% pitch_plotType) {
+      if (length(pitch_color) == 2) graphics::lines(pt$t, pt$f, lwd=3,
+                                                    col=pitch_color[2])
+      graphics::lines(pt$t, pt$f, lwd=1, col=pitch_color[1])
+    }
+    if ('speckle' %in% pitch_plotType) {
+      if (length(pitch_color) == 2) graphics::points(pt$t, pt$f, lwd=3, pch=20,
+                                                     col=pitch_color[2])
+      graphics::points(pt$t, pt$f, pch=20, col=pitch_color[1])
+    }
 
     pline <- c(3.5,1)
     if (intensity_plotOnSpec) pline <- c(1,1)
 
     graphics::mtext(pitch_axisLabel, side=4, line=pline[1], cex=0.8, las=3,
-                    col=pitch_color)
+                    col=pitch_color[1])
 
     if (min_max_only[ind]) {
       graphics::mtext(pitch_freqRange[1], side=4, line=pline[2],
-                      at=freqRange[1], padj=0, las=2, cex=0.7, col=pitch_color)
+                      at=freqRange[1], padj=0, las=2, cex=0.7,
+                      col=pitch_color[1])
       graphics::mtext(pitch_freqRange[2], side=4, line=pline[2],
-                      at=freqRange[2], padj=1, las=2, cex=0.7, col=pitch_color)
+                      at=freqRange[2], padj=1, las=2, cex=0.7,
+                      col=pitch_color[1])
     } else {
       rtix <- pretty(pfr[1]:pfr[2])
       graphics::axis(4, at=(rtix-pfr[1])*multiplier, labels=rtix,
-                     col.ticks=pitch_color, col.axis=pitch_color)
+                     col.ticks=pitch_color[1], col.axis=pitch_color[1])
     }
   }
 
@@ -267,24 +306,26 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     multiplier <- sRan / iRan
     it$i <- (it$i - intensity_range[1]) * multiplier
 
-    graphics::lines(it$t, it$i, col=intensity_color)
+    if (length(intensity_color) == 2) graphics::lines(it$t, it$i, lwd=3,
+                                                      col=intensity_color[2])
+    graphics::lines(it$t, it$i, col=intensity_color[1])
     iline <- c(3.5,1)
     if (pitch_plotOnSpec) iline <- c(3.5,3.5)
 
     graphics::mtext(intensity_axisLabel, side=4, line=iline[1], cex=0.8, las=3,
-                    col=intensity_color)
+                    col=intensity_color[1])
 
     if (min_max_only[ind]) {
       graphics::mtext(round(intensity_range[1], 0),
                       side=4, line=iline[2], at=freqRange[1],
-                      padj=0, las=2, cex=0.7, col=intensity_color)
+                      padj=0, las=2, cex=0.7, col=intensity_color[1])
       graphics::mtext(round(intensity_range[2]),
                       side=4, line=iline[2], at=freqRange[2],
-                      padj=1, las=2, cex=0.7, col=intensity_color)
+                      padj=1, las=2, cex=0.7, col=intensity_color[1])
     } else {
       rtix <- pretty(intensity_range[1]:intensity_range[2])
       graphics::axis(4, at=(rtix-intensity_range[1])*multiplier, labels=rtix,
-                     col.ticks=intensity_color, col.axis=intensity_color)
+                     col.ticks=intensity_color[1], col.axis=intensity_color[1])
     }
   }
 

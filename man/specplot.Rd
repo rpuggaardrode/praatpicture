@@ -87,7 +87,9 @@ spectrogram? Default is \code{FALSE}.}
 \item{pt}{Pitch object loaded using \link[rPraat:pt.read]{rPraat::pt.read} or similar object.}
 
 \item{pitch_plotType}{String giving the type of pitch plot to produce; default
-is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).}
+is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).
+Alternatively a vector \code{c('draw','speckle')} can be passed, in which case
+both are used.}
 
 \item{pitch_scale}{String giving the frequency scale to use when producing
 pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in Hz),
@@ -103,8 +105,9 @@ following Praat defaults.}
 y-axis when printing a pitch track. Default is \code{NULL}, in which case the
 axis label will depend on the scale.}
 
-\item{pitch_color}{String giving the name of the color to be used for
-plotting pitch. Default is \code{'black'}.}
+\item{pitch_color}{String or vector of strings giving the name of the color
+to be used for plotting pitch. Default is \code{'black'}. If a vector of two
+strings is passed, the second color will be used for background highlighting.}
 
 \item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
@@ -114,7 +117,8 @@ object.}
 
 \item{formant_plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
-plot).}
+plot). Alternatively a vector \code{c('draw','speckle')} can be passed, in which
+case both are used.}
 
 \item{formant_dynamicRange}{Dynamic range in dB for producing formant plots.
 When a formant plot of \code{formant_plotType='speckle'} is drawn, no formants are
@@ -124,7 +128,12 @@ intensity. Default is \code{30}. If set to \code{0}, all formants are shown.}
 \item{formant_color}{String or vector of strings giving the name(s) of
 colors to be used for plotting formants. If one color is provided, all
 formants will be plotted in this color. If multiple colors are provided,
-different formants will be shown in different colors. Default is \code{'black'}.}
+different formants will be shown in different colors. Default is \code{'black'}.
+If the length of this vector twice the number of formants plotted, the first
+half of strings will be used for the formants' primary colors and the second
+half will be used for background highlighting. If the length of this vector
+is one more than the number of formants plotted, the last string will
+be used for background highlighting.}
 
 \item{intensity_plotOnSpec}{Boolean; should intensity be plotted on top of
 spectrogram? Default is \code{FALSE}.}
@@ -138,8 +147,10 @@ range is simply the minimum and maximum levels in the curve.}
 \item{intensity_axisLabel}{String giving the name of the label to print along
 the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
 
-\item{intensity_color}{String giving the name of the color to be used for
-plotting intensity. Default is \code{'black'}.}
+\item{intensity_color}{String or vector of strings giving the name of the
+color to be used for plotting intensity. Default is \code{'black'}. If a vector of
+two strings is passed, the second color will be used for background
+highlighting.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}

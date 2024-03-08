@@ -24,12 +24,16 @@
 #' the nth line type. Default is `'dotted'`.
 #' @param ind Integer indexing waveform relative to other plot components.
 #' Default is `NULL`.
+#' @param line_comp Vector of strings or numbers giving plot components to draw
+#' straight lines on. Default is `NULL`.
 #' @param rect_comp Vector of strings or numbers giving plot components to draw
 #' rectangles on. Default is `NULL`.
 #' @param arr_comp Vector of strings of numbers giving plot components to draw
 #' arrows on. Default is `NULL`.
 #' @param annot_comp Vector of strings of numbers giving plot components to
 #' annotate. Default is `NULL`.
+#' @param draw_lines List of arguments for drawing straight lines passed from
+#' `praatpicture()`. Default is `NULL`.
 #' @param draw_rectangle List of arguments for drawing rectangles passed from
 #' `praatpicture()`. Default is `NULL`.
 #' @param draw_arrow List of arguments for drawing arrows passed from
@@ -56,10 +60,11 @@
 #' praatpicture(soundFile, frames='sound')
 waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
                      lines=NULL, focusTierColor='black',
-                     focusTierLineType='dotted', ind=NULL,
+                     focusTierLineType='dotted', ind=NULL, line_comp=NULL,
                      rect_comp=NULL, arr_comp=NULL, annot_comp=NULL,
-                     draw_rectangle=NULL, draw_arrow=NULL, annotate=NULL,
-                     channelNames=FALSE, cn=NULL, min_max_only=TRUE) {
+                     draw_lines=NULL, draw_rectangle=NULL, draw_arrow=NULL,
+                     annotate=NULL, channelNames=FALSE, cn=NULL,
+                     min_max_only=TRUE) {
   for (i in 1:nchan) {
 
     sig[,i] <- sig[,i] / (2^(bit - 1) - 1)
@@ -94,9 +99,11 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
     if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)
     if ('sound' %in% arr_comp) draw_arrow('sound', draw_arrow)
     if ('sound' %in% annot_comp) make_annot('sound', annotate)
+    if ('sound' %in% line_comp) draw_lines('sound', draw_lines)
 
     if (i %in% rect_comp) draw_rectangle(i, draw_rectangle)
     if (i %in% arr_comp) draw_arrow(i, draw_arrow)
     if (i %in% annot_comp) make_annot(i, annotate)
+    if (i %in% line_comp) draw_lines(i, draw_lines)
   }
 }
