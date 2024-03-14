@@ -170,7 +170,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                                  windowparameter=0.4)
 
   freqdom <- as.numeric(unlist(dimnames(spec$spectrogram)[2]))
-  within_freqran <- which(freqdom < freqRange[2])
+  within_freqran <- which(freqdom < freqRange[2] & freqdom > freqRange[1])
   spec$spectrogram <- spec$spectrogram[,within_freqran]
 
   time_s <- as.numeric(rownames(spec$spectrogram))/1000

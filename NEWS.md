@@ -1,3 +1,8 @@
+# praatpicture 1.1.1
+
+* Fixed bug that made it impossible to control the lower frequency range of
+spectrograms.
+
 # praatpicture 1.1.0
 
 * Options added to draw straight lines (vertical, horizontal, or otherwise) on 
