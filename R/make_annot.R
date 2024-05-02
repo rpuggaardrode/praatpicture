@@ -25,6 +25,10 @@ make_annot <- function(plot_component, args) {
     params <- args[[i]]
     params <- as.list(params[2:length(params)])
     for (p in 1:2) params[[p]] <- as.numeric(params[[p]])
+    for (p in c('adj', 'pos', 'offset', 'cex', 'font')) {
+      params[which(names(params) == p)] <-
+        as.numeric(params[which(names(params) == p)])
+    }
     do.call(eval(parse(text='graphics::text')), params)
   }
 }

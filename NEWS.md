@@ -1,3 +1,8 @@
+# praatpicture 1.1.4
+
+* It's now possible to change font sizes, text adjustment, alignment, etc. 
+when using the `annotate` argument
+
 # praatpicture 1.1.3
 
 * Fixed bug that made it impossible to control which channel to highlight
