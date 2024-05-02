@@ -4,7 +4,7 @@
 #' and small caps into expressions that can be read by base R plots.
 #' Instead of using
 #' this function directly, just use
-#' `praatpicture('my_sound_file', frames='TextGrid', tg_specialchar=TRUE)`.
+#' `praatpicture('my_sound_file', frames='TextGrid', tg_specialChar=TRUE)`.
 #'
 #' @param lab A string or vector of strings with labels from a TextGrid.
 #'

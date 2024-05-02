@@ -1,3 +1,8 @@
+# praatpicture 1.1.3
+
+* Fixed bug that made it impossible to control which channel to highlight
+when plotting multiple channels and other frames
+
 # praatpicture 1.1.2 
 
 * Added option to add a vector of strings to `wave_color`, for plotting 

@@ -69,34 +69,34 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
 
   if (length(color) != nchan) color <- rep(color, nchan)
 
-  for (i in 1:nchan) {
+  for (j in 1:nchan) {
 
-    sig[,i] <- sig[,i] / (2^(bit - 1) - 1)
+    sig[,j] <- sig[,j] / (2^(bit - 1) - 1)
 
     if (!min_max_only[ind]) {
-      if (i == 1 & ind == 1) {
+      if (j == 1 & ind == 1) {
         yax <- 's'
       } else {
-        ytix <- grDevices::axisTicks(c(min(sig[,i]), max(sig[,i])), log=F)
+        ytix <- grDevices::axisTicks(c(min(sig[,j]), max(sig[,j])), log=F)
         ytix <- ytix[-length(ytix)]
         yax <- 'n'
       }
     } else {
       yax <- 'n'
-      ytix <- c(round(min(sig[,i]), 3), 0, round(max(sig[,i]), 2))
+      ytix <- c(round(min(sig[,j]), 3), 0, round(max(sig[,j]), 2))
     }
 
-    plot(t[-1], sig[,i], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
-         col=color[i])
+    plot(t[-1], sig[,j], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
+         col=color[j])
 
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,0.5,1),
                                           tick=F)
-    if (channelNames) graphics::mtext(cn[i], side=2, las=2, line=3.5, cex=0.8)
+    if (channelNames) graphics::mtext(cn[j], side=2, las=2, line=3.5, cex=0.8)
     if (tgbool) {
-      for (i in 1:length(lines)) {
-        graphics::abline(v=lines[[i]], col=focusTierColor[i],
-                       lty=focusTierLineType[i])
+      for (k in 1:length(lines)) {
+        graphics::abline(v=lines[[k]], col=focusTierColor[k],
+                       lty=focusTierLineType[k])
       }
     }
 
@@ -105,9 +105,9 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
     if ('sound' %in% annot_comp) make_annot('sound', annotate)
     if ('sound' %in% line_comp) draw_lines('sound', draw_lines)
 
-    if (i %in% rect_comp) draw_rectangle(i, draw_rectangle)
-    if (i %in% arr_comp) draw_arrow(i, draw_arrow)
-    if (i %in% annot_comp) make_annot(i, annotate)
-    if (i %in% line_comp) draw_lines(i, draw_lines)
+    if (j %in% rect_comp) draw_rectangle(j, draw_rectangle)
+    if (j %in% arr_comp) draw_arrow(j, draw_arrow)
+    if (j %in% annot_comp) make_annot(j, annotate)
+    if (j %in% line_comp) draw_lines(j, draw_lines)
   }
 }
