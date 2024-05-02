@@ -1,6 +1,6 @@
 Package: praatpicture
 Title: 'Praat Picture' Style Plots of Acoustic Data
-Version: 1.1.1
+Version: 1.1.2
 Authors@R: 
     person("Rasmus", "Puggaard-Rode", 
     email = "r.puggaard@phonetik.uni-muenchen.de", 

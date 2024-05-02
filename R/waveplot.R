@@ -9,7 +9,8 @@
 #' @param t Numeric vector giving times corresponding to the signal.
 #' @param nchan Numeric; how many channels will be plotted? Default is `1`.
 #' @param color String giving the name of the color to be used for plotting
-#' the waveform. Default is `'black'`.
+#' the waveform. Default is `'black'`. Alternatively, a vector of colors, if
+#' different channels should be plotted with different colors.
 #' @param tgbool Logical; should dotted lines be plotted corresponding to
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
@@ -65,6 +66,9 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
                      draw_lines=NULL, draw_rectangle=NULL, draw_arrow=NULL,
                      annotate=NULL, channelNames=FALSE, cn=NULL,
                      min_max_only=TRUE) {
+
+  if (length(color) != nchan) color <- rep(color, nchan)
+
   for (i in 1:nchan) {
 
     sig[,i] <- sig[,i] / (2^(bit - 1) - 1)
@@ -83,7 +87,7 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
     }
 
     plot(t[-1], sig[,i], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
-         col=color)
+         col=color[i])
 
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,0.5,1),

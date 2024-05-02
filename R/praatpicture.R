@@ -41,7 +41,8 @@
 #' channels are named `Cn`, where `n` is the number of the channel. Alternatvely,
 #' a vector of strings can be provided with channel names. Default is `FALSE`.
 #' @param wave_color String giving the name of the color to be used for plotting
-#' the waveform. Default is `'black'`.
+#' the waveform. Default is `'black'`. Alternatively a vector of strings, if
+#' different colors should be used for different channels.
 #' @param tg_obj A TextGrid object returned by the [make_TextGrid()] function.
 #' @param tg_tiers Vector of numbers or strings giving either numeric identifiers
 #' of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also

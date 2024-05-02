@@ -1,3 +1,8 @@
+# praatpicture 1.1.2 
+
+* Added option to add a vector of strings to `wave_color`, for plotting 
+different channels using different colors.
+
 # praatpicture 1.1.1
 
 * Fixed bug that made it impossible to control the lower frequency range of

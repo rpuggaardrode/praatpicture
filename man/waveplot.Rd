@@ -38,7 +38,8 @@ waveplot(
 \item{nchan}{Numeric; how many channels will be plotted? Default is \code{1}.}
 
 \item{color}{String giving the name of the color to be used for plotting
-the waveform. Default is \code{'black'}.}
+the waveform. Default is \code{'black'}. Alternatively, a vector of colors, if
+different channels should be plotted with different colors.}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}

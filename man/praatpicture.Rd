@@ -119,7 +119,8 @@ channels are named \code{Cn}, where \code{n} is the number of the channel. Alter
 a vector of strings can be provided with channel names. Default is \code{FALSE}.}
 
 \item{wave_color}{String giving the name of the color to be used for plotting
-the waveform. Default is \code{'black'}.}
+the waveform. Default is \code{'black'}. Alternatively a vector of strings, if
+different colors should be used for different channels.}
 
 \item{tg_obj}{A TextGrid object returned by the \code{\link[=make_TextGrid]{make_TextGrid()}} function.}
 
