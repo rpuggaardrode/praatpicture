@@ -1,6 +1,6 @@
 Package: praatpicture
 Title: 'Praat Picture' Style Plots of Acoustic Data
-Version: 1.1.4
+Version: 1.2.0
 Authors@R: 
     person("Rasmus", "Puggaard-Rode", 
     email = "r.puggaard@phonetik.uni-muenchen.de", 
@@ -13,6 +13,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
     av (>= 0.9.0),
+    bslib (>= 0.6.1),
     crayon (>= 1.5.2),
     emuR (>= 2.4.2),
     gifski (>= 1.12.0.2),
@@ -23,6 +24,8 @@ Imports:
     phonTools (>= 0.2.2.2),
     rPraat (>= 1.3.2.1),
     rstudioapi (>= 0.15.0),
+    shiny (>= 1.8.1.1),
+    shinyjs (>= 2.1.0),
     soundgen (>= 2.6.2),
     tuneR (>= 1.4.6),
     utils (>= 4.3.2),
