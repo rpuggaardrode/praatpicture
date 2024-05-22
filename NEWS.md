@@ -1,3 +1,10 @@
+# praatpicture 1.2.0
+
+* Shiny support has been added with the `shiny_praatpicture()` function.
+* The `proportion` argument no longer has to add up to 100.
+* Users can now specify the location of a `.TextGrid` file when plotting
+annotations.
+
 # praatpicture 1.1.4
 
 * It's now possible to change font sizes, text adjustment, alignment, etc. 
