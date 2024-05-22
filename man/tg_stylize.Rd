@@ -17,7 +17,7 @@ Helper function for converting Praat font styles such as italics, bold,
 and small caps into expressions that can be read by base R plots.
 Instead of using
 this function directly, just use
-\code{praatpicture('my_sound_file', frames='TextGrid', tg_specialchar=TRUE)}.
+\code{praatpicture('my_sound_file', frames='TextGrid', tg_specialChar=TRUE)}.
 }
 \examples{
 # Don't use directly

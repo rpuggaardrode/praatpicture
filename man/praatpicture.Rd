@@ -18,6 +18,7 @@ praatpicture(
   wave_channelNames = FALSE,
   wave_color = "black",
   tg_obj = NULL,
+  tg_file = NULL,
   tg_tiers = "all",
   tg_focusTier = tg_tiers[1],
   tg_focusTierColor = "black",
@@ -26,7 +27,7 @@ praatpicture(
   tg_alignment = "central",
   tg_specialChar = FALSE,
   tg_color = "black",
-  spec_channel = 1,
+  spec_channel = NULL,
   spec_freqRange = c(0, 5000),
   spec_windowLength = 0.005,
   spec_dynamicRange = 50,
@@ -91,8 +92,7 @@ details for more information.}
 
 \item{proportion}{Integer or vector of integers of the same size as \code{frames}
 giving the proportion in percents of the plotting area to be taken up by the
-individual frames. The numbers should sum up to 100.
-Default is \code{c(30,50,20)}. If more or less than three
+individual frames. Default is \code{c(30,50,20)}. If more or less than three
 frames are plotted and no proportions are given, frames will be of equal
 size.}
 
@@ -123,6 +123,10 @@ the waveform. Default is \code{'black'}. Alternatively a vector of strings, if
 different colors should be used for different channels.}
 
 \item{tg_obj}{A TextGrid object returned by the \code{\link[=make_TextGrid]{make_TextGrid()}} function.}
+
+\item{tg_file}{Path of file to be used for plotting TextGrid. Default is
+\code{NULL}, in which case the function searches for a TextGrid sharing the same
+base name as \code{sound} with the \code{.TextGrid} extension.}
 
 \item{tg_tiers}{Vector of numbers or strings giving either numeric identifiers
 of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
