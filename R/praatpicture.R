@@ -19,8 +19,7 @@
 #' details for more information.
 #' @param proportion Integer or vector of integers of the same size as `frames`
 #' giving the proportion in percents of the plotting area to be taken up by the
-#' individual frames. The numbers should sum up to 100.
-#' Default is `c(30,50,20)`. If more or less than three
+#' individual frames. Default is `c(30,50,20)`. If more or less than three
 #' frames are plotted and no proportions are given, frames will be of equal
 #' size.
 #' @param mainTitle String giving a title to print at the top left.
@@ -43,6 +42,9 @@
 #' @param wave_color String giving the name of the color to be used for plotting
 #' the waveform. Default is `'black'`. Alternatively a vector of strings, if
 #' different colors should be used for different channels.
+#' @param tg_file Path of file to be used for plotting TextGrid. Default is
+#' `NULL`, in which case the function searches for a TextGrid sharing the same
+#' base name as `sound` with the `.TextGrid` extension.
 #' @param tg_obj A TextGrid object returned by the [make_TextGrid()] function.
 #' @param tg_tiers Vector of numbers or strings giving either numeric identifiers
 #' of TextGrid tiers to plot or the names of TextGrid tiers to plot. Also
@@ -260,12 +262,12 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          start_end_only=TRUE, min_max_only=TRUE,
                          wave_channels='all', wave_channelNames=FALSE,
                          wave_color='black',
-                         tg_obj=NULL, tg_tiers='all',tg_focusTier=tg_tiers[1],
-                         tg_focusTierColor='black',
+                         tg_obj=NULL, tg_file=NULL, tg_tiers='all',
+                         tg_focusTier=tg_tiers[1], tg_focusTierColor='black',
                          tg_focusTierLineType='dotted', tg_tierNames=TRUE,
                          tg_alignment='central', tg_specialChar=FALSE,
                          tg_color='black',
-                         spec_channel=1, spec_freqRange=c(0,5000),
+                         spec_channel=NULL, spec_freqRange=c(0,5000),
                          spec_windowLength=0.005, spec_dynamicRange=50,
                          spec_timeStep=1000, spec_windowShape='Gaussian',
                          spec_colors=c('white', 'black'),
@@ -308,9 +310,11 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   if (!any(pitch_plotType %in% c('draw', 'speckle'))) {
     stop('Please select either draw or speckle as the pitch plot type')
   }
-  if (sum(proportion) != 100) {
-    stop('The numbers in proportion should sum up to 100')
-  }
+  # if (sum(proportion) != 100) {
+  #   stop('The numbers in proportion should sum up to 100')
+  # }
+
+  proportion <- round((proportion / sum(proportion)) * 100)
 
   nframe <- length(frames)
   if (nframe != 3 & length(proportion) != nframe) {
@@ -344,7 +348,18 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   bit <- snd@bit
   nsamp <- snd@dim[1]
   nchan <- snd@dim[2]
-  if (any(wave_channels == 'all')) wave_channels <- 1:nchan
+  if (any(wave_channels == 'all')) {
+    wave_channels <- 1:nchan
+  }
+
+  if (any(is.null(spec_channel))) {
+    if (any(wave_channels == 'all')) {
+      spec_channel <- 1
+    } else {
+      spec_channel <- wave_channels[1]
+    }
+  }
+
   sig <- snd@.Data[,wave_channels]
   if (any(class(sig) == 'integer')) sig <- as.matrix(sig)
   nchan <- dim(sig)[2]
@@ -375,7 +390,11 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   fn <- paste(spl[1:(length(spl)-1)], collapse='.')
 
   if ('TextGrid' %in% frames) {
-    tgfn <- paste0(fn, '.TextGrid')
+    if (!is.null(tg_file)) {
+      tgfn <- tg_file
+    } else {
+      tgfn <- paste0(fn, '.TextGrid')
+    }
     if (!is.null(tg_obj)) {
       tg <- tg_obj
     } else if (file.exists(tgfn)) {
