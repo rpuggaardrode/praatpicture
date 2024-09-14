@@ -1,3 +1,6 @@
+# praatpicture 1.2.1
+* Fixed color issue when plotting point tiers in `tgplot()`.
+
 # praatpicture 1.2.0
 
 * Shiny support has been added with the `shiny_praatpicture()` function.

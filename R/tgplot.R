@@ -88,8 +88,8 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
       if (alignment[[i]]=='right') graphics::text(
         t2, 5, lab, pos=2, col=color[i], adj=c(0.5, 0.5))
     } else {
-      graphics::segments(x0=line_vec, x1=line_vec, y0=0, y1=2)
-      graphics::segments(x0=line_vec, x1=line_vec, y0=8, y1=10)
+      graphics::segments(x0=line_vec, x1=line_vec, y0=0, y1=2, col=color[i])
+      graphics::segments(x0=line_vec, x1=line_vec, y0=8, y1=10, col=color[i])
       graphics::text(t0, 5, lab, adj=c(0.5,0.5), col=color[i])
     }
     if (tierNames) graphics::mtext(tname, side=2, las=2, line=0.6, cex=0.8)
