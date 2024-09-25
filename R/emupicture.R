@@ -15,10 +15,14 @@
 #' @param intensity_ssffExt
 #' String giving the file extension for an SSFF track with intensity data to
 #' plot. Default is `NULL`.
-#' @param ... Further arguments passed to `praatpicture`.
+#' @param talking Boolean; should a video be created with embedded audio, as
+#' when using [talking_praatpicture]? Default is `FALSE`.
+#' @param ... Further arguments passed to [praatpicture] (or
+#' [talking_praatpicture] if `talking = TRUE`).
 #'
-#' @seealso See [praatpicture] for more details on how to customize plots.
-#' @return No return value, produces a plot.
+#' @seealso See [praatpicture] for more details on how to customize plots and
+#' [talking_praatpicture] for more details on how to customize videos.
+#' @return No return value, produces a plot or a video.
 #' @export
 #'
 #' @examples
@@ -39,7 +43,7 @@
 #' }
 emupicture <- function(db_handle, session='0000', bundle,
                        pitch_ssffExt=NULL, formant_ssffExt=NULL,
-                       intensity_ssffExt=NULL, ...) {
+                       intensity_ssffExt=NULL, talking=FALSE, ...) {
   tg <- FALSE
   args <- list(...)
   if ('frames' %in% names(args) & 'TextGrid' %in% args$frames) tg <- TRUE
@@ -76,7 +80,14 @@ emupicture <- function(db_handle, session='0000', bundle,
     wit <- NULL
   }
 
-  praatpicture(fn, tg_specialChar=FALSE,
-               pitch_ssff=wpt, formant_ssff=wft, intensity_ssff=wit, ...)
+  if (talking) {
+    talking_praatpicture(fn, tg_specialChar=FALSE,
+                         pitch_ssff=wpt, formant_ssff=wft, intensity_ssff=wit,
+                         ...)
+  } else {
+    praatpicture(fn, tg_specialChar=FALSE,
+                 pitch_ssff=wpt, formant_ssff=wft, intensity_ssff=wit, ...)
+  }
+
   if (tg) unlink(session, recursive=T)
 }

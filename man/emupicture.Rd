@@ -11,6 +11,7 @@ emupicture(
   pitch_ssffExt = NULL,
   formant_ssffExt = NULL,
   intensity_ssffExt = NULL,
+  talking = FALSE,
   ...
 )
 }
@@ -32,10 +33,14 @@ with formant data to plot. Default is \code{NULL}.}
 \item{intensity_ssffExt}{String giving the file extension for an SSFF track with intensity data to
 plot. Default is \code{NULL}.}
 
-\item{...}{Further arguments passed to \code{praatpicture}.}
+\item{talking}{Boolean; should a video be created with embedded audio, as
+when using \link{talking_praatpicture}? Default is \code{FALSE}.}
+
+\item{...}{Further arguments passed to \link{praatpicture} (or
+\link{talking_praatpicture} if \code{talking = TRUE}).}
 }
 \value{
-No return value, produces a plot.
+No return value, produces a plot or a video.
 }
 \description{
 Generate plots in the style of Praat Pictures from sound files and annotations
@@ -59,5 +64,6 @@ proportion=c(30,70), formant_ssffExt='fms')
 }
 }
 \seealso{
-See \link{praatpicture} for more details on how to customize plots.
+See \link{praatpicture} for more details on how to customize plots and
+\link{talking_praatpicture} for more details on how to customize videos.
 }

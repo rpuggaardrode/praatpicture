@@ -1,3 +1,8 @@
+# praatpicture 1.2.2
+* Added `talking` argument to `emupicture()`, allowing users to make
+`talking_praatpicture()` plots with embedded audio directly from an EMU 
+database.
+
 # praatpicture 1.2.1
 * Fixed color issue when plotting point tiers in `tgplot()`.
 
