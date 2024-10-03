@@ -80,7 +80,7 @@ ui <- bslib::page_sidebar(
                                      1000)),
         shinyjs::hidden(selectInput('spec_windowShape', 'Window shape',
                                     choices = c('Gaussian', 'Hamming', 'Hanning',
-                                                'Bartlett', 'square'),
+                                                'Bartlett', 'square', 'Blackman'),
                                     selected = 'Gaussian')),
         shinyjs::hidden(textInput('spec_colors', 'Colors (comma-delimited)',
                                   'white,black'),
