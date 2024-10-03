@@ -1,3 +1,16 @@
+# praatpicture 1.2.3
+* Added `Blackman` as a possible option to `spec_windowShape`. Blackman windows
+were already available in `phonTools::windowfunc()` which is used to generate
+windows for spectrogram estimation. These weren't originally used by 
+`praatpicture()` as they're not implemented in Praat, but I decided to add 
+them because the Gaussian windows used by `phonTools::windowfunc()` don't
+behave the same as Praat. If you the spectrogram of a simple sine wave using
+the Gaussian windows, sidelobes (horizontal lines) are clearly visible in the
+spectrogram; these are artefacts of the windowing and should theoretically
+not be there when using Gaussian windows (at least according to the Praat 
+documentation), but for some reason they are. 
+* Increased the upload limit for the Shiny server to approx 50 MB.
+
 # praatpicture 1.2.2
 * Added `talking` argument to `emupicture()`, allowing users to make
 `talking_praatpicture()` plots with embedded audio directly from an EMU 

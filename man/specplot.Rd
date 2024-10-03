@@ -73,7 +73,13 @@ plotting parameters it is a good idea to choose a smaller value.}
 
 \item{windowShape}{String giving the name of the window shape to be applied
 to the signal when generating spectrograms. Default is \code{Gaussian}; other
-options are \code{square}, \code{Hamming}, \code{Bartlett}, or \code{Hanning}.}
+options are \code{square}, \code{Hamming}, \code{Bartlett}, \code{Hanning}, or \code{Blackman}.
+Note that the Gaussian window function provided by the \code{phonTools} package
+and used in \code{praatpicture()} does not have the same properties as the
+Gaussian window function used for spectral estimation in Praat; plotting
+a simple sine wave with high dynamic range will produce sidelobes in
+\code{praatpicture()} but not in Praat. It's recommended to use Blackman windows
+instead if you have this problem.}
 
 \item{colors}{Vector of strings giving the names of colors to be used
 for plotting the spectrogram; default is \code{c('white', 'black')}. The first

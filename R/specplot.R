@@ -23,7 +23,13 @@
 #' plotting parameters it is a good idea to choose a smaller value.
 #' @param windowShape String giving the name of the window shape to be applied
 #' to the signal when generating spectrograms. Default is `Gaussian`; other
-#' options are `square`, `Hamming`, `Bartlett`, or `Hanning`.
+#' options are `square`, `Hamming`, `Bartlett`, `Hanning`, or `Blackman`.
+#' Note that the Gaussian window function provided by the `phonTools` package
+#' and used in `praatpicture()` does not have the same properties as the
+#' Gaussian window function used for spectral estimation in Praat; plotting
+#' a simple sine wave with high dynamic range will produce sidelobes in
+#' `praatpicture()` but not in Praat. It's recommended to use Blackman windows
+#' instead if you have this problem.
 #' @param colors Vector of strings giving the names of colors to be used
 #' for plotting the spectrogram; default is `c('white', 'black')`. The first
 #' value is used for plotting the lowest visible amplitude, and the last for
@@ -134,10 +140,11 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
   wl <- windowLength*1000
   ts <- -timeStep
 
-  legal_ws <- c('square', 'Hamming', 'Bartlett', 'Hanning', 'Gaussian')
+  legal_ws <- c('square', 'Hamming', 'Bartlett', 'Hanning', 'Gaussian',
+                'Blackman')
   if (!windowShape %in% legal_ws) {
-    stop('Possible window shapes are square, Hamming, Bartlett, Hanning, or ',
-         'Gaussian.')
+    stop('Possible window shapes are square, Hamming, Bartlett, Hanning, ',
+         'Gaussian, or Blackman.')
   }
 
   if (tfrom0) {
@@ -150,6 +157,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
   if (windowShape == 'Bartlett') ws <- 'bartlett'
   if (windowShape == 'Hanning') ws <- 'hann'
   if (windowShape == 'Gaussian') ws <- 'gaussian'
+  if (windowShape == 'Blackman') ws <- 'blackman'
 
   if (!min_max_only[ind]) {
     if (ind == 1) {
