@@ -1,3 +1,14 @@
+# praatpicture 1.2.4
+* Added the option to plot read and plot `Pitch` files with the `.Pitch` 
+extension generated in R in addition to `PitchTier` files with the `.PitchTier`
+extension. If a `.Pitch` file is available with the same base name as the
+plotted sound file, this is now by default used to when plotting pitch unless 
+a `.PitchTier` file is also available. Plotting a `.Pitch` file is likely 
+somewhat slower than plotting a `.PitchTier` file, but they are simpler to 
+generate and this fixes the bug where plotting `.PitchTier` files with 
+`pitch_plotType = 'draw'` would linearly extrapolate pitch in unvoiced regions.
+
+
 # praatpicture 1.2.3
 * Added `Blackman` as a possible option to `spec_windowShape`. Blackman windows
 were already available in `phonTools::windowfunc()` which is used to generate

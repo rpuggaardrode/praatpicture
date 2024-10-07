@@ -379,8 +379,8 @@ When available, pitch, formant, and intensity tracks are loaded
 from Praat files with the same base name as \code{sound}; i.e., if your sound
 file is called \verb{1.wav} and there is a Praat file called \verb{1.Formant} in the
 same directory, this file is used for plotting formants. Pitch files should
-have the \code{PitchTier} extension, and intensity files should have the
-\code{IntensityTier} extension.
+have either the \code{PitchTier} or \code{Pitch} extension, and intensity files should
+have the \code{IntensityTier} extension.
 
 If no such files are available, the signal processing tools in the \code{wrassp}
 package are used; pitch is tracked with the function \link[wrassp:ksvF0]{wrassp::ksvF0},

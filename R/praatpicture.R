@@ -237,8 +237,8 @@
 #' from Praat files with the same base name as `sound`; i.e., if your sound
 #' file is called `1.wav` and there is a Praat file called `1.Formant` in the
 #' same directory, this file is used for plotting formants. Pitch files should
-#' have the `PitchTier` extension, and intensity files should have the
-#' `IntensityTier` extension.
+#' have either the `PitchTier` or `Pitch` extension, and intensity files should
+#' have the `IntensityTier` extension.
 #'
 #' If no such files are available, the signal processing tools in the `wrassp`
 #' package are used; pitch is tracked with the function [wrassp::ksvF0],
@@ -316,9 +316,6 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   if (!any(pitch_plotType %in% c('draw', 'speckle'))) {
     stop('Please select either draw or speckle as the pitch plot type')
   }
-  # if (sum(proportion) != 100) {
-  #   stop('The numbers in proportion should sum up to 100')
-  # }
 
   proportion <- round((proportion / sum(proportion)) * 100)
 
@@ -483,6 +480,14 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
     if (file.exists(paste0(fn, '.PitchTier'))) {
       ptfn <- paste0(fn, '.PitchTier')
       pt <- rPraat::pt.read(ptfn)
+    } else if (file.exists(paste0(fn, '.Pitch'))) {
+      ptfn <- paste0(fn, '.Pitch')
+      pt <- rPraat::pitch.read(ptfn)
+      f <- c()
+      for (i in 1:length(pt$frame)) f[i] <- pt$frame[[i]]$frequency[1]
+      t <- pt$t
+      f[which(f==0)] <- NA
+      pt <- list(t = t, f = f)
     } else {
       if (!is.null(pitch_ssff)) {
         wpt <- pitch_ssff
