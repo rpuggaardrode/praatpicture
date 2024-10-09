@@ -24,6 +24,7 @@ waveplot(
   draw_arrow = NULL,
   annotate = NULL,
   channelNames = FALSE,
+  lineWidth = 1,
   cn = NULL,
   min_max_only = TRUE
 )
@@ -86,6 +87,9 @@ annotate. Default is \code{NULL}.}
 
 \item{channelNames}{Logical; should names of audio channels be printed on
 the y-axis? Default is \code{FALSE}.}
+
+\item{lineWidth}{Number giving the line width to use for plotting
+the waveform. Default is \code{1}.}
 
 \item{cn}{Vector of strings with channel names to be printed on the y-axis
 if \code{channelNames} is \code{TRUE}.}

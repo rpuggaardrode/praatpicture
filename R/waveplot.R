@@ -43,6 +43,8 @@
 #' `praatpicture()`. Default is `NULL`.
 #' @param channelNames Logical; should names of audio channels be printed on
 #' the y-axis? Default is `FALSE`.
+#' @param lineWidth Number giving the line width to use for plotting
+#' the waveform. Default is `1`.
 #' @param cn Vector of strings with channel names to be printed on the y-axis
 #' if `channelNames` is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
@@ -64,7 +66,7 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
                      focusTierLineType='dotted', ind=NULL, line_comp=NULL,
                      rect_comp=NULL, arr_comp=NULL, annot_comp=NULL,
                      draw_lines=NULL, draw_rectangle=NULL, draw_arrow=NULL,
-                     annotate=NULL, channelNames=FALSE, cn=NULL,
+                     annotate=NULL, channelNames=FALSE, lineWidth=1, cn=NULL,
                      min_max_only=TRUE) {
 
   if (length(color) != nchan) color <- rep(color, nchan)
@@ -87,7 +89,7 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
     }
 
     plot(t[-1], sig[,j], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
-         col=color[j])
+         col=color[j], lwd=lineWidth)
 
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,0.5,1),

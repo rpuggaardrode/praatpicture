@@ -46,6 +46,12 @@
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when printing a pitch track. Default is `NULL`, in which case the
 #' axis label will depend on the scale.
+#' @param drawSize Number indicating the line width if
+#' `plotType` is `'draw'`. Default is `1`. Controls the `lwd` argument of
+#' [graphics::lines].
+#' @param speckleSize Number indicating the point size of if `_plotType` is
+#' `'speckle'`. Default is `1`. Controls the `cex` arguments of
+#' [graphics::points].
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -61,7 +67,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       plotType='draw', scale='hz', freqRange=NULL,
                       semitonesRe=100, color='black', ind=NULL,
                       min_max_only=TRUE,
-                      axisLabel=NULL) {
+                      axisLabel=NULL, drawSize=1, speckleSize=1) {
 
   if (scale == 'logarithmic') {
     logsc <- 'y'
@@ -89,7 +95,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if ('draw' %in% plotType) {
     plot(pt$t, pt$f, xlim=c(start, end+start), xaxt='n', ylim=freqRange,
-         yaxt=yax, type='l', log=logsc, col=color)
+         yaxt=yax, type='l', log=logsc, col=color, lwd=drawSize)
     if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
       graphics::axis(2, at=ytix)
     }
@@ -102,7 +108,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       }
     }
     if ('speckle' %in% plotType) {
-      graphics::points(pt$t, pt$f, pch=20, col=color)
+      graphics::points(pt$t, pt$f, pch=20, col=color, cex=speckleSize)
     }
     graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
@@ -110,7 +116,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   if (length(plotType) == 1) {
     if (plotType == 'speckle') {
       plot(pt$t, pt$f, xlim=c(start, end+start), xaxt='n', ylim=freqRange,
-           yaxt=yax, type='p', pch=20, log=logsc, col=color)
+           yaxt=yax, type='p', pch=20, log=logsc, col=color, cex=speckleSize)
       if (ind != 1 & scale != 'logarithmic' & !min_max_only[ind]) {
         graphics::axis(2, at=ytix)
       }

@@ -39,7 +39,7 @@
 #'
 #' emuR::list_ssffTrackDefinitions(db)
 #' emupicture(db, bundle='msajc003', frames=c('sound', 'formant'),
-#' proportion=c(30,70), formant_ssffExt='fms')
+#' proportion=c(30,70), formant_ssffExt='fms', formant_number=4)
 #' }
 emupicture <- function(db_handle, session='0000', bundle,
                        pitch_ssffExt=NULL, formant_ssffExt=NULL,

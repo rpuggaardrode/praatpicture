@@ -40,7 +40,9 @@ specplot(
   focusTierLineType = "dotted",
   ind = NULL,
   min_max_only = TRUE,
-  axisLabel = "Frequency (Hz)"
+  axisLabel = "Frequency (Hz)",
+  drawSize = 1,
+  speckleSize = 1
 )
 }
 \arguments{
@@ -184,6 +186,15 @@ Ignored for TextGrid component.}
 
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when plotting a spectrogram. Default is \code{Frequency (Hz)}.}
+
+\item{drawSize}{Number indicating the line width of plot components where
+the \verb{_plotType} is \code{'draw'} (i.e., pitch, formants, or intensity rendered as
+line plots). Default is \code{1}. Controls the \code{lwd} argument of
+\link[graphics:lines]{graphics::lines}.}
+
+\item{speckleSize}{Number indicating the point size of plot components where
+the \verb{_plotType} is \code{'speckle'} (i.e. pitch or formants rendered as point
+plots). Default is \code{1}. Controls the \code{cex} arguments of \link[graphics:points]{graphics::points}.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

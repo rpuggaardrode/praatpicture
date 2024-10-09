@@ -17,7 +17,8 @@ intensityplot(
   color = "black",
   ind = NULL,
   min_max_only = TRUE,
-  axisLabel = "Intensity (dB)"
+  axisLabel = "Intensity (dB)",
+  drawSize = 1
 )
 }
 \arguments{
@@ -63,6 +64,9 @@ Ignored for TextGrid component.}
 
 \item{axisLabel}{String giving the name of the label to print along
 the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
+
+\item{drawSize}{Number indicating the line width of the intensity contour.
+Default is \code{1}. Controls the \code{lwd} argument of \link[graphics:lines]{graphics::lines}.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

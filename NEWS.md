@@ -1,3 +1,22 @@
+# praatpicture 1.3.0
+* Added the `drawSize` and `speckleSize` arguments, which respectively control
+the line widths of plot components where the `_plotType` is `'draw'` and the
+point sizes of plot components where the `_plotType` is `'speckle'`.
+* Added the `wave_lineWidth` argument which controls the line width of the
+waveform.
+* Added the `tUnit` argument for controlling the time unit printed along the
+x-axis. The default is still time in seconds, but when `tUnit = 'ms'`, the
+time unit is milliseconds. The `time_axisLabel` argument will by default reflect
+the unit specified in `tUnit`, but the axis label can still be controlled by 
+the user.
+* Added the `formant_number` argument which determines the number of formants
+to include in a plot (independently of `formant_maxN`, which determines the
+number of formants to track if no `.Formant` file is provided). By default,
+all available formants are plotted. 
+* Added the `mainTitleAlignment` argument which controls the vertical 
+alignment of the plot title.
+* Fixed a bug that made it impossible to plot 24-bit WAV files.
+
 # praatpicture 1.2.4
 * Added the option to plot read and plot `Pitch` files with the `.Pitch` 
 extension generated in R in addition to `PitchTier` files with the `.PitchTier`

@@ -12,6 +12,8 @@
 #' (= the entire file).
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
 #' original time? Default is `TRUE`.
+#' @param tUnit String giving the unit of time to print along the x-axis.
+#' Possible options are `'s'` (default) for seconds and `'ms'` for milliseconds.
 #' @param frames String or vector of strings giving the frames that the plot
 #' should consist of. Default is `sound`, `spectrogram`, `TextGrid`. This
 #' requires a file with the extension `.TextGrid` and the same base name as the
@@ -22,14 +24,25 @@
 #' individual frames. Default is `c(30,50,20)`. If more or less than three
 #' frames are plotted and no proportions are given, frames will be of equal
 #' size.
-#' @param mainTitle String giving a title to print at the top left.
+#' @param mainTitle String giving a title to print at the top of the plot.
 #' The default is an empty string, i.e. no title.
+#' @param mainTitleAlignment Number indicating the vertical alignment of the
+#' plot title, where `0` (default) indicates left-alignment, `1` indicates
+#' right-alignment, `0.5` indicates central alignment, etc, following the
+#' conventions of the `adj` argument of [graphics::mtext].
 #' @param start_end_only Logical; should there only be ticks on the x-axis
 #' for start and end times? Default is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param drawSize Number indicating the line width of plot components where
+#' the `_plotType` is `'draw'` (i.e., pitch, formants, or intensity rendered as
+#' line plots). Default is `1`. Controls the `lwd` argument of
+#' [graphics::lines].
+#' @param speckleSize Number indicating the point size of plot components where
+#' the `_plotType` is `'speckle'` (i.e. pitch or formants rendered as point
+#' plots). Default is `1`. Controls the `cex` arguments of [graphics::points].
 #' @param wave_channels Vector of numbers or strings giving either numeric
 #' identifiers of audio channels to plot of the names of audio channels to plot.
 #' Also understands `'all'`, which plots all channels and is the default.
@@ -42,6 +55,8 @@
 #' @param wave_color String giving the name of the color to be used for plotting
 #' the waveform. Default is `'black'`. Alternatively a vector of strings, if
 #' different colors should be used for different channels.
+#' @param wave_lineWidth Number giving the line width to use for plotting
+#' the waveform. Default is `1`.
 #' @param tg_file Path of file to be used for plotting TextGrid. Default is
 #' `NULL`, in which case the function searches for a TextGrid sharing the same
 #' base name as `sound` with the `.TextGrid` extension.
@@ -154,6 +169,8 @@
 #' intensity. Default is `30`. If set to `0`, all formants are shown.
 #' @param formant_freqRange Vector of two integers giving the frequency range to
 #' be used for producing formant plots. Default is `c(0,5500)`.
+#' @param formant_number Number of formants to plot. Default is `NULL`, in
+#' which case all available formants are plotted.
 #' @param formant_plotType String giving the type of formant plot to produce;
 #' default is `speckle` (a point plot), the only other option is `draw` (a line
 #' plot). Alternatively a vector `c('draw','speckle')` can be passed, in which
@@ -196,7 +213,8 @@
 #' If `intensity_plotOnSpec=TRUE`, this label
 #' will be printed on the right-hand y-axis label.
 #' @param time_axisLabel String giving the name of the label to print along
-#' the x-axis. Default is `Time (s)`.
+#' the x-axis. Default is `NULL`, in which case `Time (s)` is printed if
+#' `tUnit = 's'` and `Time (ms)` is printed if `tUnit = 'ms'`.
 #' @param draw_lines Use for drawing straight lines on plot components. Takes
 #' an argument of type `list` which should contain a) a string giving the plot
 #' component to draw straight lines on, and b) arguments to pass on to
@@ -262,12 +280,14 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' soundFile <- paste0(datapath, '/1.wav')
 #' praatpicture(soundFile)
-praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
+praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          frames=c('sound', 'spectrogram', 'TextGrid'),
                          proportion=c(30,50,20), mainTitle='',
+                         mainTitleAlignment = 0,
                          start_end_only=TRUE, min_max_only=TRUE,
+                         drawSize = 1, speckleSize = 1,
                          wave_channels='all', wave_channelNames=FALSE,
-                         wave_color='black',
+                         wave_color='black', wave_lineWidth=1,
                          tg_obj=NULL, tg_file=NULL, tg_tiers='all',
                          tg_focusTier=tg_tiers[1], tg_focusTierColor='black',
                          tg_focusTierLineType='dotted', tg_tierNames=TRUE,
@@ -286,6 +306,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          formant_timeStep=NULL, formant_maxN=5,
                          formant_windowLength=0.025, formant_dynamicRange=30,
                          formant_freqRange=c(50, 5500),
+                         formant_number=NULL,
                          formant_plotType='speckle', formant_color='black',
                          formant_plotOnSpec=FALSE,
                          formant_ssff=NULL, formant_axisLabel='Frequency (Hz)',
@@ -293,7 +314,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                          intensity_range=NULL, intensity_color='black',
                          intensity_plotOnSpec=FALSE, intensity_ssff=NULL,
                          intensity_axisLabel='Intensity (dB)',
-                         time_axisLabel='Time (s)',
+                         time_axisLabel=NULL,
                          draw_lines=list('formant', h=seq(0,10000,by=1000),
                                          lty='dotted'),
                          draw_rectangle=NULL, draw_arrow=NULL, annotate=NULL,
@@ -315,6 +336,16 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   }
   if (!any(pitch_plotType %in% c('draw', 'speckle'))) {
     stop('Please select either draw or speckle as the pitch plot type')
+  }
+  if (!tUnit %in% c('s', 'ms')) {
+    stop('Please select either s or ms as the time unit')
+  }
+
+  if (is.null(time_axisLabel)) {
+    time_axisLabel <- ifelse(tUnit == 's', 'Time (s)', 'Time (ms)')
+  }
+  if (is.null(formant_number)) {
+    formant_number <- formant_maxN
   }
 
   proportion <- round((proportion / sum(proportion)) * 100)
@@ -364,7 +395,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   }
 
   sig <- snd@.Data[,wave_channels]
-  if (any(class(sig) == 'integer')) sig <- as.matrix(sig)
+  if (any(class(sig) %in% c('integer', 'numeric'))) sig <- as.matrix(sig)
   nchan <- dim(sig)[2]
 
   if (is.logical(wave_channelNames) & isTRUE(wave_channelNames)) {
@@ -522,6 +553,13 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       fm <- rPraat::formant.read(fmfn)
       fm <- rPraat::formant.toArray(fm)
       fm$conv2db <- TRUE
+      mnf <- dim(fm$frequencyArray)[1]
+      if (formant_number < mnf) {
+        fm$frequencyArray <- fm$frequencyArray[1:formant_number,]
+        fm$maxnFormants <- formant_number
+      }
+      if (formant_number > mnf) stop(paste('formant_number is greater than the',
+                                           'number of formants available'))
     } else {
       if (!is.null(formant_ssff)) {
         wfm <- formant_ssff
@@ -553,8 +591,11 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       a <- attributes(wfm)
       t <- seq(a$startTime, a$endRecord/a$sampleRate, by=1/a$sampleRate)
       fArray <- t(wfm[[1]])
-      mnf <- nrow(fArray)
-      fm <- list(t = t, frequencyArray = fArray, maxnFormants = mnf,
+      mnf <- dim(fArray)[1]
+      if (formant_number < mnf) fArray <- fArray[1:formant_number,]
+      if (formant_number > mnf) stop(paste('formant_number is greater than the',
+                                           'number of formants available'))
+      fm <- list(t = t, frequencyArray = fArray, maxnFormants = formant_number,
                  intensityVector = wit$rms, conv2db = FALSE)
     }
   } else {
@@ -626,7 +667,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                tg_focusTierColor, tg_focusTierLineType, ind,
                line_comp, rect_comp, arr_comp, annot_comp,
                draw_lines, draw_rectangle, draw_arrow, annotate,
-               wave_channelNames, cn, min_max_only)
+               wave_channelNames, wave_lineWidth, cn, min_max_only)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,
@@ -640,7 +681,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                intensity_axisLabel, intensity_color,
                tgbool, focus_linevec, tg_focusTierColor,
                tg_focusTierLineType, ind,
-               min_max_only, spec_axisLabel)
+               min_max_only, spec_axisLabel, drawSize, speckleSize)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram',
                                                        draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
@@ -657,7 +698,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                 tg_focusTierColor, tg_focusTierLineType,
                 pitch_plotType, pitch_scale, pitch_freqRange,
                 pitch_semitonesRe, pitch_color, ind,
-                min_max_only, pitch_axisLabel)
+                min_max_only, pitch_axisLabel,
+                drawSize, speckleSize)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
       if ('pitch' %in% annot_comp) make_annot('pitch', annotate)
@@ -669,7 +711,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
                   tg_focusTierColor, tg_focusTierLineType,
                   formant_dynamicRange, formant_freqRange, formant_plotType,
                   formant_color, ind,
-                  min_max_only, formant_axisLabel)
+                  min_max_only, formant_axisLabel, drawSize, speckleSize)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
       if ('formant' %in% annot_comp) make_annot('formant', annotate)
@@ -680,7 +722,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                     tg_focusTierColor, tg_focusTierLineType,
                     intensity_range, intensity_color, ind,
-                    min_max_only, intensity_axisLabel)
+                    min_max_only, intensity_axisLabel, drawSize)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity',
                                                      draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
@@ -691,14 +733,26 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE,
   }
 
   if (!start_end_only) {
-    graphics::axis(1, ...)
+    xtix <- grDevices::axisTicks(c(round(min(t), 3),
+                                   round(max(t), 3)), log=F)
+    if (tUnit == 's') {
+      xtixLab <- xtix
+    } else {
+      xtixLab <- xtix*1000
+    }
+    graphics::axis(1, at=xtix, labels=xtixLab, ...)
   } else {
     xtix <- c(round(min(t), 3), round(max(t), 3), 0)
-    graphics::axis(1, at=xtix, ...)
+    if (tUnit == 's') {
+      xtixLab <- xtix
+    } else {
+      xtixLab <- xtix*1000
+    }
+    graphics::axis(1, at=xtix, labels=xtixLab, ...)
   }
 
   graphics::mtext(time_axisLabel, side=1, line=3, outer=T, cex=0.8)
-  graphics::mtext(mainTitle, side=3, line=2, adj=0, outer=T)
+  graphics::mtext(mainTitle, side=3, line=2, adj=mainTitleAlignment, outer=T)
 
   graphics::par(p)
 }

@@ -20,7 +20,9 @@ pitchplot(
   color = "black",
   ind = NULL,
   min_max_only = TRUE,
-  axisLabel = NULL
+  axisLabel = NULL,
+  drawSize = 1,
+  speckleSize = 1
 )
 }
 \arguments{
@@ -81,6 +83,14 @@ Ignored for TextGrid component.}
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when printing a pitch track. Default is \code{NULL}, in which case the
 axis label will depend on the scale.}
+
+\item{drawSize}{Number indicating the line width if
+\code{plotType} is \code{'draw'}. Default is \code{1}. Controls the \code{lwd} argument of
+\link[graphics:lines]{graphics::lines}.}
+
+\item{speckleSize}{Number indicating the point size of if \verb{_plotType} is
+\code{'speckle'}. Default is \code{1}. Controls the \code{cex} arguments of
+\link[graphics:points]{graphics::points}.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

@@ -9,14 +9,19 @@ praatpicture(
   start = 0,
   end = 0,
   tfrom0 = TRUE,
+  tUnit = "s",
   frames = c("sound", "spectrogram", "TextGrid"),
   proportion = c(30, 50, 20),
   mainTitle = "",
+  mainTitleAlignment = 0,
   start_end_only = TRUE,
   min_max_only = TRUE,
+  drawSize = 1,
+  speckleSize = 1,
   wave_channels = "all",
   wave_channelNames = FALSE,
   wave_color = "black",
+  wave_lineWidth = 1,
   tg_obj = NULL,
   tg_file = NULL,
   tg_tiers = "all",
@@ -51,6 +56,7 @@ praatpicture(
   formant_windowLength = 0.025,
   formant_dynamicRange = 30,
   formant_freqRange = c(50, 5500),
+  formant_number = NULL,
   formant_plotType = "speckle",
   formant_color = "black",
   formant_plotOnSpec = FALSE,
@@ -63,7 +69,7 @@ praatpicture(
   intensity_plotOnSpec = FALSE,
   intensity_ssff = NULL,
   intensity_axisLabel = "Intensity (dB)",
-  time_axisLabel = "Time (s)",
+  time_axisLabel = NULL,
   draw_lines = list("formant", h = seq(0, 10000, by = 1000), lty = "dotted"),
   draw_rectangle = NULL,
   draw_arrow = NULL,
@@ -84,6 +90,9 @@ extension.}
 \item{tfrom0}{Logical; should time on the x-axis run from 0 or from the
 original time? Default is \code{TRUE}.}
 
+\item{tUnit}{String giving the unit of time to print along the x-axis.
+Possible options are \code{'s'} (default) for seconds and \code{'ms'} for milliseconds.}
+
 \item{frames}{String or vector of strings giving the frames that the plot
 should consist of. Default is \code{sound}, \code{spectrogram}, \code{TextGrid}. This
 requires a file with the extension \code{.TextGrid} and the same base name as the
@@ -96,8 +105,13 @@ individual frames. Default is \code{c(30,50,20)}. If more or less than three
 frames are plotted and no proportions are given, frames will be of equal
 size.}
 
-\item{mainTitle}{String giving a title to print at the top left.
+\item{mainTitle}{String giving a title to print at the top of the plot.
 The default is an empty string, i.e. no title.}
+
+\item{mainTitleAlignment}{Number indicating the vertical alignment of the
+plot title, where \code{0} (default) indicates left-alignment, \code{1} indicates
+right-alignment, \code{0.5} indicates central alignment, etc, following the
+conventions of the \code{adj} argument of \link[graphics:mtext]{graphics::mtext}.}
 
 \item{start_end_only}{Logical; should there only be ticks on the x-axis
 for start and end times? Default is \code{TRUE}.}
@@ -106,6 +120,15 @@ for start and end times? Default is \code{TRUE}.}
 on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
 not all plot components should have minimum and maximum values on the y-axis.
 Ignored for TextGrid component.}
+
+\item{drawSize}{Number indicating the line width of plot components where
+the \verb{_plotType} is \code{'draw'} (i.e., pitch, formants, or intensity rendered as
+line plots). Default is \code{1}. Controls the \code{lwd} argument of
+\link[graphics:lines]{graphics::lines}.}
+
+\item{speckleSize}{Number indicating the point size of plot components where
+the \verb{_plotType} is \code{'speckle'} (i.e. pitch or formants rendered as point
+plots). Default is \code{1}. Controls the \code{cex} arguments of \link[graphics:points]{graphics::points}.}
 
 \item{wave_channels}{Vector of numbers or strings giving either numeric
 identifiers of audio channels to plot of the names of audio channels to plot.
@@ -121,6 +144,9 @@ a vector of strings can be provided with channel names. Default is \code{FALSE}.
 \item{wave_color}{String giving the name of the color to be used for plotting
 the waveform. Default is \code{'black'}. Alternatively a vector of strings, if
 different colors should be used for different channels.}
+
+\item{wave_lineWidth}{Number giving the line width to use for plotting
+the waveform. Default is \code{1}.}
 
 \item{tg_obj}{A TextGrid object returned by the \code{\link[=make_TextGrid]{make_TextGrid()}} function.}
 
@@ -268,6 +294,9 @@ intensity. Default is \code{30}. If set to \code{0}, all formants are shown.}
 \item{formant_freqRange}{Vector of two integers giving the frequency range to
 be used for producing formant plots. Default is \code{c(0,5500)}.}
 
+\item{formant_number}{Number of formants to plot. Default is \code{NULL}, in
+which case all available formants are plotted.}
+
 \item{formant_plotType}{String giving the type of formant plot to produce;
 default is \code{speckle} (a point plot), the only other option is \code{draw} (a line
 plot). Alternatively a vector \code{c('draw','speckle')} can be passed, in which
@@ -322,7 +351,8 @@ If \code{intensity_plotOnSpec=TRUE}, this label
 will be printed on the right-hand y-axis label.}
 
 \item{time_axisLabel}{String giving the name of the label to print along
-the x-axis. Default is \code{Time (s)}.}
+the x-axis. Default is \code{NULL}, in which case \code{Time (s)} is printed if
+\code{tUnit = 's'} and \code{Time (ms)} is printed if \code{tUnit = 'ms'}.}
 
 \item{draw_lines}{Use for drawing straight lines on plot components. Takes
 an argument of type \code{list} which should contain a) a string giving the plot

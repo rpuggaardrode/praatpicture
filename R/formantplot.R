@@ -43,6 +43,12 @@
 #' Ignored for TextGrid component.
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when plotting formants. Default is `Frequency (Hz)`.
+#' @param drawSize Number indicating the line width if
+#' `plotType` is `'draw'`. Default is `1`. Controls the `lwd` argument of
+#' [graphics::lines].
+#' @param speckleSize Number indicating the point size of if `_plotType` is
+#' `'speckle'`. Default is `1`. Controls the `cex` arguments of
+#' [graphics::points].
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -58,7 +64,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         dynamicRange=30, freqRange=c(0,5500),
                         plotType='speckle', color='black',
                         ind=NULL, min_max_only=FALSE,
-                        axisLabel='Frequency (Hz)') {
+                        axisLabel='Frequency (Hz)', drawSize=1, speckleSize=1) {
 
   if (!min_max_only[ind]) {
     if (ind == 1) {
@@ -98,9 +104,10 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if ('draw' %in% plotType) {
     plot(fm$t, fm$frequencyArray[1,], xlim=c(start, end+start),
-         xaxt='n', ylim=freqRange, yaxt=yax, type='l', col=color[1])
+         xaxt='n', ylim=freqRange, yaxt=yax, type='l', col=color[1],
+         lwd=drawSize)
     for (i in 2:nf) {
-      graphics::lines(fm$t, fm$frequencyArray[i,], col=color[i])
+      graphics::lines(fm$t, fm$frequencyArray[i,], col=color[i], lwd=drawSize)
     }
     if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
@@ -113,10 +120,10 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     }
     if ('speckle' %in% plotType) {
       graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
-                       col=color[1])
+                       col=color[1], cex=speckleSize)
       for (i in 2:nf) {
         graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
-                         col=color[i])
+                         col=color[i], cex=speckleSize)
       }
     }
 
@@ -127,10 +134,10 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (plotType == 'speckle') {
       plot(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
            xlim=c(start, end+start), xaxt='n',
-           ylim=freqRange, yaxt=yax, col=color[1])
+           ylim=freqRange, yaxt=yax, col=color[1], cex=speckleSize)
       for (i in 2:nf) {
         graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
-                         col=color[i])
+                         col=color[i], cex=speckleSize)
       }
       if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
       if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,

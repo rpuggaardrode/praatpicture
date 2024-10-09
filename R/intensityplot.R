@@ -34,6 +34,8 @@
 #' Ignored for TextGrid component.
 #' @param axisLabel String giving the name of the label to print along
 #' the y-axis when plotting intensity. Default is `Intensity (dB)`.
+#' @param drawSize Number indicating the line width of the intensity contour.
+#' Default is `1`. Controls the `lwd` argument of [graphics::lines].
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -47,7 +49,7 @@
 intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                           focusTierColor='black', focusTierLineType='dotted',
                           range=NULL, color='black', ind=NULL, min_max_only=TRUE,
-                          axisLabel='Intensity (dB)') {
+                          axisLabel='Intensity (dB)', drawSize=1) {
 
   if (!min_max_only[ind]) {
     if (ind == 1) {
@@ -68,7 +70,7 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   }
 
   plot(it$t, it$i, xlim=c(start, end+start), xaxt='n',
-       ylim=range, yaxt=yax, type='l', col=color)
+       ylim=range, yaxt=yax, type='l', col=color, lwd=drawSize)
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                         tick=F)
