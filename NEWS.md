@@ -15,6 +15,7 @@ number of formants to track if no `.Formant` file is provided). By default,
 all available formants are plotted. 
 * Added the `mainTitleAlignment` argument which controls the vertical 
 alignment of the plot title.
+* Added support for all the above features in `shiny_praatpicture()`
 * Fixed a bug that made it impossible to plot 24-bit WAV files.
 
 # praatpicture 1.2.4
