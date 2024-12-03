@@ -48,10 +48,17 @@ emupicture <- function(db_handle, session='0000', bundle,
   args <- list(...)
   if ('frames' %in% names(args) & 'TextGrid' %in% args$frames) tg <- TRUE
   if (!'frames' %in% names(args)) tg <- TRUE
+  if ('tg_tiers' %in% names(args)) {
+    attrNames <- args$tg_tiers
+  } else {
+    attrNames <- NULL
+  }
   if (tg) {
     emuR::export_TextGridCollection(db_handle, targetDir='.',
                                     sessionPattern=session,
-                                    bundlePattern=bundle, verbose=F)
+                                    bundlePattern=bundle,
+                                    attributeDefinitionNames = attrNames,
+                                    verbose=F)
     fn <- paste0(session, '/', bundle, '.wav')
   } else {
     fn <- paste0(db_handle$basePath, '/', session, '_ses/', bundle, '_bndl/',

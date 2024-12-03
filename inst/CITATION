@@ -1,7 +1,7 @@
 bibentry(
   bibtype  = "Article",
   title    = "praatpicture. A library for making flexible Praat Picture-style figures in R",
-  author   = "Puggaard-Rode, Rasmus",
+  author   = "Rasmus Puggaard-Rode",
   journal  = "Proceedings of the International Seminar on Speech Production",
   year     = "2024",
   volume   = "13",

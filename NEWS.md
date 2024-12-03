@@ -1,3 +1,9 @@
+# praatpicture 1.3.1
+* Fix to `emupicture()`. In previous versions, all annotation levels were
+converted to a TextGrid, which could have unfortunate side effects if some 
+levels have no time information. Changed so that when the `tg_tiers` argument is 
+set, only those annotation levels are exported.
+
 # praatpicture 1.3.0
 * Added the `drawSize` and `speckleSize` arguments, which respectively control
 the line widths of plot components where the `_plotType` is `'draw'` and the
