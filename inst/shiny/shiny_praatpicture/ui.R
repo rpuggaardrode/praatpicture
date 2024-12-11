@@ -1,6 +1,6 @@
 ui <- bslib::page_sidebar(
   shinyjs::useShinyjs(),
-  title = 'praatpicture: Praat-style plots of acousic data in R',
+  title = 'praatpicture: Praat-style plots of acoustic data in R',
   sidebar = bslib::sidebar(
     bslib::accordion(
       bslib::accordion_panel(
