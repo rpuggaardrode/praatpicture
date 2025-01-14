@@ -26,6 +26,11 @@
 #' @param color String or vector of strings giving the name of the color(s)
 #' to be used for the text in TextGrids. Default is `'black'`. If a vector is
 #' provided, different colors are used for different tiers.
+#' @param highlight Named list giving parameters for differential
+#' highlighting of TextGrid intervals. This list
+#' should contain information about which intervals to highlight, using the
+#' `tier` and `label`. Further contains the argument
+#' `color`.
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -38,7 +43,7 @@
 #' praatpicture(soundFile, frames='TextGrid')
 tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
                    alignment='central',
-                   specialChar=FALSE, color='black') {
+                   specialChar=FALSE, color='black', highlight=NULL) {
 
   if (length(alignment) != length(tiers)) {
     alignment <- rep(alignment, length(tiers))
@@ -93,6 +98,25 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
       graphics::text(t0, 5, lab, adj=c(0.5,0.5), col=color[i])
     }
     if (tierNames) graphics::mtext(tname, side=2, las=2, line=0.6, cex=0.8)
+    if (!is.null(highlight)) {
+      if ('tier' %in% names(highlight)) {
+        if (tier == highlight$tier | tg[[tier]]$name == highlight$tier) {
+          match <- which(grepl(highlight$label, tg[[tier]]$label))
+          lab_highlight <- lab[match]
+          t1_highlight <- t1[match]
+          t2_highlight <- t2[match]
+          if (alignment[[i]]=='central') graphics::text(
+            t1_highlight+(t2_highlight-t1_highlight)/2, 5, lab_highlight,
+            col=highlight$color, adj=c(0.5,0.5))
+          if (alignment[[i]]=='left') graphics::text(
+            t1_highlight, 5, lab_highlight, pos=4, col=highlight$color,
+            adj=c(0.5,0.5))
+          if (alignment[[i]]=='right') graphics::text(
+            t2_highlight, 5, lab_highlight, pos=2, col=highlight$color,
+            adj=c(0.5, 0.5))
+        }
+      }
+    }
   }
 
 }

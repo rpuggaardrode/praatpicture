@@ -57,6 +57,13 @@
 #' different colors should be used for different channels.
 #' @param wave_lineWidth Number giving the line width to use for plotting
 #' the waveform. Default is `1`.
+#' @param wave_highlight Named list giving parameters for differential
+#' highlighting of the waveform based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the argument
+#' `color` (string, see `wave_color`).
 #' @param tg_file Path of file to be used for plotting TextGrid. Default is
 #' `NULL`, in which case the function searches for a TextGrid sharing the same
 #' base name as `sound` with the `.TextGrid` extension.
@@ -93,6 +100,11 @@
 #' @param tg_color String or vector of strings giving the name of the color(s)
 #' to be used for the text in TextGrids. Default is `'black'`. If a vector is
 #' provided, different colors are used for different tiers.
+#' @param tg_highlight Named list giving parameters for differential
+#' highlighting of TextGrid intervals. This list
+#' should contain information about which intervals to highlight, using the
+#' `tier` and `label`. Further contains the argument
+#' `color`.
 #' @param spec_channel Numeric giving the channel that should be used to
 #' generate the spectrogram. Default is `1`. Generating spectrograms from
 #' multiple channels is not currently possible with `praatpicture`.
@@ -121,6 +133,13 @@
 #' names can be used for plotting values in between in different colors.
 #' @param spec_axisLabel String giving the name of the label to print along the
 #' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
+#' @param spec_highlight Named list giving parameters for differential
+#' highlighting of the spectrogram based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the argument
+#' `colors` (vector of strings, see `spec_colors`).
 #' @param pitch_timeStep Measurement interval in seconds for tracking pitch.
 #' Default is `NULL`, in which case the measurement interval is equal to
 #' 0.75 / `pitch_floor`.
@@ -155,6 +174,14 @@
 #' y-axis when printing a pitch track. Default is `NULL`, in which case the
 #' axis label will depend on the scale. If `pitch_plotOnSpec=TRUE`, this label
 #' will be printed on the right-hand y-axis label.
+#' @param pitch_highlight Named list giving parameters for differential
+#' highlighting of pitch based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `pitch_color`),
+#' `drawSize` or `speckleSize` (both numeric).
 #' @param formant_timeStep Measurement interval in seconds for tracking formants.
 #' Default is `NULL`, in which case the measurement interval is equal to
 #' `formant_windowLength` / 4.
@@ -191,6 +218,14 @@
 #' Default is `NULL`.
 #' @param formant_axisLabel String giving the name of the label to print along the
 #' y-axis when plotting formants. Default is `Frequency (Hz)`.
+#' @param formant_highlight Named list giving parameters for differential
+#' highlighting of formants based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `formant_color`),
+#' `drawSize` or `speckleSize` (both numeric).
 #' @param intensity_timeStep Measurement interval in seconds for tracking
 #' intensity. Default is `NULL`, in which case the measurement interval is
 #' equal to 0.8 * `intensity_minPitch`.
@@ -212,9 +247,26 @@
 #' the y-axis when plotting intensity. Default is `Intensity (dB)`.
 #' If `intensity_plotOnSpec=TRUE`, this label
 #' will be printed on the right-hand y-axis label.
+#' @param intensity_highlight Named list giving parameters for differential
+#' highlighting of the intensity contour based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `intensity_color`) and
+#' `drawSize` (integer).
 #' @param time_axisLabel String giving the name of the label to print along
 #' the x-axis. Default is `NULL`, in which case `Time (s)` is printed if
 #' `tUnit = 's'` and `Time (ms)` is printed if `tUnit = 'ms'`.
+#' @param highlight Named list giving parameters for differential highlighting
+#' of part of the plot based on the time domain. This list should contain
+#' information about which parts of the plot to highlight, either done with the
+#' `start` and `end` arguments which must be numbers or numeric vectors, or
+#' using the `tier` and `label` arguments to highlight based on information in
+#' a plotted TextGrid. Further contains the optional arguments `color`
+#' (a string), `drawSize`, and `speckleSize` (both numeric). This argument is
+#' used to highlight all plot components, use the `*_highlight` arguments for
+#' highlighting individuals plot components.
 #' @param draw_lines Use for drawing straight lines on plot components. Takes
 #' an argument of type `list` which should contain a) a string giving the plot
 #' component to draw straight lines on, and b) arguments to pass on to
@@ -288,21 +340,24 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          drawSize = 1, speckleSize = 1,
                          wave_channels='all', wave_channelNames=FALSE,
                          wave_color='black', wave_lineWidth=1,
+                         wave_highlight=NULL,
                          tg_obj=NULL, tg_file=NULL, tg_tiers='all',
                          tg_focusTier=tg_tiers[1], tg_focusTierColor='black',
                          tg_focusTierLineType='dotted', tg_tierNames=TRUE,
                          tg_alignment='central', tg_specialChar=FALSE,
-                         tg_color='black',
+                         tg_color='black', tg_highlight=NULL,
                          spec_channel=NULL, spec_freqRange=c(0,5000),
                          spec_windowLength=0.005, spec_dynamicRange=50,
                          spec_timeStep=1000, spec_windowShape='Gaussian',
                          spec_colors=c('white', 'black'),
                          spec_axisLabel='Frequency (Hz)',
+                         spec_highlight=NULL,
                          pitch_timeStep=NULL, pitch_floor=75, pitch_ceiling=600,
                          pitch_plotType='draw', pitch_scale='hz',
                          pitch_freqRange=NULL, pitch_semitonesRe=100,
                          pitch_color='black', pitch_plotOnSpec=FALSE,
                          pitch_ssff=NULL, pitch_axisLabel=NULL,
+                         pitch_highlight=NULL,
                          formant_timeStep=NULL, formant_maxN=5,
                          formant_windowLength=0.025, formant_dynamicRange=30,
                          formant_freqRange=c(50, 5500),
@@ -310,11 +365,14 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          formant_plotType='speckle', formant_color='black',
                          formant_plotOnSpec=FALSE,
                          formant_ssff=NULL, formant_axisLabel='Frequency (Hz)',
+                         formant_highlight=NULL,
                          intensity_timeStep=NULL, intensity_minPitch=100,
                          intensity_range=NULL, intensity_color='black',
                          intensity_plotOnSpec=FALSE, intensity_ssff=NULL,
                          intensity_axisLabel='Intensity (dB)',
+                         intensity_highlight=NULL,
                          time_axisLabel=NULL,
+                         highlight=NULL,
                          draw_lines=list('formant', h=seq(0,10000,by=1000),
                                          lty='dotted'),
                          draw_rectangle=NULL, draw_arrow=NULL, annotate=NULL,
@@ -489,6 +547,40 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     tgbool <- FALSE
     focus_linevec <- NULL
   }
+
+  findStartEndVals <- function(listobj) {
+    if ('tier' %in% names(listobj)) {
+      tierName <- listobj$tier
+      matches <- which(grepl(listobj$label, tg[[tierName]]$label, perl=T))
+      if (length(matches) == 0) stop(paste('There is no match for the',
+                                            'highlighting conditions'))
+      listobj$start <- tg[[tierName]]$t1[matches]
+      listobj$end <- tg[[tierName]]$t2[matches]
+      if (start > 0 & tfrom0) {
+        listobj$start <- listobj$start - start
+        listobj$end <- listobj$end - start
+      }
+    }
+    return(listobj)
+  }
+
+  if (!is.null(highlight)) {
+    if (is.null(wave_highlight)) wave_highlight <- highlight
+    if (is.null(pitch_highlight)) pitch_highlight <- highlight
+    if (is.null(formant_highlight)) formant_highlight <- highlight
+    if (is.null(intensity_highlight)) intensity_highlight <- highlight
+    if (is.null(spec_highlight)) {
+      spec_highlight <- highlight
+      spec_highlight$colors <- c(spec_colors[1], spec_highlight$color)
+    }
+    if (is.null(tg_highlight)) tg_highlight <- highlight
+  }
+
+  wave_highlight <- findStartEndVals(wave_highlight)
+  pitch_highlight <- findStartEndVals(pitch_highlight)
+  formant_highlight <- findStartEndVals(formant_highlight)
+  intensity_highlight <- findStartEndVals(intensity_highlight)
+  spec_highlight <- findStartEndVals(spec_highlight)
 
   if ('pitch' %in% frames | pitch_plotOnSpec) {
     if (is.null(pitch_freqRange)) {
@@ -667,7 +759,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                tg_focusTierColor, tg_focusTierLineType, ind,
                line_comp, rect_comp, arr_comp, annot_comp,
                draw_lines, draw_rectangle, draw_arrow, annotate,
-               wave_channelNames, wave_lineWidth, cn, min_max_only)
+               wave_channelNames, wave_lineWidth, cn, min_max_only,
+               wave_highlight)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,
@@ -675,13 +768,14 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                spec_freqRange, spec_windowLength, spec_dynamicRange,
                spec_timeStep, spec_windowShape, spec_colors,
                pitch_plotOnSpec, pt, pitch_plotType, pitch_scale,
-               pitch_freqRange, pitch_axisLabel, pitch_color,
+               pitch_freqRange, pitch_axisLabel, pitch_color, pitch_highlight,
                formant_plotOnSpec, fm, formant_plotType, formant_dynamicRange,
-               formant_color,  intensity_plotOnSpec, it, intensity_range,
-               intensity_axisLabel, intensity_color,
+               formant_color, formant_highlight, intensity_plotOnSpec, it,
+               intensity_range, intensity_axisLabel, intensity_color,
+               intensity_highlight,
                tgbool, focus_linevec, tg_focusTierColor,
-               tg_focusTierLineType, ind,
-               min_max_only, spec_axisLabel, drawSize, speckleSize)
+               tg_focusTierLineType, ind, min_max_only,
+               spec_highlight, spec_axisLabel, drawSize, speckleSize)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram',
                                                        draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
@@ -691,14 +785,14 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
       tgplot(tg, t, sr, start, tg_tiers, tfrom0, tg_tierNames,
-             tg_alignment, tg_specialChar, tg_color)
+             tg_alignment, tg_specialChar, tg_color, tg_highlight)
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                 tg_focusTierColor, tg_focusTierLineType,
                 pitch_plotType, pitch_scale, pitch_freqRange,
                 pitch_semitonesRe, pitch_color, ind,
-                min_max_only, pitch_axisLabel,
+                min_max_only, pitch_highlight, pitch_axisLabel,
                 drawSize, speckleSize)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
@@ -710,8 +804,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
       formantplot(fm, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                   tg_focusTierColor, tg_focusTierLineType,
                   formant_dynamicRange, formant_freqRange, formant_plotType,
-                  formant_color, ind,
-                  min_max_only, formant_axisLabel, drawSize, speckleSize)
+                  formant_color, ind, min_max_only, formant_highlight,
+                  formant_axisLabel, drawSize, speckleSize)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
       if ('formant' %in% annot_comp) make_annot('formant', annotate)
@@ -722,7 +816,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
       intensityplot(it, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
                     tg_focusTierColor, tg_focusTierLineType,
                     intensity_range, intensity_color, ind,
-                    min_max_only, intensity_axisLabel, drawSize)
+                    min_max_only, intensity_highlight,
+                    intensity_axisLabel, drawSize)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity',
                                                      draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)

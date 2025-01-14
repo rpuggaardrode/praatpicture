@@ -19,6 +19,7 @@ formantplot(
   color = "black",
   ind = NULL,
   min_max_only = FALSE,
+  highlight = NULL,
   axisLabel = "Frequency (Hz)",
   drawSize = 1,
   speckleSize = 1
@@ -75,6 +76,15 @@ Default is \code{NULL}.}
 on the y-axis? Default is \code{FALSE}. Can also be a logical vector if some but
 not all plot components should have minimum and maximum values on the y-axis.
 Ignored for TextGrid component.}
+
+\item{highlight}{Named list giving parameters for differential
+highlighting of formants based on the time domain. This list
+should contain information about which parts of the plot to highlight, either
+done with the \code{start} and \code{end} arguments which must be numbers or numeric
+vectors, or using the \code{tier} and \code{label} arguments to highlight based on
+information in a plotted TextGrid. Further contains the optional arguments
+\code{color} (string or vector of strings, see \code{color}),
+\code{drawSize} or \code{speckleSize} (both numeric).}
 
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when plotting formants. Default is \code{Frequency (Hz)}.}

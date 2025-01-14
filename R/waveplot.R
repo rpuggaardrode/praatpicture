@@ -51,6 +51,13 @@
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param highlight Named list giving parameters for differential
+#' highlighting of the waveform based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the argument
+#' `color` (string, see `color`).
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -67,7 +74,7 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
                      rect_comp=NULL, arr_comp=NULL, annot_comp=NULL,
                      draw_lines=NULL, draw_rectangle=NULL, draw_arrow=NULL,
                      annotate=NULL, channelNames=FALSE, lineWidth=1, cn=NULL,
-                     min_max_only=TRUE) {
+                     min_max_only=TRUE, highlight=NULL) {
 
   if (length(color) != nchan) color <- rep(color, nchan)
 
@@ -88,8 +95,25 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
       ytix <- c(round(min(sig[,j]), 3), 0, round(max(sig[,j]), 2))
     }
 
+    if (!is.null(highlight)) {
+      highlight_t <- c()
+      highlight_w <- c()
+      for (int in 1:length(highlight$start)) {
+        times <- which(t > highlight$start[int] & t < highlight$end[int])
+        highlight_t <- c(highlight_t, t[times], max(t[times] + 0.0001))
+        highlight_w <- c(highlight_w, sig[times,j], NA)
+      }
+
+      if (!'color' %in% names(highlight)) highlight$color <- color
+    }
+
     plot(t[-1], sig[,j], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
          col=color[j], lwd=lineWidth)
+
+    if (!is.null(highlight)) graphics::lines(highlight_t,
+                                             highlight_w,
+                                             col=highlight$color,
+                                             lwd=lineWidth)
 
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,0.5,1),

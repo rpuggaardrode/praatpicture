@@ -41,6 +41,14 @@
 #' on the y-axis? Default is `FALSE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param highlight Named list giving parameters for differential
+#' highlighting of formants based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `color`),
+#' `drawSize` or `speckleSize` (both numeric).
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when plotting formants. Default is `Frequency (Hz)`.
 #' @param drawSize Number indicating the line width if
@@ -63,7 +71,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         focusTierColor='black', focusTierLineType='dotted',
                         dynamicRange=30, freqRange=c(0,5500),
                         plotType='speckle', color='black',
-                        ind=NULL, min_max_only=FALSE,
+                        ind=NULL, min_max_only=FALSE, highlight=NULL,
                         axisLabel='Frequency (Hz)', drawSize=1, speckleSize=1) {
 
   if (!min_max_only[ind]) {
@@ -99,6 +107,32 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     subdr <- 1
   }
 
+  if (!is.null(highlight)) {
+    highlight_t <- 0
+    highlight_f <- array(rep(NA, nf), dim = c(nf,1))
+    highlight_i <- c()
+    for (int in 1:length(highlight$start)) {
+      times <- which(fm$t > highlight$start[int] & fm$t < highlight$end[int])
+      highlight_t <- c(highlight_t, fm$t[times], max(fm$t[times] + 0.0001))
+      highlight_f <- cbind(highlight_f, fm$frequencyArray[,times], rep(NA, nf))
+      highlight_i <- c(highlight_i, db[times], 0)
+    }
+
+    if (dynamicRange != 0) {
+      hsubdr <- which(highlight_i < max(db)-dynamicRange)
+      if (length(hsubdr) == 0) hsubdr <- 1
+    } else {
+      hsubdr <- 1
+    }
+
+    if (!'color' %in% names(highlight)) highlight$color <- color
+    if (!'drawSize' %in% names(highlight)) highlight$drawSize <- drawSize
+    if (!'speckleSize' %in% names(highlight)) highlight$speckleSize <-
+      speckleSize
+    if (length(highlight$color) == 1) highlight$color <-
+      rep(highlight$color, nf)
+  }
+
   s <- freqRange[1]:freqRange[2]
   freql <- s[s %% 1000 == 0]
 
@@ -127,6 +161,23 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       }
     }
 
+    if (!is.null(highlight)) {
+      graphics::lines(highlight_t, highlight_f[1,], col=highlight$color[1],
+                      lwd=highlight$drawSize)
+      for (i in 2:nf) {
+        graphics::lines(highlight_t, highlight_f[i,],
+                        col=highlight$color[i], lwd=highlight$drawSize)
+      }
+      if ('speckle' %in% plotType) {
+        graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
+                         col=highlight$color[1], cex=highlight$speckleSize)
+        for (i in 2:nf) {
+          graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
+                           col=highlight$color[i], cex=highlight$speckleSize)
+        }
+      }
+    }
+
     graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
@@ -148,6 +199,16 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                            lty=focusTierLineType[i])
         }
       }
+
+      if (!is.null(highlight)) {
+        graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
+                         col=highlight$color[1], cex=highlight$speckleSize)
+        for (i in 2:nf) {
+          graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
+                           col=highlight$color[i], cex=highlight$speckleSize)
+        }
+      }
+
       graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
     }
   }

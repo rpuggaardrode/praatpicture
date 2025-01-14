@@ -275,7 +275,4 @@ praatanimation <- function(sound, width=1080, height=720, frameRate=24,
       rstudioapi::viewer(htmlFile)
     }
   }
-
-
-
 }

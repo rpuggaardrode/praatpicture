@@ -56,6 +56,14 @@
 #' @param pitch_color String or vector of strings giving the name of the color
 #' to be used for plotting pitch. Default is `'black'`. If a vector of two
 #' strings is passed, the second color will be used for background highlighting.
+#' @param pitch_highlight Named list giving parameters for differential
+#' highlighting of pitch based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `pitch_color`),
+#' `drawSize` or `speckleSize` (both numeric).
 #' @param formant_plotOnSpec Boolean; should formants be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param fm Formant object loaded using [rPraat::formant.read] or similar
@@ -77,6 +85,14 @@
 #' half will be used for background highlighting. If the length of this vector
 #' is one more than the number of formants plotted, the last string will
 #' be used for background highlighting.
+#' @param formant_highlight Named list giving parameters for differential
+#' highlighting of formants based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `formant_color`),
+#' `drawSize` or `speckleSize` (both numeric).
 #' @param intensity_plotOnSpec Boolean; should intensity be plotted on top of
 #' spectrogram? Default is `FALSE`.
 #' @param it Intensity object loaded using [rPraat::it.read] or similar object.
@@ -89,6 +105,14 @@
 #' color to be used for plotting intensity. Default is `'black'`. If a vector of
 #' two strings is passed, the second color will be used for background
 #' highlighting.
+#' @param intensity_highlight Named list giving parameters for differential
+#' highlighting of the intensity contour based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `intensity_color`) and
+#' `drawSize` (integer).
 #' @param tgbool Logical; should dotted lines be plotted corresponding to
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
@@ -107,6 +131,13 @@
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param highlight Named list giving parameters for differential
+#' highlighting of the spectrogram based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the argument
+#' `colors` (vector of strings, see `colors`).
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
 #' @param drawSize Number indicating the line width of plot components where
@@ -132,16 +163,16 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                      pitch_plotOnSpec=FALSE, pt=NULL,
                      pitch_plotType='draw', pitch_scale='hz',
                      pitch_freqRange=NULL, pitch_axisLabel=NULL,
-                     pitch_color='black',
+                     pitch_color='black', pitch_highlight=NULL,
                      formant_plotOnSpec=FALSE, fm=NULL,
                      formant_plotType='speckle', formant_dynamicRange=30,
-                     formant_color='black',
+                     formant_color='black', formant_highlight=NULL,
                      intensity_plotOnSpec=FALSE, it=NULL, intensity_range=NULL,
                      intensity_axisLabel='Intensity (dB)',
-                     intensity_color='black',
+                     intensity_color='black', intensity_highlight=NULL,
                      tgbool=FALSE, lines=NULL, focusTierColor='black',
                      focusTierLineType='dotted', ind=NULL,
-                     min_max_only=TRUE,
+                     min_max_only=TRUE, highlight=NULL,
                      axisLabel='Frequency (Hz)', drawSize=1, speckleSize=1) {
 
   wl <- windowLength*1000
@@ -220,6 +251,18 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
   graphics::image(x=xVals, y=yVals, z=spec$spectrogram,
                   col=fillCol, useRaster=useRaster, add=TRUE)
 
+  if (!is.null(highlight)) {
+    hlFillCol <- grDevices::colorRampPalette(highlight$colors)
+    hlFillCol <- hlFillCol(length(levels) - 1)
+    for (int in 1:length(highlight$start)) {
+      times <- which(xVals > highlight$start[int] & xVals < highlight$end[int])
+      highlight_t <- xVals[times]
+      highlight_spec <- spec$spectrogram[times,]
+      graphics::image(x=highlight_t, y=yVals, z=highlight_spec,
+                      col=hlFillCol, useRaster=useRaster, add=TRUE)
+    }
+  }
+
   if (formant_plotOnSpec) {
     nf <- fm$maxnFormants
     if (length(formant_color) == 1) formant_color <- rep(formant_color, nf)
@@ -239,6 +282,39 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     } else {
       subdr <- 1
     }
+
+    if (!is.null(formant_highlight)) {
+      times <- which(fm$t > formant_highlight$start &
+                       fm$t < formant_highlight$end)
+      highlight_t <- fm$t[times]
+      highlight_f <- fm$frequencyArray[,times]
+      highlight_i <- db[times]
+      if (formant_dynamicRange != 0) {
+        hsubdr <- which(highlight_i < max(db)-formant_dynamicRange)
+        if (length(hsubdr) == 0) hsubdr <- 1
+      } else {
+        hsubdr <- 1
+      }
+
+      if (!'color' %in% names(formant_highlight)) formant_highlight$color <-
+        formant_color
+      if (!'drawSize' %in% names(formant_highlight)) {
+        formant_highlight$drawSize <- drawSize
+      }
+      if (!'speckleSize' %in% names(formant_highlight)) {
+        formant_highlight$speckleSize <- speckleSize
+      }
+      if (length(formant_highlight$color) == 1) formant_highlight$color <-
+        rep(formant_highlight$color, nf)
+      if (length(formant_highlight$color) == 2 & nf > 2) {
+        formant_highlight$color <- c(
+          rep(formant_highlight$color[1], nf),
+          rep(formant_highlight$color[2], nf))
+      }
+      if (length(formant_highlight$color) == nf+1) formant_highlight$color <- c(
+        formant_highlight$color, rep(formant_highlight$color[nf+1], nf-1))
+    }
+
     if ('draw' %in% formant_plotType) {
       if (length(formant_color) == nf*2) {
         graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[nf+1],
@@ -253,6 +329,26 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
         }
         graphics::lines(fm$t, fm$frequencyArray[i,], col=formant_color[i],
                         lwd=drawSize)
+      }
+      if (!is.null(formant_highlight)) {
+        if (length(formant_highlight$color) == nf*2) {
+          graphics::lines(highlight_t, highlight_f[1,],
+                          col=formant_highlight$color[nf+1],
+                          lwd=formant_highlight$drawSize+2)
+        }
+        graphics::lines(highlight_t, highlight_f[1,],
+                        col=formant_highlight$color[1],
+                        lwd=formant_highlight$drawSize)
+        for (i in 2:nf) {
+          if (length(formant_highlight$color) == nf*2) {
+            graphics::lines(highlight_t, highlight_f[i,],
+                            lwd=formant_highlight$drawSize+2,
+                            col=formant_highlight$color[nf+i])
+          }
+          graphics::lines(highlight_t, highlight_f[i,],
+                          col=formant_highlight$color[i],
+                          lwd=formant_highlight$drawSize)
+        }
       }
     }
     if ('speckle' %in% formant_plotType) {
@@ -271,6 +367,27 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
         graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
                          col=formant_color[i], cex=speckleSize)
       }
+      if (!is.null(formant_highlight)) {
+        if (length(formant_highlight$color) == nf*2) {
+          graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr],
+                          col=formant_highlight$color[nf+1], pch=20,
+                          lwd=3, cex=formant_highlight$speckleSize)
+        }
+        graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr],
+                        col=formant_highlight$color[1], pch=20,
+                        cex=formant_highlight$speckleSize)
+        for (i in 2:nf) {
+          if (length(formant_highlight$color) == nf*2) {
+            graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr],
+                             col=formant_highlight$color[nf+i], pch=20,
+                            lwd=3, cex=formant_highlight$speckleSize)
+          }
+          graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr],
+                          col=formant_highlight$color[i], pch=20,
+                          cex=formant_highlight$speckleSize)
+        }
+      }
+
     }
   }
 
@@ -286,16 +403,48 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     multiplier <- sRan / pRan
     pt$f <- (pt$f - pfr[1]) * multiplier
 
+    if (!is.null(pitch_highlight)) {
+      times <- which(pt$t > pitch_highlight$start & pt$t < pitch_highlight$end)
+      highlight_t <- pt$t[times]
+      highlight_f <- pt$f[times]
+      if (!'color' %in% names(pitch_highlight)) pitch_highlight$color <-
+        pitch_color
+      if (!'drawSize' %in% names(pitch_highlight)) pitch_highlight$drawSize <-
+        drawSize
+      if (!'speckleSize' %in% names(pitch_highlight)) {
+        pitch_highlight$speckleSize <- speckleSize
+      }
+    }
+
     if ('draw' %in% pitch_plotType) {
       if (length(pitch_color) == 2) graphics::lines(pt$t, pt$f, lwd=drawSize+2,
                                                     col=pitch_color[2])
       graphics::lines(pt$t, pt$f, lwd=drawSize, col=pitch_color[1])
+      if (!is.null(pitch_highlight)) {
+        if (length(pitch_highlight$color) == 2) {
+          graphics::lines(highlight_t, highlight_f,
+                          lwd=pitch_highlight$drawSize+2,
+                          col=pitch_highlight$color[2])
+        }
+        graphics::lines(highlight_t, highlight_f, col=pitch_highlight$color[1],
+                        lwd=pitch_highlight$drawSize)
+      }
     }
     if ('speckle' %in% pitch_plotType) {
       if (length(pitch_color) == 2) graphics::points(pt$t, pt$f, lwd=3, pch=20,
                                                      col=pitch_color[2],
                                                      cex=speckleSize)
       graphics::points(pt$t, pt$f, pch=20, col=pitch_color[1], cex=speckleSize)
+      if (!is.null(pitch_highlight)) {
+        if (length(pitch_highlight$color == 2)) {
+          graphics::points(highlight_t, highlight_f, lwd=3, pch=20,
+                           col=pitch_highlight$color[2],
+                           cex=pitch_highlight$speckleSize)
+        }
+        graphics::points(highlight_t, highlight_f, pch=20,
+                         col=pitch_highlight$color[1],
+                         cex=pitch_highlight$speckleSize)
+      }
     }
 
     pline <- c(3.5,1)
@@ -325,10 +474,33 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     multiplier <- sRan / iRan
     it$i <- (it$i - intensity_range[1]) * multiplier
 
+    if (!is.null(intensity_highlight)) {
+      times <- which(it$t > intensity_highlight$start &
+                       it$t < intensity_highlight$end)
+      highlight_t <- it$t[times]
+      highlight_i <- it$i[times]
+      if (!'color' %in% names(intensity_highlight)) intensity_highlight$color <-
+        intensity_color
+      if (!'drawSize' %in% names(intensity_highlight)) {
+        intensity_highlight$drawSize <- drawSize
+      }
+    }
+
     if (length(intensity_color) == 2) graphics::lines(it$t, it$i,
                                                       lwd=drawSize+2,
                                                       col=intensity_color[2])
     graphics::lines(it$t, it$i, col=intensity_color[1], lwd=drawSize)
+    if (!is.null(intensity_highlight)) {
+      if (length(intensity_highlight$color) == 2) {
+        graphics::lines(highlight_t, highlight_i,
+                        lwd=intensity_highlight$drawSize+2,
+                        col=intensity_highlight$color[2])
+      }
+      graphics::lines(highlight_t, highlight_i,
+                      col=intensity_highlight$color,
+                      lwd=intensity_highlight$drawSize)
+    }
+
     iline <- c(3.5,1)
     if (pitch_plotOnSpec) iline <- c(3.5,3.5)
 

@@ -1,3 +1,14 @@
+# praatpicture 1.4.0
+* Added a range of arguments to `praatpicture()` and sister functions for 
+differential highlighting of signals with colors, line width, point size to 
+stand out from the rest of the plot. These are `highlight` (for all signals),
+`wave_highlight`, `spec_highlight`, `tg_highlight`, `pitch_highlight`, 
+`formant_highlight`, and `intensity_highlight`. These should be named `list()`s
+with information about which part of the signal to highlight, using either 
+`start` or `end` arguments, or using `tier` and `label` arguments if 
+highlighting is based on information in a TextGrid. Other possible arguments
+are `color`, `drawSize`, and `speckleSize`, which work in the usual way.
+
 # praatpicture 1.3.1
 * Fix to `emupicture()`. In previous versions, all annotation levels were
 converted to a TextGrid, which could have unfortunate side effects if some 

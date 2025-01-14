@@ -43,6 +43,14 @@
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.
 #' Ignored for TextGrid component.
+#' @param highlight Named list giving parameters for differential
+#' highlighting of pitch based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `color`),
+#' `drawSize` or `speckleSize` (both numeric).
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when printing a pitch track. Default is `NULL`, in which case the
 #' axis label will depend on the scale.
@@ -66,7 +74,7 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                       focusTierColor='black', focusTierLineType='dotted',
                       plotType='draw', scale='hz', freqRange=NULL,
                       semitonesRe=100, color='black', ind=NULL,
-                      min_max_only=TRUE,
+                      min_max_only=TRUE, highlight=NULL,
                       axisLabel=NULL, drawSize=1, speckleSize=1) {
 
   if (scale == 'logarithmic') {
@@ -93,6 +101,21 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
+  if (!is.null(highlight)) {
+    highlight_t <- c()
+    highlight_f <- c()
+    for (int in 1:length(highlight$start)) {
+      times <- which(pt$t > highlight$start[int] & pt$t < highlight$end[int])
+      highlight_t <- c(highlight_t, pt$t[times], max(pt$t[times] + 0.0001))
+      highlight_f <- c(highlight_f, pt$f[times], NA)
+    }
+
+    if (!'color' %in% names(highlight)) highlight$color <- color
+    if (!'drawSize' %in% names(highlight)) highlight$drawSize <- drawSize
+    if (!'speckleSize' %in% names(highlight)) highlight$speckleSize <-
+      speckleSize
+  }
+
   if ('draw' %in% plotType) {
     plot(pt$t, pt$f, xlim=c(start, end+start), xaxt='n', ylim=freqRange,
          yaxt=yax, type='l', log=logsc, col=color, lwd=drawSize)
@@ -110,6 +133,16 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if ('speckle' %in% plotType) {
       graphics::points(pt$t, pt$f, pch=20, col=color, cex=speckleSize)
     }
+
+    if (!is.null(highlight)) {
+      graphics::lines(highlight_t, highlight_f, col=highlight$color,
+                      lwd=highlight$drawSize)
+      if ('speckle' %in% plotType) {
+        graphics::points(highlight_t, highlight_f, pch=20, col=highlight$color,
+                         cex=highlight$speckleSize)
+      }
+    }
+
     graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
@@ -128,6 +161,15 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                            lty=focusTierLineType[i])
         }
       }
+      if (!is.null(highlight)) {
+        graphics::points(highlight_t, highlight_f, col=highlight$color, pch=20,
+                        cex=highlight$speckleSize)
+        if ('draw' %in% plotType) {
+          graphics::lines(highlight_t, highlight_f, col=highlight$color,
+                           lwd=highlight$drawSize)
+        }
+      }
+
       graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
     }
   }

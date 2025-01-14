@@ -24,22 +24,26 @@ specplot(
   pitch_freqRange = NULL,
   pitch_axisLabel = NULL,
   pitch_color = "black",
+  pitch_highlight = NULL,
   formant_plotOnSpec = FALSE,
   fm = NULL,
   formant_plotType = "speckle",
   formant_dynamicRange = 30,
   formant_color = "black",
+  formant_highlight = NULL,
   intensity_plotOnSpec = FALSE,
   it = NULL,
   intensity_range = NULL,
   intensity_axisLabel = "Intensity (dB)",
   intensity_color = "black",
+  intensity_highlight = NULL,
   tgbool = FALSE,
   lines = NULL,
   focusTierColor = "black",
   focusTierLineType = "dotted",
   ind = NULL,
   min_max_only = TRUE,
+  highlight = NULL,
   axisLabel = "Frequency (Hz)",
   drawSize = 1,
   speckleSize = 1
@@ -117,6 +121,15 @@ axis label will depend on the scale.}
 to be used for plotting pitch. Default is \code{'black'}. If a vector of two
 strings is passed, the second color will be used for background highlighting.}
 
+\item{pitch_highlight}{Named list giving parameters for differential
+highlighting of pitch based on the time domain. This list
+should contain information about which parts of the plot to highlight, either
+done with the \code{start} and \code{end} arguments which must be numbers or numeric
+vectors, or using the \code{tier} and \code{label} arguments to highlight based on
+information in a plotted TextGrid. Further contains the optional arguments
+\code{color} (string or vector of strings, see \code{pitch_color}),
+\code{drawSize} or \code{speckleSize} (both numeric).}
+
 \item{formant_plotOnSpec}{Boolean; should formants be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
@@ -143,6 +156,15 @@ half will be used for background highlighting. If the length of this vector
 is one more than the number of formants plotted, the last string will
 be used for background highlighting.}
 
+\item{formant_highlight}{Named list giving parameters for differential
+highlighting of formants based on the time domain. This list
+should contain information about which parts of the plot to highlight, either
+done with the \code{start} and \code{end} arguments which must be numbers or numeric
+vectors, or using the \code{tier} and \code{label} arguments to highlight based on
+information in a plotted TextGrid. Further contains the optional arguments
+\code{color} (string or vector of strings, see \code{formant_color}),
+\code{drawSize} or \code{speckleSize} (both numeric).}
+
 \item{intensity_plotOnSpec}{Boolean; should intensity be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
@@ -159,6 +181,15 @@ the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
 color to be used for plotting intensity. Default is \code{'black'}. If a vector of
 two strings is passed, the second color will be used for background
 highlighting.}
+
+\item{intensity_highlight}{Named list giving parameters for differential
+highlighting of the intensity contour based on the time domain. This list
+should contain information about which parts of the plot to highlight, either
+done with the \code{start} and \code{end} arguments which must be numbers or numeric
+vectors, or using the \code{tier} and \code{label} arguments to highlight based on
+information in a plotted TextGrid. Further contains the optional arguments
+\code{color} (string or vector of strings, see \code{intensity_color}) and
+\code{drawSize} (integer).}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}
@@ -183,6 +214,14 @@ Default is \code{NULL}.}
 on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but
 not all plot components should have minimum and maximum values on the y-axis.
 Ignored for TextGrid component.}
+
+\item{highlight}{Named list giving parameters for differential
+highlighting of the spectrogram based on the time domain. This list
+should contain information about which parts of the plot to highlight, either
+done with the \code{start} and \code{end} arguments which must be numbers or numeric
+vectors, or using the \code{tier} and \code{label} arguments to highlight based on
+information in a plotted TextGrid. Further contains the argument
+\code{colors} (vector of strings, see \code{colors}).}
 
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when plotting a spectrogram. Default is \code{Frequency (Hz)}.}

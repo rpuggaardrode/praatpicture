@@ -14,7 +14,8 @@ tgplot(
   tierNames = TRUE,
   alignment = "central",
   specialChar = FALSE,
-  color = "black"
+  color = "black",
+  highlight = NULL
 )
 }
 \arguments{
@@ -49,6 +50,12 @@ See https://www.fon.hum.uva.nl/praat/manual/Text_styles.html.}
 \item{color}{String or vector of strings giving the name of the color(s)
 to be used for the text in TextGrids. Default is \code{'black'}. If a vector is
 provided, different colors are used for different tiers.}
+
+\item{highlight}{Named list giving parameters for differential
+highlighting of TextGrid intervals. This list
+should contain information about which intervals to highlight, using the
+\code{tier} and \code{label}. Further contains the argument
+\code{color}.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling
