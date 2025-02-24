@@ -9,10 +9,12 @@ tgplot(
   t,
   sr,
   start,
+  end,
   tiers = 1,
   tfrom0 = TRUE,
   tierNames = TRUE,
   alignment = "central",
+  edgeLabels = "keep",
   specialChar = FALSE,
   color = "black",
   highlight = NULL
@@ -26,6 +28,8 @@ tgplot(
 \item{sr}{Integer giving the sampling rate of the signal.}
 
 \item{start}{Start time (in seconds) of desired plotted area.}
+
+\item{end}{End time (in seconds) of desired plotted area.}
 
 \item{tiers}{Vector of number or strings giving either numeric identifiers
 of TextGrid tiers to plot or the names of TextGrid tiers to plot. Default is
@@ -41,6 +45,12 @@ y-axis? Default is \code{TRUE}.}
 TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
 Alternatively, a vector of strings if different alignments are needed.}
 
+\item{edgeLabels}{String specifying how to handle TextGrid labels in
+interval tiers that fall partially before \code{start} or partially after \code{end}.
+Default is \code{'keep'}, where labels are kept at the center of the interval.
+Other options are \code{'center'}, where labels are recentered to the visible
+part of the interval, or \code{'discard'}, where such labels are ignored.}
+
 \item{specialChar}{Logical; should Praat typesetting for special font types
 such as italic, bold, and small caps be converted into corresponding
 R-readable special font types. Default is \code{FALSE}, since special characters
@@ -55,7 +65,8 @@ provided, different colors are used for different tiers.}
 highlighting of TextGrid intervals. This list
 should contain information about which intervals to highlight, using the
 \code{tier} and \code{label}. Further contains the argument
-\code{color}.}
+\code{color}, and \code{background}
+(a string specifying a background color).}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

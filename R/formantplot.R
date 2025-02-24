@@ -48,7 +48,8 @@
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `color`),
-#' `drawSize` or `speckleSize` (both numeric).
+#' `drawSize` or `speckleSize` (both numeric), and `background`
+#' (a string specifying a background color).
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when plotting formants. Default is `Frequency (Hz)`.
 #' @param drawSize Number indicating the line width if
@@ -117,6 +118,12 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       highlight_f <- cbind(highlight_f, fm$frequencyArray[,times], rep(NA, nf))
       highlight_i <- c(highlight_i, db[times], 0)
     }
+    if (any(highlight$start < start)) {
+      highlight$start[which(highlight$start < start)] <- start
+    }
+    if (any(highlight$end > end)) {
+      highlight$end[which(highlight$end > end)] <- end
+    }
 
     if (dynamicRange != 0) {
       hsubdr <- which(highlight_i < max(db)-dynamicRange)
@@ -146,12 +153,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                           tick=F)
-    if (tgbool) {
-      for (i in 1:length(lines)) {
-        graphics::abline(v=lines[[i]], col=focusTierColor[i],
-                         lty=focusTierLineType[i])
-      }
-    }
+
     if ('speckle' %in% plotType) {
       graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
                        col=color[1], cex=speckleSize)
@@ -162,6 +164,13 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     }
 
     if (!is.null(highlight)) {
+      if ('background' %in% names(highlight)) {
+        graphics::rect(highlight$start,
+                       freqRange[1] - freqRange[2] * 2,
+                       highlight$end,
+                       freqRange[2] + freqRange[2] * 2,
+                       col = highlight$background, border = NA)
+      }
       graphics::lines(highlight_t, highlight_f[1,], col=highlight$color[1],
                       lwd=highlight$drawSize)
       for (i in 2:nf) {
@@ -175,6 +184,13 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
           graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
                            col=highlight$color[i], cex=highlight$speckleSize)
         }
+      }
+    }
+
+    if (tgbool) {
+      for (i in 1:length(lines)) {
+        graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                         lty=focusTierLineType[i])
       }
     }
 
@@ -193,19 +209,27 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
       if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                             tick=F)
-      if (tgbool) {
-        for (i in 1:length(lines)) {
-          graphics::abline(v=lines[[i]], col=focusTierColor[i],
-                           lty=focusTierLineType[i])
-        }
-      }
 
       if (!is.null(highlight)) {
+        if ('background' %in% names(highlight)) {
+          graphics::rect(highlight$start,
+                         freqRange[1] - freqRange[2] * 2,
+                         highlight$end,
+                         freqRange[2] + freqRange[2] * 2,
+                         col = highlight$background, border = NA)
+        }
         graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
                          col=highlight$color[1], cex=highlight$speckleSize)
         for (i in 2:nf) {
           graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
                            col=highlight$color[i], cex=highlight$speckleSize)
+        }
+      }
+
+      if (tgbool) {
+        for (i in 1:length(lines)) {
+          graphics::abline(v=lines[[i]], col=focusTierColor[i],
+                           lty=focusTierLineType[i])
         }
       }
 

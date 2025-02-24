@@ -88,7 +88,8 @@ done with the \code{start} and \code{end} arguments which must be numbers or num
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{color}),
-\code{drawSize} or \code{speckleSize} (both numeric).}
+\code{drawSize} or \code{speckleSize} (both numeric), and \code{background}
+(a string specifying a background color).}
 
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when printing a pitch track. Default is \code{NULL}, in which case the

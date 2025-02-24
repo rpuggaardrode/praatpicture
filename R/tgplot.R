@@ -8,6 +8,7 @@
 #' @param t Numeric vector giving times corresponding to the signal.
 #' @param sr Integer giving the sampling rate of the signal.
 #' @param start Start time (in seconds) of desired plotted area.
+#' @param end End time (in seconds) of desired plotted area.
 #' @param tiers Vector of number or strings giving either numeric identifiers
 #' of TextGrid tiers to plot or the names of TextGrid tiers to plot. Default is
 #' `1`, which plots just the first tier.
@@ -18,6 +19,11 @@
 #' @param alignment String giving the desired alignment of text in the
 #' TextGrids. Default is `central`; other options are `left` and `right`.
 #' Alternatively, a vector of strings if different alignments are needed.
+#' @param edgeLabels String specifying how to handle TextGrid labels in
+#' interval tiers that fall partially before `start` or partially after `end`.
+#' Default is `'keep'`, where labels are kept at the center of the interval.
+#' Other options are `'center'`, where labels are recentered to the visible
+#' part of the interval, or `'discard'`, where such labels are ignored.
 #' @param specialChar Logical; should Praat typesetting for special font types
 #' such as italic, bold, and small caps be converted into corresponding
 #' R-readable special font types. Default is `FALSE`, since special characters
@@ -30,7 +36,8 @@
 #' highlighting of TextGrid intervals. This list
 #' should contain information about which intervals to highlight, using the
 #' `tier` and `label`. Further contains the argument
-#' `color`.
+#' `color`, and `background`
+#' (a string specifying a background color).
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -41,8 +48,8 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' soundFile <- paste0(datapath, '/1.wav')
 #' praatpicture(soundFile, frames='TextGrid')
-tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
-                   alignment='central',
+tgplot <- function(tg, t, sr, start, end, tiers=1, tfrom0=TRUE, tierNames=TRUE,
+                   alignment='central', edgeLabels='keep',
                    specialChar=FALSE, color='black', highlight=NULL) {
 
   if (length(alignment) != length(tiers)) {
@@ -60,11 +67,38 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
     if (tg[[tier]]$type == 'interval') {
       t1 <- tg[[tier]]$t1
       t2 <- tg[[tier]]$t2
+      if (edgeLabels != 'keep' & (start > 0 | end > 0)) {
+        line_vec <- t1[-which(t1 < start | t1 > end)]
+      } else {
+        line_vec <- t1
+      }
+      if (edgeLabels == 'center') {
+        discard <- which(t2 < start | t1 > end)
+        lab <- lab[-discard]
+        t1 <- t1[-discard]
+        t2 <- t2[-discard]
+        if (any(t1 < start)) t1[which(t1 < start)] <- start
+        if (any(t2 > end)) t2[which(t2 > end)] <- end
+      }
+      if (edgeLabels == 'discard') {
+        if (start != 0 & any(t1 < start)) {
+          discard <- which(t1 < start)
+          t1 <- t1[-discard]
+          t2 <- t2[-discard]
+          lab <- lab[-discard]
+        }
+        if (any(t2 > end)) {
+          discard <- which(t2 > end)
+          t1 <- t1[-discard]
+          t2 <- t2[-discard]
+          lab <- lab[-discard]
+        }
+      }
       if (tfrom0) {
         t1 <- t1 - start
         t2 <- t2 - start
+        line_vec <- line_vec - start
       }
-      line_vec <- t1[-1]
     } else {
       t0 <- tg[[tier]]$t
       if (tfrom0) t0 <- t0 - start
@@ -101,10 +135,17 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
     if (!is.null(highlight)) {
       if ('tier' %in% names(highlight)) {
         if (tier == highlight$tier | tg[[tier]]$name == highlight$tier) {
-          match <- which(grepl(highlight$label, tg[[tier]]$label))
+          match <- which(grepl(highlight$label, lab))
           lab_highlight <- lab[match]
           t1_highlight <- t1[match]
           t2_highlight <- t2[match]
+          if ('background' %in% names(highlight)) {
+            graphics::rect(t1_highlight,
+                           -10,
+                           t2_highlight,
+                           10,
+                           col = highlight$background, border = NA)
+          }
           if (alignment[[i]]=='central') graphics::text(
             t1_highlight+(t2_highlight-t1_highlight)/2, 5, lab_highlight,
             col=highlight$color, adj=c(0.5,0.5))
@@ -114,9 +155,11 @@ tgplot <- function(tg, t, sr, start, tiers=1, tfrom0=TRUE, tierNames=TRUE,
           if (alignment[[i]]=='right') graphics::text(
             t2_highlight, 5, lab_highlight, pos=2, col=highlight$color,
             adj=c(0.5, 0.5))
+          graphics::abline(v=line_vec)
         }
       }
     }
-  }
 
+    graphics::box()
+  }
 }

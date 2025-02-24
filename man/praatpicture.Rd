@@ -31,6 +31,7 @@ praatpicture(
   tg_focusTierLineType = "dotted",
   tg_tierNames = TRUE,
   tg_alignment = "central",
+  tg_edgeLabels = "keep",
   tg_specialChar = FALSE,
   tg_color = "black",
   tg_highlight = NULL,
@@ -161,7 +162,8 @@ should contain information about which parts of the plot to highlight, either
 done with the \code{start} and \code{end} arguments which must be numbers or numeric
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the argument
-\code{color} (string, see \code{wave_color}).}
+\code{color} (string, see \code{wave_color}), and \code{background}
+(a string specifying a background color).}
 
 \item{tg_obj}{A TextGrid object returned by the \code{\link[=make_TextGrid]{make_TextGrid()}} function.}
 
@@ -199,6 +201,12 @@ y-axis? Default is \code{TRUE}.}
 TextGrids. Default is \code{central}; other options are \code{left} and \code{right}.
 Alternatively, a vector of strings if different alignments are needed.}
 
+\item{tg_edgeLabels}{String specifying how to handle TextGrid labels in
+interval tiers that fall partially before \code{start} or partially after \code{end}.
+Default is \code{'keep'}, where labels are kept at the center of the interval.
+Other options are \code{'center'}, where labels are recentered to the visible
+part of the interval, or \code{'discard'}, where such labels are ignored.}
+
 \item{tg_specialChar}{Logical; should Praat typesetting for special font types
 such as italic, bold, and small caps be converted into corresponding
 R-readable special font types. Default is \code{FALSE}, since special characters
@@ -213,7 +221,8 @@ provided, different colors are used for different tiers.}
 highlighting of TextGrid intervals. This list
 should contain information about which intervals to highlight, using the
 \code{tier} and \code{label}. Further contains the argument
-\code{color}.}
+\code{color}, and \code{background}
+(a string specifying a background color).}
 
 \item{spec_channel}{Numeric giving the channel that should be used to
 generate the spectrogram. Default is \code{1}. Generating spectrograms from
@@ -311,7 +320,8 @@ done with the \code{start} and \code{end} arguments which must be numbers or num
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{pitch_color}),
-\code{drawSize} or \code{speckleSize} (both numeric).}
+\code{drawSize} or \code{speckleSize} (both numeric), and \code{background}
+(a string specifying a background color).}
 
 \item{formant_timeStep}{Measurement interval in seconds for tracking formants.
 Default is \code{NULL}, in which case the measurement interval is equal to
@@ -367,7 +377,8 @@ done with the \code{start} and \code{end} arguments which must be numbers or num
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{formant_color}),
-\code{drawSize} or \code{speckleSize} (both numeric).}
+\code{drawSize} or \code{speckleSize} (both numeric), and \code{background}
+(a string specifying a background color).}
 
 \item{intensity_timeStep}{Measurement interval in seconds for tracking
 intensity. Default is \code{NULL}, in which case the measurement interval is
@@ -404,7 +415,8 @@ done with the \code{start} and \code{end} arguments which must be numbers or num
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{intensity_color}) and
-\code{drawSize} (integer).}
+\code{drawSize} (integer), and \code{background}
+(a string specifying a background color).}
 
 \item{time_axisLabel}{String giving the name of the label to print along
 the x-axis. Default is \code{NULL}, in which case \code{Time (s)} is printed if
@@ -416,7 +428,8 @@ information about which parts of the plot to highlight, either done with the
 \code{start} and \code{end} arguments which must be numbers or numeric vectors, or
 using the \code{tier} and \code{label} arguments to highlight based on information in
 a plotted TextGrid. Further contains the optional arguments \code{color}
-(a string), \code{drawSize}, and \code{speckleSize} (both numeric). This argument is
+(a string), \code{drawSize} and \code{speckleSize} (both numeric), and \code{background}
+(a string specifying a background color). This argument is
 used to highlight all plot components, use the \verb{*_highlight} arguments for
 highlighting individuals plot components.}
 

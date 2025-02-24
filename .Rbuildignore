@@ -1,6 +1,7 @@
 ^praatpicture\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^LICENSE
 ^README\.Rmd$
 ^\.github$
 ^cran-comments\.md$

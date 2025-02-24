@@ -401,12 +401,39 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     sRan <- freqRange[2] - freqRange[1]
     pRan <- pfr[2] - pfr[1]
     multiplier <- sRan / pRan
-    pt$f <- (pt$f - pfr[1]) * multiplier
+    pt$f <- freqRange[1] + (pt$f - pfr[1]) * multiplier
 
     if (!is.null(pitch_highlight)) {
-      times <- which(pt$t > pitch_highlight$start & pt$t < pitch_highlight$end)
-      highlight_t <- pt$t[times]
-      highlight_f <- pt$f[times]
+      highlight_tSpeckle <- c()
+      highlight_fSpeckle <- c()
+      highlight_tDraw <- c()
+      highlight_fDraw <- c()
+      for (int in 1:length(pitch_highlight$start)) {
+        times <- which(pt$t > pitch_highlight$start[int] &
+                         pt$t < pitch_highlight$end[int])
+        highlight_tSpeckle <- c(highlight_tSpeckle, pt$t[times],
+                                max(pt$t[times] + 0.0001))
+        highlight_fSpeckle <- c(highlight_fSpeckle, pt$f[times], NA)
+        if (pitch_highlight$start[int] < start) {
+          extrema <- zoo::na.approx(c(NA, pt$f),
+                                    c(pitch_highlight$end[int], pt$t))
+          highlight_tDraw <- c(highlight_tDraw,
+                               pt$t[times], pitch_highlight$end[int],
+                               max(pt$t[times] + 0.0001))
+          highlight_fDraw <- c(highlight_fDraw, pt$f[times], extrema[1], NA)
+        } else {
+          extrema <- zoo::na.approx(c(NA, NA, pt$f),
+                                    c(pitch_highlight$start[int],
+                                      pitch_highlight$end[int],
+                                      pt$t))[1:2]
+          highlight_tDraw <- c(highlight_tDraw, pitch_highlight$start[int],
+                               pt$t[times], pitch_highlight$end[int],
+                               max(pt$t[times] + 0.0001))
+          highlight_fDraw <- c(highlight_fDraw, extrema[1], pt$f[times],
+                               extrema[2], NA)
+        }
+      }
+
       if (!'color' %in% names(pitch_highlight)) pitch_highlight$color <-
         pitch_color
       if (!'drawSize' %in% names(pitch_highlight)) pitch_highlight$drawSize <-
@@ -422,11 +449,12 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
       graphics::lines(pt$t, pt$f, lwd=drawSize, col=pitch_color[1])
       if (!is.null(pitch_highlight)) {
         if (length(pitch_highlight$color) == 2) {
-          graphics::lines(highlight_t, highlight_f,
+          graphics::lines(highlight_tDraw, highlight_fDraw,
                           lwd=pitch_highlight$drawSize+2,
                           col=pitch_highlight$color[2])
         }
-        graphics::lines(highlight_t, highlight_f, col=pitch_highlight$color[1],
+        graphics::lines(highlight_tDraw, highlight_fDraw,
+                        col=pitch_highlight$color[1],
                         lwd=pitch_highlight$drawSize)
       }
     }
@@ -437,11 +465,12 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
       graphics::points(pt$t, pt$f, pch=20, col=pitch_color[1], cex=speckleSize)
       if (!is.null(pitch_highlight)) {
         if (length(pitch_highlight$color == 2)) {
-          graphics::points(highlight_t, highlight_f, lwd=3, pch=20,
+          graphics::points(highlight_tSpeckle, highlight_fSpeckle,
+                           lwd=3, pch=20,
                            col=pitch_highlight$color[2],
                            cex=pitch_highlight$speckleSize)
         }
-        graphics::points(highlight_t, highlight_f, pch=20,
+        graphics::points(highlight_tSpeckle, highlight_fSpeckle, pch=20,
                          col=pitch_highlight$color[1],
                          cex=pitch_highlight$speckleSize)
       }
@@ -472,13 +501,32 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     sRan <- freqRange[2] - freqRange[1]
     iRan <- intensity_range[2] - intensity_range[1]
     multiplier <- sRan / iRan
-    it$i <- (it$i - intensity_range[1]) * multiplier
+    it$i <- freqRange[1] + (it$i - intensity_range[1]) * multiplier
 
     if (!is.null(intensity_highlight)) {
-      times <- which(it$t > intensity_highlight$start &
-                       it$t < intensity_highlight$end)
-      highlight_t <- it$t[times]
-      highlight_i <- it$i[times]
+      highlight_t <- c()
+      highlight_i <- c()
+      for (int in 1:length(intensity_highlight$start)) {
+        times <- which(it$t > intensity_highlight$start[int] &
+                         it$t < intensity_highlight$end[int])
+        if (intensity_highlight$start[int] < start) {
+          extrema <- zoo::na.approx(c(NA, it$i),
+                                    c(intensity_highlight$end[int], it$t))
+          highlight_t <- c(highlight_t,
+                           it$t[times], intensity_highlight$end[int],
+                           max(it$t[times] + 0.0001))
+          highlight_i <- c(highlight_i, it$i[times], extrema[1], NA)
+        } else {
+          extrema <- zoo::na.approx(c(NA, NA, it$i),
+                                    c(intensity_highlight$start[int],
+                                      intensity_highlight$end[int],
+                                      it$t))[1:2]
+          highlight_t <- c(highlight_t, intensity_highlight$start[int],
+                           it$t[times], intensity_highlight$end[int],
+                           max(it$t[times] + 0.0001))
+          highlight_i <- c(highlight_i, extrema[1], it$i[times], extrema[2], NA)
+        }
+      }
       if (!'color' %in% names(intensity_highlight)) intensity_highlight$color <-
         intensity_color
       if (!'drawSize' %in% names(intensity_highlight)) {

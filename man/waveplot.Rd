@@ -106,7 +106,8 @@ should contain information about which parts of the plot to highlight, either
 done with the \code{start} and \code{end} arguments which must be numbers or numeric
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the argument
-\code{color} (string, see \code{color}).}
+\code{color} (string, see \code{color}), and \code{background}
+(a string specifying a background color).}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

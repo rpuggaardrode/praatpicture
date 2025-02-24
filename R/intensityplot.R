@@ -39,7 +39,8 @@
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `color`) and
-#' `drawSize` (integer).
+#' `drawSize` (integer), and `background`
+#' (a string specifying a background color).
 #' @param axisLabel String giving the name of the label to print along
 #' the y-axis when plotting intensity. Default is `Intensity (dB)`.
 #' @param drawSize Number indicating the line width of the intensity contour.
@@ -83,8 +84,28 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     highlight_i <- c()
     for (int in 1:length(highlight$start)) {
       times <- which(it$t > highlight$start[int] & it$t < highlight$end[int])
-      highlight_t <- c(highlight_t, it$t[times], max(it$t[times] + 0.0001))
-      highlight_i <- c(highlight_i, it$i[times], NA)
+      if (highlight$start[int] < start) {
+        extrema <- zoo::na.approx(c(NA, it$i),
+                                  c(highlight$end[int], it$t))
+        highlight_t <- c(highlight_t,
+                         it$t[times], highlight$end[int],
+                         max(it$t[times] + 0.0001))
+        highlight_i <- c(highlight_i, it$i[times], extrema[1], NA)
+      } else {
+        extrema <- zoo::na.approx(c(NA, NA, it$i),
+                                  c(highlight$start[int], highlight$end[int],
+                                    it$t))[1:2]
+        highlight_t <- c(highlight_t, highlight$start[int],
+                         it$t[times], highlight$end[int],
+                         max(it$t[times] + 0.0001))
+        highlight_i <- c(highlight_i, extrema[1], it$i[times], extrema[2], NA)
+      }
+    }
+    if (any(highlight$start < start)) {
+      highlight$start[which(highlight$start < start)] <- start
+    }
+    if (any(highlight$end > end)) {
+      highlight$end[which(highlight$end > end)] <- end
     }
     if (!'color' %in% names(highlight)) highlight$color <- color
     if (!'drawSize' %in% names(highlight)) highlight$drawSize <- drawSize
@@ -95,16 +116,26 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                         tick=F)
+
+  if (!is.null(highlight)) {
+    if ('background' %in% names(highlight)) {
+      graphics::rect(highlight$start,
+                     range[1] - range[2] * 2,
+                     highlight$end,
+                     range[2] + range[2] * 2,
+                     col = highlight$background, border = NA)
+    }
+    graphics::lines(highlight_t, highlight_i,
+                    col=highlight$color,
+                    lwd=highlight$drawSize)
+  }
+
   if (tgbool) {
     for (i in 1:length(lines)) {
       graphics::abline(v=lines[[i]], col=focusTierColor[i],
                        lty=focusTierLineType[i])
     }
   }
-
-  if (!is.null(highlight)) graphics::lines(highlight_t, highlight_i,
-                                           col=highlight$color,
-                                           lwd=highlight$drawSize)
 
   graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
 

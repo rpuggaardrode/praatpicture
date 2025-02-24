@@ -70,7 +70,8 @@ done with the \code{start} and \code{end} arguments which must be numbers or num
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{color}) and
-\code{drawSize} (integer).}
+\code{drawSize} (integer), and \code{background}
+(a string specifying a background color).}
 
 \item{axisLabel}{String giving the name of the label to print along
 the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}

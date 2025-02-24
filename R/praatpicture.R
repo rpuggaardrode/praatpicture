@@ -63,7 +63,8 @@
 #' done with the `start` and `end` arguments which must be numbers or numeric
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the argument
-#' `color` (string, see `wave_color`).
+#' `color` (string, see `wave_color`), and `background`
+#' (a string specifying a background color).
 #' @param tg_file Path of file to be used for plotting TextGrid. Default is
 #' `NULL`, in which case the function searches for a TextGrid sharing the same
 #' base name as `sound` with the `.TextGrid` extension.
@@ -90,6 +91,11 @@
 #' @param tg_alignment String giving the desired alignment of text in the
 #' TextGrids. Default is `central`; other options are `left` and `right`.
 #' Alternatively, a vector of strings if different alignments are needed.
+#' @param tg_edgeLabels String specifying how to handle TextGrid labels in
+#' interval tiers that fall partially before `start` or partially after `end`.
+#' Default is `'keep'`, where labels are kept at the center of the interval.
+#' Other options are `'center'`, where labels are recentered to the visible
+#' part of the interval, or `'discard'`, where such labels are ignored.
 #' @param tg_specialChar Logical; should Praat typesetting for special font types
 #' such as italic, bold, and small caps be converted into corresponding
 #' R-readable special font types. Default is `FALSE`, since special characters
@@ -104,7 +110,8 @@
 #' highlighting of TextGrid intervals. This list
 #' should contain information about which intervals to highlight, using the
 #' `tier` and `label`. Further contains the argument
-#' `color`.
+#' `color`, and `background`
+#' (a string specifying a background color).
 #' @param spec_channel Numeric giving the channel that should be used to
 #' generate the spectrogram. Default is `1`. Generating spectrograms from
 #' multiple channels is not currently possible with `praatpicture`.
@@ -181,7 +188,8 @@
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `pitch_color`),
-#' `drawSize` or `speckleSize` (both numeric).
+#' `drawSize` or `speckleSize` (both numeric), and `background`
+#' (a string specifying a background color).
 #' @param formant_timeStep Measurement interval in seconds for tracking formants.
 #' Default is `NULL`, in which case the measurement interval is equal to
 #' `formant_windowLength` / 4.
@@ -225,7 +233,8 @@
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `formant_color`),
-#' `drawSize` or `speckleSize` (both numeric).
+#' `drawSize` or `speckleSize` (both numeric), and `background`
+#' (a string specifying a background color).
 #' @param intensity_timeStep Measurement interval in seconds for tracking
 #' intensity. Default is `NULL`, in which case the measurement interval is
 #' equal to 0.8 * `intensity_minPitch`.
@@ -254,7 +263,8 @@
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `intensity_color`) and
-#' `drawSize` (integer).
+#' `drawSize` (integer), and `background`
+#' (a string specifying a background color).
 #' @param time_axisLabel String giving the name of the label to print along
 #' the x-axis. Default is `NULL`, in which case `Time (s)` is printed if
 #' `tUnit = 's'` and `Time (ms)` is printed if `tUnit = 'ms'`.
@@ -264,7 +274,8 @@
 #' `start` and `end` arguments which must be numbers or numeric vectors, or
 #' using the `tier` and `label` arguments to highlight based on information in
 #' a plotted TextGrid. Further contains the optional arguments `color`
-#' (a string), `drawSize`, and `speckleSize` (both numeric). This argument is
+#' (a string), `drawSize` and `speckleSize` (both numeric), and `background`
+#' (a string specifying a background color). This argument is
 #' used to highlight all plot components, use the `*_highlight` arguments for
 #' highlighting individuals plot components.
 #' @param draw_lines Use for drawing straight lines on plot components. Takes
@@ -344,7 +355,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          tg_obj=NULL, tg_file=NULL, tg_tiers='all',
                          tg_focusTier=tg_tiers[1], tg_focusTierColor='black',
                          tg_focusTierLineType='dotted', tg_tierNames=TRUE,
-                         tg_alignment='central', tg_specialChar=FALSE,
+                         tg_alignment='central', tg_edgeLabels='keep',
+                         tg_specialChar=FALSE,
                          tg_color='black', tg_highlight=NULL,
                          spec_channel=NULL, spec_freqRange=c(0,5000),
                          spec_windowLength=0.005, spec_dynamicRange=50,
@@ -397,6 +409,9 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
   }
   if (!tUnit %in% c('s', 'ms')) {
     stop('Please select either s or ms as the time unit')
+  }
+  if (!tg_edgeLabels %in% c('keep', 'center', 'discard')) {
+    stop('tg_edgeLabels should be either keep, center, or discard')
   }
 
   if (is.null(time_axisLabel)) {
@@ -556,6 +571,9 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                                             'highlighting conditions'))
       listobj$start <- tg[[tierName]]$t1[matches]
       listobj$end <- tg[[tierName]]$t2[matches]
+      discard <- which(listobj$end < start | listobj$start > end)
+      listobj$start <- listobj$start[-discard]
+      listobj$end <- listobj$end[-discard]
       if (start > 0 & tfrom0) {
         listobj$start <- listobj$start - start
         listobj$end <- listobj$end - start
@@ -571,7 +589,11 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     if (is.null(intensity_highlight)) intensity_highlight <- highlight
     if (is.null(spec_highlight)) {
       spec_highlight <- highlight
-      spec_highlight$colors <- c(spec_colors[1], spec_highlight$color)
+      spec_highlight$colors <- spec_colors
+      if ('color' %in% names(highlight)) spec_highlight$colors <-
+          c(spec_highlight$colors[1], highlight$color)
+      if ('background' %in% names(highlight)) spec_highlight$colors <-
+          c(highlight$background, spec_highlight$colors[2])
     }
     if (is.null(tg_highlight)) tg_highlight <- highlight
   }
@@ -784,8 +806,9 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
       graphics::box()
     } else if (frames[i] == 'TextGrid') {
       ind <- which(frames == 'TextGrid')
-      tgplot(tg, t, sr, start, tg_tiers, tfrom0, tg_tierNames,
-             tg_alignment, tg_specialChar, tg_color, tg_highlight)
+      tgplot(tg, t, sr, start, end, tg_tiers, tfrom0, tg_tierNames,
+             tg_alignment, tg_edgeLabels, tg_specialChar,
+             tg_color, tg_highlight)
     } else if (frames[i] == 'pitch') {
       ind <- which(frames == 'pitch')
       pitchplot(pt, start, max(tseq)-start, tfrom0, tgbool, focus_linevec,
@@ -851,3 +874,4 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
 
   graphics::par(p)
 }
+

@@ -1,6 +1,6 @@
 Package: praatpicture
 Title: 'Praat Picture' Style Plots of Acoustic Data
-Version: 1.4.0
+Version: 1.4.1
 Authors@R: 
     person("Rasmus", "Puggaard-Rode", 
     email = "r.puggaard@phonetik.uni-muenchen.de", 
@@ -29,6 +29,7 @@ Imports:
     soundgen (>= 2.6.2),
     tuneR (>= 1.4.6),
     utils (>= 4.3.2),
-    wrassp (>= 1.0.4)
+    wrassp (>= 1.0.4),
+    zoo (>= 1.8-12)
 URL: https://github.com/rpuggaardrode/praatpicture
 BugReports: https://github.com/rpuggaardrode/praatpicture/issues
