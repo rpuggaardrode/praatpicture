@@ -1,3 +1,6 @@
+# praatpicture 1.4.2
+* Added Shiny support for background highlighting.
+
 # praatpicture 1.4.1
 * Added support for a `background` argument in the `*_highlight` arguments.
 * Added `tg_edgeLabels` argument for controlling the behavior of TextGrid 

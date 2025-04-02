@@ -347,21 +347,17 @@ server <- function(input, output, session) {
       shinyjs::show('highlightStart')
       shinyjs::show('highlightEnd')
       shinyjs::show('highlightCol')
+      shinyjs::show('highlightBG')
       shinyjs::show('highlightTGbool')
+      shinyjs::show('highlightDrawSize')
+      shinyjs::show('highlightSpeckleSize')
     } else {
       shinyjs::hide('highlightComp')
       shinyjs::hide('highlightStart')
       shinyjs::hide('highlightEnd')
       shinyjs::hide('highlightCol')
+      shinyjs::hide('highlightBG')
       shinyjs::hide('highlightTGbool')
-    }
-  })
-
-  observeEvent(input$highlightComp, {
-    if (input$highlightComp %in% c('all', 'pitch', 'formant', 'intensity')) {
-      shinyjs::show('highlightDrawSize')
-      shinyjs::show('highlightSpeckleSize')
-    } else {
       shinyjs::hide('highlightDrawSize')
       shinyjs::hide('highlightSpeckleSize')
     }
@@ -459,6 +455,7 @@ server <- function(input, output, session) {
         tmp$label <- input$highlightLabel
       }
       tmp$color <- unlist(strsplit(input$highlightCol, ','))
+      tmp$background <- input$highlightBG
       tmp$drawSize <- as.numeric(
         unlist(strsplit(input$highlightDrawSize, ',')))
       tmp$speckleSize <- as.numeric(
@@ -479,6 +476,7 @@ server <- function(input, output, session) {
         tmp$label <- input$highlightLabel
       }
       tmp$color <- unlist(strsplit(input$highlightCol, ','))
+      tmp$background <- input$highlightBG
       return(tmp)
     }
   })
@@ -495,6 +493,7 @@ server <- function(input, output, session) {
         tmp$label <- input$highlightLabel
       }
       tmp$colors <- unlist(strsplit(input$highlightCol, ','))
+      tmp$background <- input$highlightBG
       return(tmp)
     }
   })
@@ -511,6 +510,7 @@ server <- function(input, output, session) {
         tmp$label <- input$highlightLabel
       }
       tmp$color <- unlist(strsplit(input$highlightCol, ','))
+      tmp$background <- input$highlightBG
       tmp$drawSize <- as.numeric(
         unlist(strsplit(input$highlightDrawSize, ',')))
       tmp$speckleSize <- as.numeric(
@@ -531,6 +531,7 @@ server <- function(input, output, session) {
         tmp$label <- input$highlightLabel
       }
       tmp$color <- unlist(strsplit(input$highlightCol, ','))
+      tmp$background <- input$highlightBG
       tmp$drawSize <- as.numeric(
         unlist(strsplit(input$highlightDrawSize, ',')))
       tmp$speckleSize <- as.numeric(
@@ -551,6 +552,7 @@ server <- function(input, output, session) {
         tmp$label <- input$highlightLabel
       }
       tmp$color <- unlist(strsplit(input$highlightCol, ','))
+      tmp$background <- input$highlightBG
       tmp$drawSize <- as.numeric(
         unlist(strsplit(input$highlightDrawSize, ',')))
       return(tmp)
