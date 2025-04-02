@@ -1,3 +1,6 @@
+# praatpicture 1.4.3
+* Fixed bug that broke TextGrid-delimited highlighting
+
 # praatpicture 1.4.2
 * Added Shiny support for background highlighting.
 

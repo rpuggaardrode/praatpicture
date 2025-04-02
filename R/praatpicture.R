@@ -571,9 +571,15 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                                             'highlighting conditions'))
       listobj$start <- tg[[tierName]]$t1[matches]
       listobj$end <- tg[[tierName]]$t2[matches]
-      discard <- which(listobj$end < start | listobj$start > end)
-      listobj$start <- listobj$start[-discard]
-      listobj$end <- listobj$end[-discard]
+      if (end != 0) {
+        discard <- which(listobj$end < start | listobj$start > end)
+      } else {
+        discard <- which(listobj$end < start)
+      }
+      if (length(discard) > 0) {
+        listobj$start <- listobj$start[-discard]
+        listobj$end <- listobj$end[-discard]
+      }
       if (start > 0 & tfrom0) {
         listobj$start <- listobj$start - start
         listobj$end <- listobj$end - start
