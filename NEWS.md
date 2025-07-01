@@ -1,3 +1,8 @@
+# praatpicture 1.4.4
+* Added argument `wave_axisDigits` to determine how many digits should be used
+for the waveform y-axis when `min_max_only = TRUE`. Passing `0` will suppress
+the y-axis.
+
 # praatpicture 1.4.3
 * Fixed bug that broke TextGrid-delimited highlighting
 

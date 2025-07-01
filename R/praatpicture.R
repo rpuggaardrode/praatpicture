@@ -52,6 +52,11 @@
 #' `left` and `right`. If more or less than two channels are available,
 #' channels are named `Cn`, where `n` is the number of the channel. Alternatvely,
 #' a vector of strings can be provided with channel names. Default is `FALSE`.
+#' @param wave_axisDigits Numeric giving the number of digits to print for
+#' values along the y-axis of the waveform. Default is `3`. If `0` is passed,
+#' the y-axis is suppressed. Note that this only applies when
+#' `min_max_only = TRUE`, as otherwise the look of the y-axis is determined
+#' entirely using `grDevices::axisTicks()`.
 #' @param wave_color String giving the name of the color to be used for plotting
 #' the waveform. Default is `'black'`. Alternatively a vector of strings, if
 #' different colors should be used for different channels.
@@ -350,6 +355,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          start_end_only=TRUE, min_max_only=TRUE,
                          drawSize = 1, speckleSize = 1,
                          wave_channels='all', wave_channelNames=FALSE,
+                         wave_axisDigits=3,
                          wave_color='black', wave_lineWidth=1,
                          wave_highlight=NULL,
                          tg_obj=NULL, tg_file=NULL, tg_tiers='all',
@@ -787,8 +793,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                tg_focusTierColor, tg_focusTierLineType, ind,
                line_comp, rect_comp, arr_comp, annot_comp,
                draw_lines, draw_rectangle, draw_arrow, annotate,
-               wave_channelNames, wave_lineWidth, cn, min_max_only,
-               wave_highlight)
+               wave_channelNames, wave_axisDigits, wave_lineWidth,
+               cn, min_max_only, wave_highlight)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,

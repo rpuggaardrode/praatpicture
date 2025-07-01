@@ -43,6 +43,11 @@
 #' `praatpicture()`. Default is `NULL`.
 #' @param channelNames Logical; should names of audio channels be printed on
 #' the y-axis? Default is `FALSE`.
+#' @param axisDigits Numeric giving the number of digits to print for
+#' values along the y-axis of the waveform. Default is `3`. If `0` is passed,
+#' the y-axis is suppressed. Note that this only applies when
+#' `min_max_only = TRUE`, as otherwise the look of the y-axis is determined
+#' entirely using `grDevices::axisTicks()`.
 #' @param lineWidth Number giving the line width to use for plotting
 #' the waveform. Default is `1`.
 #' @param cn Vector of strings with channel names to be printed on the y-axis
@@ -74,8 +79,8 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
                      focusTierLineType='dotted', ind=NULL, line_comp=NULL,
                      rect_comp=NULL, arr_comp=NULL, annot_comp=NULL,
                      draw_lines=NULL, draw_rectangle=NULL, draw_arrow=NULL,
-                     annotate=NULL, channelNames=FALSE, lineWidth=1, cn=NULL,
-                     min_max_only=TRUE, highlight=NULL) {
+                     annotate=NULL, channelNames=FALSE, axisDigits=3,
+                     lineWidth=1, cn=NULL, min_max_only=TRUE, highlight=NULL) {
 
   if (length(color) != nchan) color <- rep(color, nchan)
 
@@ -93,7 +98,13 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
       }
     } else {
       yax <- 'n'
-      ytix <- c(round(min(sig[,j]), 3), 0, round(max(sig[,j]), 2))
+      ytix <- c(min(sig[,j]), 0, max(sig[,j]))
+      if (axisDigits == 0) {
+        ytixLabs <- rep('', 3)
+      } else {
+        ytixLabs <- c(round(min(sig[,j]), axisDigits), 0,
+                      round(max(sig[,j]), axisDigits))
+      }
     }
 
     if (!is.null(highlight)) {
@@ -133,7 +144,7 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
 
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, las=2, padj=c(0,0.5,1),
-                                          tick=F)
+                                          tick=F, labels=ytixLabs)
     if (channelNames) graphics::mtext(cn[j], side=2, las=2, line=3.5, cex=0.8)
     if (tgbool) {
       for (k in 1:length(lines)) {

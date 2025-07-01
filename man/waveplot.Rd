@@ -24,6 +24,7 @@ waveplot(
   draw_arrow = NULL,
   annotate = NULL,
   channelNames = FALSE,
+  axisDigits = 3,
   lineWidth = 1,
   cn = NULL,
   min_max_only = TRUE,
@@ -88,6 +89,12 @@ annotate. Default is \code{NULL}.}
 
 \item{channelNames}{Logical; should names of audio channels be printed on
 the y-axis? Default is \code{FALSE}.}
+
+\item{axisDigits}{Numeric giving the number of digits to print for
+values along the y-axis of the waveform. Default is \code{3}. If \code{0} is passed,
+the y-axis is suppressed. Note that this only applies when
+\code{min_max_only = TRUE}, as otherwise the look of the y-axis is determined
+entirely using \code{grDevices::axisTicks()}.}
 
 \item{lineWidth}{Number giving the line width to use for plotting
 the waveform. Default is \code{1}.}
