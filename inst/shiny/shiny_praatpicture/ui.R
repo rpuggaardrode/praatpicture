@@ -62,12 +62,22 @@ ui <- bslib::page_sidebar(
                                                            paste('Should channel names be writted next',
                                                                  'to waveform channels?'),
                                                            FALSE)),
+                             shinyjs::hidden(numericInput('wave_axisDigits',
+                                                          paste('How many digits should be used for',
+                                                                'the waveform y-axis?'),
+                                                          3)),
                              shinyjs::hidden(textInput('wave_channelNamesStr',
                                                        'Custom channel names (comma-delimited)',
                                                        NA)),
                              shinyjs::hidden(numericInput('wave_lineWidth',
                                                           'Line width',
-                                                          1))
+                                                          1)),
+                             shinyjs::hidden(checkboxInput('pitch_plotOnWave',
+                                                           'Pitch overlay',
+                                                           FALSE)),
+                             shinyjs::hidden(checkboxInput('intensity_plotOnWave',
+                                                           'Intensity overlay',
+                                                           FALSE))
       ),
       bslib::accordion_panel(
         'Spectrogram',

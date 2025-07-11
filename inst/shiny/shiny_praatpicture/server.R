@@ -11,11 +11,17 @@ server <- function(input, output, session) {
       shinyjs::show('wave_channels')
       shinyjs::show('wave_channelNames')
       shinyjs::show('wave_lineWidth')
+      shinyjs::show('wave_axisDigits')
+      shinyjs::show('pitch_plotOnWave')
+      shinyjs::show('intensity_plotOnWave')
     } else {
       shinyjs::hide('wave_color')
       shinyjs::hide('wave_channels')
       shinyjs::hide('wave_channelNames')
       shinyjs::hide('wave_lineWidth')
+      shinyjs::hide('wave_axisDigits')
+      shinyjs::hide('pitch_plotOnWave')
+      shinyjs::hide('intensity_plotOnWave')
     }
 
     if ('TextGrid' %in% input$frames) {
@@ -161,6 +167,31 @@ server <- function(input, output, session) {
     }
   })
 
+  observeEvent(input$pitch_plotOnWave, {
+    if (input$pitch_plotOnWave) {
+      shinyjs::show('pitch_plotType')
+      shinyjs::show('pitch_scale')
+      shinyjs::show('pitch_freqRangeMin')
+      shinyjs::show('pitch_freqRangeMax')
+      shinyjs::show('pitch_timeStep')
+      shinyjs::show('pitch_floor')
+      shinyjs::show('pitch_ceiling')
+      shinyjs::show('pitch_color')
+      shinyjs::show('pitch_axisLabel')
+    } else {
+      shinyjs::hide('pitch_plotType')
+      shinyjs::hide('pitch_scale')
+      shinyjs::hide('pitch_freqRangeMin')
+      shinyjs::hide('pitch_freqRangeMax')
+      shinyjs::hide('pitch_timeStep')
+      shinyjs::hide('pitch_floor')
+      shinyjs::hide('pitch_ceiling')
+      shinyjs::hide('pitch_color')
+      shinyjs::hide('pitch_axisLabel')
+    }
+  })
+
+
   observeEvent(input$formant_plotOnSpec, {
     if (input$formant_plotOnSpec) {
       shinyjs::show('formant_plotType')
@@ -189,6 +220,22 @@ server <- function(input, output, session) {
 
   observeEvent(input$intensity_plotOnSpec, {
     if (input$intensity_plotOnSpec) {
+      shinyjs::show('intensity_rangeMin')
+      shinyjs::show('intensity_rangeMax')
+      shinyjs::show('intensity_minPitch')
+      shinyjs::show('intensity_color')
+      shinyjs::show('intensity_axisLabel')
+    } else {
+      shinyjs::hide('intensity_rangeMin')
+      shinyjs::hide('intensity_rangeMax')
+      shinyjs::hide('intensity_minPitch')
+      shinyjs::hide('intensity_color')
+      shinyjs::hide('intensity_axisLabel')
+    }
+  })
+
+  observeEvent(input$intensity_plotOnWave, {
+    if (input$intensity_plotOnWave) {
       shinyjs::show('intensity_rangeMin')
       shinyjs::show('intensity_rangeMax')
       shinyjs::show('intensity_minPitch')
@@ -692,6 +739,7 @@ server <- function(input, output, session) {
                                wave_color = input$wave_color,
                                wave_channels = wave_channels(),
                                wave_channelNames = channelNames(),
+                               wave_axisDigits = input$wave_axisDigits,
                                wave_lineWidth = input$wave_lineWidth,
                                wave_highlight = waveHighlight_args(),
                                tg_file = input$tg_file$datapath,
@@ -735,6 +783,7 @@ server <- function(input, output, session) {
                                  input$pitch_color, ',')),
                                pitch_axisLabel = input$pitch_axisLabel,
                                pitch_plotOnSpec = input$pitch_plotOnSpec,
+                               pitch_plotOnWave = input$pitch_plotOnWave,
                                pitch_highlight = pitchHighlight_args(),
                                formant_plotType = input$formant_plotType,
                                formant_freqRange = c(
@@ -760,6 +809,7 @@ server <- function(input, output, session) {
                                  input$intensity_color, ',')),
                                intensity_axisLabel = input$intensity_axisLabel,
                                intensity_plotOnSpec = input$intensity_plotOnSpec,
+                               intensity_plotOnWave = input$intensity_plotOnWave,
                                intensity_highlight = intensityHighlight_args(),
                                font = as.numeric(input$fontFace),
                                font.axis = as.numeric(input$fontFace),
