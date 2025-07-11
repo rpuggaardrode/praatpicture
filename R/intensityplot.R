@@ -4,7 +4,10 @@
 #' using this function directly, just use
 #' `praatpicture('my_sound_file', frames='intensity')`.
 #'
-#' @param it IntensityTier object loaded using [rPraat::it.read]
+#' @param it IntensityTier object loaded using [rPraat::it.read] or other object
+#' formatted in a similar way, i.e. a `list` object containing the elements
+#' `t` (a vector of time values) and `i` (a vector of intensity values) of
+#' identical length.
 #' @param start Start time (in seconds) of desired plotted area.
 #' @param end End time (in seconds) of desired plotted area.
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
@@ -26,8 +29,8 @@
 #' range is simply the minimum and maximum levels in the curve.
 #' @param color String giving the name of the color to be used for
 #' plotting intensity. Default is `'black'`.
-#' @param ind Integer indexing waveform relative to other plot components.
-#' Default is `NULL`.
+#' @param ind Integer indexing current plot frame relative to other plot
+#' components. Default is `NULL`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
 #' not all plot components should have minimum and maximum values on the y-axis.

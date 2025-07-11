@@ -27,7 +27,10 @@ pitchplot(
 )
 }
 \arguments{
-\item{pt}{PitchTier object loaded using \link[rPraat:pt.read]{rPraat::pt.read}}
+\item{pt}{PitchTier object loaded using \link[rPraat:pt.read]{rPraat::pt.read} or other object
+formatted in a similar way, i.e. a \code{list} object containing the elements
+\code{t} (a vector of time values) and \code{f} (a vector of frequency values) of
+identical length.}
 
 \item{start}{Start time (in seconds) of desired plotted area.}
 
@@ -73,7 +76,7 @@ pitch frequency to semitones. Default is \code{100}.}
 \item{color}{String giving the name of the color to be used for
 plotting pitch. Default is \code{'black'}.}
 
-\item{ind}{Integer indexing waveform relative to other plot components.
+\item{ind}{Integer indexing pitch relative to other plot components.
 Default is \code{NULL}.}
 
 \item{min_max_only}{Logical; should only minimum and maximum values be given

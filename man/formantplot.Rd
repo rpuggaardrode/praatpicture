@@ -26,7 +26,12 @@ formantplot(
 )
 }
 \arguments{
-\item{fm}{Formant object loaded using \link[rPraat:formant.read]{rPraat::formant.read}}
+\item{fm}{Formant object loaded using \link[rPraat:formant.read]{rPraat::formant.read} or similar
+object, i.e. a \code{list} object containing the elements \code{t} (time),
+\code{frequencyArray} (array or formant frequencies with number of rows
+corresponding to the length of \code{t}), \code{maxnFormants} (integer giving the
+number of formants), \code{intensityVector} (vector of intensity values of
+the same length as \code{t}), and \code{conv2db} (logical).}
 
 \item{start}{Start time (in seconds) of desired plotted area.}
 
@@ -69,7 +74,7 @@ colors to be used for plotting formants. If one color is provided, all
 formants will be plotted in this color. If multiple colors are provided,
 different formants will be shown in different colors. Default is \code{'black'}.}
 
-\item{ind}{Integer indexing waveform relative to other plot components.
+\item{ind}{Integer indexing formants relative to other plot components.
 Default is \code{NULL}.}
 
 \item{min_max_only}{Logical; should only minimum and maximum values be given

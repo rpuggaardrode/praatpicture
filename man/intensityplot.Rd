@@ -23,7 +23,10 @@ intensityplot(
 )
 }
 \arguments{
-\item{it}{IntensityTier object loaded using \link[rPraat:it.read]{rPraat::it.read}}
+\item{it}{IntensityTier object loaded using \link[rPraat:it.read]{rPraat::it.read} or other object
+formatted in a similar way, i.e. a \code{list} object containing the elements
+\code{t} (a vector of time values) and \code{i} (a vector of intensity values) of
+identical length.}
 
 \item{start}{Start time (in seconds) of desired plotted area.}
 
@@ -55,8 +58,8 @@ range is simply the minimum and maximum levels in the curve.}
 \item{color}{String giving the name of the color to be used for
 plotting intensity. Default is \code{'black'}.}
 
-\item{ind}{Integer indexing waveform relative to other plot components.
-Default is \code{NULL}.}
+\item{ind}{Integer indexing current plot frame relative to other plot
+components. Default is \code{NULL}.}
 
 \item{min_max_only}{Logical; should only minimum and maximum values be given
 on the y-axis? Default is \code{TRUE}. Can also be a logical vector if some but

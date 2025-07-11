@@ -4,7 +4,10 @@
 #' using this function directly, just use
 #' `praatpicture('my_sound_file', frames='pitch')`.
 #'
-#' @param pt PitchTier object loaded using [rPraat::pt.read]
+#' @param pt PitchTier object loaded using [rPraat::pt.read] or other object
+#' formatted in a similar way, i.e. a `list` object containing the elements
+#' `t` (a vector of time values) and `f` (a vector of frequency values) of
+#' identical length.
 #' @param start Start time (in seconds) of desired plotted area.
 #' @param end End time (in seconds) of desired plotted area.
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
@@ -37,7 +40,7 @@
 #' pitch frequency to semitones. Default is `100`.
 #' @param color String giving the name of the color to be used for
 #' plotting pitch. Default is `'black'`.
-#' @param ind Integer indexing waveform relative to other plot components.
+#' @param ind Integer indexing pitch relative to other plot components.
 #' Default is `NULL`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `TRUE`. Can also be a logical vector if some but
@@ -178,8 +181,6 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                          lty=focusTierLineType[i])
       }
     }
-
-    graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
   if (length(plotType) == 1) {
@@ -215,8 +216,9 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                            lty=focusTierLineType[i])
         }
       }
-
-      graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
     }
   }
+
+  graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
+
 }

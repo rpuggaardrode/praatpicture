@@ -4,7 +4,12 @@
 #' using this function directly, just use
 #' `praatpicture('my_sound_file', frames='formant')`.
 #'
-#' @param fm Formant object loaded using [rPraat::formant.read]
+#' @param fm Formant object loaded using [rPraat::formant.read] or similar
+#' object, i.e. a `list` object containing the elements `t` (time),
+#' `frequencyArray` (array or formant frequencies with number of rows
+#' corresponding to the length of `t`), `maxnFormants` (integer giving the
+#' number of formants), `intensityVector` (vector of intensity values of
+#' the same length as `t`), and `conv2db` (logical).
 #' @param start Start time (in seconds) of desired plotted area.
 #' @param end End time (in seconds) of desired plotted area.
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
@@ -35,7 +40,7 @@
 #' colors to be used for plotting formants. If one color is provided, all
 #' formants will be plotted in this color. If multiple colors are provided,
 #' different formants will be shown in different colors. Default is `'black'`.
-#' @param ind Integer indexing waveform relative to other plot components.
+#' @param ind Integer indexing formants relative to other plot components.
 #' Default is `NULL`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
 #' on the y-axis? Default is `FALSE`. Can also be a logical vector if some but
