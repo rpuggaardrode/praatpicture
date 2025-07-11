@@ -1,7 +1,12 @@
+# praatpicture 1.5.0
+* Added arguments `pitch_plotOnWave` and `intensity_plotOnWave` for overlaying pitch and intensity on waveforms, analogous to the `pitch_plotOnSpec` and `intensity_plotOnSpec` arguments. Since the code required for this is very similar for spectrograms and waveforms, I did some refactoring to avoid repeating code. (Thanks to Janne Lorenzen for the suggestion!)
+* Added Shiny support for waveform overlays and for controlling the y-axis digits in waveforms.
+* Long overdue updates to some of the documentation.
+
 # praatpicture 1.4.4
 * Added argument `wave_axisDigits` to determine how many digits should be used
 for the waveform y-axis when `min_max_only = TRUE`. Passing `0` will suppress
-the y-axis.
+the y-axis. (Thanks to Josie Riverin-Coutlée for the suggestion!)
 
 # praatpicture 1.4.3
 * Fixed bug that broke TextGrid-delimited highlighting
