@@ -54,6 +54,7 @@ praatpicture(
   pitch_semitonesRe = 100,
   pitch_color = "black",
   pitch_plotOnSpec = FALSE,
+  pitch_plotOnWave = FALSE,
   pitch_ssff = NULL,
   pitch_axisLabel = NULL,
   pitch_highlight = NULL,
@@ -74,6 +75,7 @@ praatpicture(
   intensity_range = NULL,
   intensity_color = "black",
   intensity_plotOnSpec = FALSE,
+  intensity_plotOnWave = FALSE,
   intensity_ssff = NULL,
   intensity_axisLabel = "Intensity (dB)",
   intensity_highlight = NULL,
@@ -312,6 +314,9 @@ background highlighting.}
 \item{pitch_plotOnSpec}{Boolean; should pitch be plotted on top of
 spectrogram? Default is \code{FALSE}.}
 
+\item{pitch_plotOnWave}{Boolean; should pitch be plotted on top of
+waveform? Default is \code{FALSE}.}
+
 \item{pitch_ssff}{An object of class \code{AsspDataObj} containing a pitch track.
 Default is \code{NULL}.}
 
@@ -406,6 +411,9 @@ for background highlighting.}
 
 \item{intensity_plotOnSpec}{Boolean; should intensity be plotted on top of
 spectrogram? Default is \code{FALSE}.}
+
+\item{intensity_plotOnWave}{Boolean; should intensity be plotted on top of
+waveform? Default is \code{FALSE}.}
 
 \item{intensity_ssff}{An object of class \code{AsspDataObj} containing intensity
 tracks. Default is \code{NULL}.}

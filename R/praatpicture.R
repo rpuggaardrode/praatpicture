@@ -180,6 +180,8 @@
 #' background highlighting.
 #' @param pitch_plotOnSpec Boolean; should pitch be plotted on top of
 #' spectrogram? Default is `FALSE`.
+#' @param pitch_plotOnWave Boolean; should pitch be plotted on top of
+#' waveform? Default is `FALSE`.
 #' @param pitch_ssff An object of class `AsspDataObj` containing a pitch track.
 #' Default is `NULL`.
 #' @param pitch_axisLabel String giving the name of the label to print along the
@@ -255,6 +257,8 @@
 #' for background highlighting.
 #' @param intensity_plotOnSpec Boolean; should intensity be plotted on top of
 #' spectrogram? Default is `FALSE`.
+#' @param intensity_plotOnWave Boolean; should intensity be plotted on top of
+#' waveform? Default is `FALSE`.
 #' @param intensity_ssff An object of class `AsspDataObj` containing intensity
 #' tracks. Default is `NULL`.
 #' @param intensity_axisLabel String giving the name of the label to print along
@@ -374,8 +378,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          pitch_plotType='draw', pitch_scale='hz',
                          pitch_freqRange=NULL, pitch_semitonesRe=100,
                          pitch_color='black', pitch_plotOnSpec=FALSE,
-                         pitch_ssff=NULL, pitch_axisLabel=NULL,
-                         pitch_highlight=NULL,
+                         pitch_plotOnWave=FALSE, pitch_ssff=NULL,
+                         pitch_axisLabel=NULL, pitch_highlight=NULL,
                          formant_timeStep=NULL, formant_maxN=5,
                          formant_windowLength=0.025, formant_dynamicRange=30,
                          formant_freqRange=c(50, 5500),
@@ -386,7 +390,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          formant_highlight=NULL,
                          intensity_timeStep=NULL, intensity_minPitch=100,
                          intensity_range=NULL, intensity_color='black',
-                         intensity_plotOnSpec=FALSE, intensity_ssff=NULL,
+                         intensity_plotOnSpec=FALSE, intensity_plotOnWave=FALSE,
+                         intensity_ssff=NULL,
                          intensity_axisLabel='Intensity (dB)',
                          intensity_highlight=NULL,
                          time_axisLabel=NULL,
@@ -616,7 +621,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
   intensity_highlight <- findStartEndVals(intensity_highlight)
   spec_highlight <- findStartEndVals(spec_highlight)
 
-  if ('pitch' %in% frames | pitch_plotOnSpec) {
+  if ('pitch' %in% frames | pitch_plotOnSpec | pitch_plotOnWave) {
     if (is.null(pitch_freqRange)) {
       if (pitch_scale == 'erb') {
         pitch_freqRange <- c(0,10)
@@ -728,7 +733,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     fm <- NULL
   }
 
-  if ('intensity' %in% frames | intensity_plotOnSpec) {
+  if ('intensity' %in% frames | intensity_plotOnSpec | intensity_plotOnWave) {
     if (file.exists(paste0(fn, '.IntensityTier'))) {
       itfn <- paste0(fn, '.IntensityTier')
       it <- rPraat::it.read(itfn)
@@ -789,12 +794,18 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
   for (i in 1:nframe) {
     if (frames[i] == 'sound') {
       ind <- which(frames == 'sound')
-      waveplot(sig, bit, t, nchan, wave_color, tgbool, focus_linevec,
+      waveplot(sig, bit, t, start, tfrom0, nchan, wave_color,
+               pitch_plotOnWave, pt, pitch_plotType, pitch_scale,
+               pitch_freqRange, pitch_axisLabel, pitch_color, pitch_highlight,
+               intensity_plotOnWave, it,
+               intensity_range, intensity_axisLabel, intensity_color,
+               intensity_highlight,
+               tgbool, focus_linevec,
                tg_focusTierColor, tg_focusTierLineType, ind,
                line_comp, rect_comp, arr_comp, annot_comp,
                draw_lines, draw_rectangle, draw_arrow, annotate,
                wave_channelNames, wave_axisDigits, wave_lineWidth,
-               cn, min_max_only, wave_highlight)
+               cn, min_max_only, wave_highlight, drawSize, speckleSize)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,

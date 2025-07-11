@@ -8,8 +8,24 @@ waveplot(
   sig,
   bit,
   t,
+  start,
+  tfrom0 = TRUE,
   nchan = 1,
   color = "black",
+  pitch_plotOnWave = FALSE,
+  pt = NULL,
+  pitch_plotType = "draw",
+  pitch_scale = "hz",
+  pitch_freqRange = NULL,
+  pitch_axisLabel = NULL,
+  pitch_color = "black",
+  pitch_highlight = NULL,
+  intensity_plotOnWave = FALSE,
+  it = NULL,
+  intensity_range = NULL,
+  intensity_axisLabel = "Intensity (dB)",
+  intensity_color = "black",
+  intensity_highlight = NULL,
   tgbool = FALSE,
   lines = NULL,
   focusTierColor = "black",
@@ -28,7 +44,9 @@ waveplot(
   lineWidth = 1,
   cn = NULL,
   min_max_only = TRUE,
-  highlight = NULL
+  highlight = NULL,
+  drawSize = 1,
+  speckleSize = 1
 )
 }
 \arguments{
@@ -38,11 +56,79 @@ waveplot(
 
 \item{t}{Numeric vector giving times corresponding to the signal.}
 
+\item{start}{Start time (in seconds) of desired plotted area.}
+
+\item{tfrom0}{Logical; should time on the x-axis run from 0 or from the
+original time? Default is \code{TRUE}.}
+
 \item{nchan}{Numeric; how many channels will be plotted? Default is \code{1}.}
 
 \item{color}{String giving the name of the color to be used for plotting
 the waveform. Default is \code{'black'}. Alternatively, a vector of colors, if
 different channels should be plotted with different colors.}
+
+\item{pitch_plotOnWave}{Boolean; should pitch be plotted on top of
+waveform? Default is \code{FALSE}.}
+
+\item{pt}{Pitch object loaded using \link[rPraat:pt.read]{rPraat::pt.read} or similar object.}
+
+\item{pitch_plotType}{String giving the type of pitch plot to produce; default
+is \code{draw} (a line plot), the only other option is \code{speckle} (a point plot).
+Alternatively a vector \code{c('draw','speckle')} can be passed, in which case
+both are used.}
+
+\item{pitch_scale}{String giving the frequency scale to use when producing
+pitch plots. Default is \code{hz}; other options are \code{logarithmic} (also in Hz),
+\code{semitones}, \code{erb}, and \code{mel}.}
+
+\item{pitch_freqRange}{Vector of two integers giving the frequency range to be
+used for producing pitch plots. Default is \code{NULL}, in which case the pitch
+range is automatically reset to \code{c(-12,30)} for the \code{semitones} scale,
+\code{c(0,10)} for the \code{erb} scale, and \code{c(50,500)} for the Hz-based scales,
+following Praat defaults.}
+
+\item{pitch_axisLabel}{String giving the name of the label to print along the
+y-axis when printing a pitch track. Default is \code{NULL}, in which case the
+axis label will depend on the scale.}
+
+\item{pitch_color}{String or vector of strings giving the name of the color
+to be used for plotting pitch. Default is \code{'black'}. If a vector of two
+strings is passed, the second color will be used for background highlighting.}
+
+\item{pitch_highlight}{Named list giving parameters for differential
+highlighting of pitch based on the time domain. This list
+should contain information about which parts of the plot to highlight, either
+done with the \code{start} and \code{end} arguments which must be numbers or numeric
+vectors, or using the \code{tier} and \code{label} arguments to highlight based on
+information in a plotted TextGrid. Further contains the optional arguments
+\code{color} (string or vector of strings, see \code{pitch_color}),
+\code{drawSize} or \code{speckleSize} (both numeric).}
+
+\item{intensity_plotOnWave}{Boolean; should intensity be plotted on top of
+waveform? Default is \code{FALSE}.}
+
+\item{it}{Intensity object loaded using \link[rPraat:it.read]{rPraat::it.read} or similar object.}
+
+\item{intensity_range}{Vector of two integers giving the intensity range to be
+used for producing intensity plots. Default is \code{NULL}, in which case the
+range is simply the minimum and maximum levels in the curve.}
+
+\item{intensity_axisLabel}{String giving the name of the label to print along
+the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
+
+\item{intensity_color}{String or vector of strings giving the name of the
+color to be used for plotting intensity. Default is \code{'black'}. If a vector of
+two strings is passed, the second color will be used for background
+highlighting.}
+
+\item{intensity_highlight}{Named list giving parameters for differential
+highlighting of the intensity contour based on the time domain. This list
+should contain information about which parts of the plot to highlight, either
+done with the \code{start} and \code{end} arguments which must be numbers or numeric
+vectors, or using the \code{tier} and \code{label} arguments to highlight based on
+information in a plotted TextGrid. Further contains the optional arguments
+\code{color} (string or vector of strings, see \code{intensity_color}) and
+\code{drawSize} (integer).}
 
 \item{tgbool}{Logical; should dotted lines be plotted corresponding to
 locations in a TextGrid? Default is \code{FALSE}.}
@@ -115,6 +201,15 @@ vectors, or using the \code{tier} and \code{label} arguments to highlight based 
 information in a plotted TextGrid. Further contains the argument
 \code{color} (string, see \code{color}), and \code{background}
 (a string specifying a background color).}
+
+\item{drawSize}{Number indicating the line width of plot components where
+the \verb{_plotType} is \code{'draw'} (i.e., pitch, formants, or intensity rendered as
+line plots). Default is \code{1}. Controls the \code{lwd} argument of
+\link[graphics:lines]{graphics::lines}.}
+
+\item{speckleSize}{Number indicating the point size of plot components where
+the \verb{_plotType} is \code{'speckle'} (i.e. pitch or formants rendered as point
+plots). Default is \code{1}. Controls the \code{cex} arguments of \link[graphics:points]{graphics::points}.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

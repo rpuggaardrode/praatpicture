@@ -7,10 +7,62 @@
 #' @param sig Numeric vector corresponding to a sound signal.
 #' @param bit Numeric; will generally be grabbed from a loaded `WaveMC` object.
 #' @param t Numeric vector giving times corresponding to the signal.
+#' @param start Start time (in seconds) of desired plotted area.
+#' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
+#' original time? Default is `TRUE`.
 #' @param nchan Numeric; how many channels will be plotted? Default is `1`.
 #' @param color String giving the name of the color to be used for plotting
 #' the waveform. Default is `'black'`. Alternatively, a vector of colors, if
 #' different channels should be plotted with different colors.
+#' @param pitch_plotOnWave Boolean; should pitch be plotted on top of
+#' waveform? Default is `FALSE`.
+#' @param pt Pitch object loaded using [rPraat::pt.read] or similar object.
+#' @param pitch_plotType String giving the type of pitch plot to produce; default
+#' is `draw` (a line plot), the only other option is `speckle` (a point plot).
+#' Alternatively a vector `c('draw','speckle')` can be passed, in which case
+#' both are used.
+#' @param pitch_scale String giving the frequency scale to use when producing
+#' pitch plots. Default is `hz`; other options are `logarithmic` (also in Hz),
+#' `semitones`, `erb`, and `mel`.
+#' @param pitch_freqRange Vector of two integers giving the frequency range to be
+#' used for producing pitch plots. Default is `NULL`, in which case the pitch
+#' range is automatically reset to `c(-12,30)` for the `semitones` scale,
+#' `c(0,10)` for the `erb` scale, and `c(50,500)` for the Hz-based scales,
+#' following Praat defaults.
+#' @param pitch_axisLabel String giving the name of the label to print along the
+#' y-axis when printing a pitch track. Default is `NULL`, in which case the
+#' axis label will depend on the scale.
+#' @param pitch_color String or vector of strings giving the name of the color
+#' to be used for plotting pitch. Default is `'black'`. If a vector of two
+#' strings is passed, the second color will be used for background highlighting.
+#' @param pitch_highlight Named list giving parameters for differential
+#' highlighting of pitch based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `pitch_color`),
+#' `drawSize` or `speckleSize` (both numeric).
+#' @param intensity_plotOnWave Boolean; should intensity be plotted on top of
+#' waveform? Default is `FALSE`.
+#' @param it Intensity object loaded using [rPraat::it.read] or similar object.
+#' @param intensity_range Vector of two integers giving the intensity range to be
+#' used for producing intensity plots. Default is `NULL`, in which case the
+#' range is simply the minimum and maximum levels in the curve.
+#' @param intensity_axisLabel String giving the name of the label to print along
+#' the y-axis when plotting intensity. Default is `Intensity (dB)`.
+#' @param intensity_color String or vector of strings giving the name of the
+#' color to be used for plotting intensity. Default is `'black'`. If a vector of
+#' two strings is passed, the second color will be used for background
+#' highlighting.
+#' @param intensity_highlight Named list giving parameters for differential
+#' highlighting of the intensity contour based on the time domain. This list
+#' should contain information about which parts of the plot to highlight, either
+#' done with the `start` and `end` arguments which must be numbers or numeric
+#' vectors, or using the `tier` and `label` arguments to highlight based on
+#' information in a plotted TextGrid. Further contains the optional arguments
+#' `color` (string or vector of strings, see `intensity_color`) and
+#' `drawSize` (integer).
 #' @param tgbool Logical; should dotted lines be plotted corresponding to
 #' locations in a TextGrid? Default is `FALSE`.
 #' @param lines Numeric vector giving locations in seconds of locations from
@@ -64,6 +116,13 @@
 #' information in a plotted TextGrid. Further contains the argument
 #' `color` (string, see `color`), and `background`
 #' (a string specifying a background color).
+#' @param drawSize Number indicating the line width of plot components where
+#' the `_plotType` is `'draw'` (i.e., pitch, formants, or intensity rendered as
+#' line plots). Default is `1`. Controls the `lwd` argument of
+#' [graphics::lines].
+#' @param speckleSize Number indicating the point size of plot components where
+#' the `_plotType` is `'speckle'` (i.e. pitch or formants rendered as point
+#' plots). Default is `1`. Controls the `cex` arguments of [graphics::points].
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -74,15 +133,30 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' soundFile <- paste0(datapath, '/1.wav')
 #' praatpicture(soundFile, frames='sound')
-waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
+waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1, color='black',
+                     pitch_plotOnWave=FALSE, pt=NULL,
+                     pitch_plotType='draw', pitch_scale='hz',
+                     pitch_freqRange=NULL, pitch_axisLabel=NULL,
+                     pitch_color='black', pitch_highlight=NULL,
+                     intensity_plotOnWave=FALSE, it=NULL, intensity_range=NULL,
+                     intensity_axisLabel='Intensity (dB)',
+                     intensity_color='black', intensity_highlight=NULL,
+                     tgbool=FALSE,
                      lines=NULL, focusTierColor='black',
-                     focusTierLineType='dotted', ind=NULL, line_comp=NULL,
+                     focusTierLineType='dotted',
+                     ind=NULL, line_comp=NULL,
                      rect_comp=NULL, arr_comp=NULL, annot_comp=NULL,
                      draw_lines=NULL, draw_rectangle=NULL, draw_arrow=NULL,
                      annotate=NULL, channelNames=FALSE, axisDigits=3,
-                     lineWidth=1, cn=NULL, min_max_only=TRUE, highlight=NULL) {
+                     lineWidth=1, cn=NULL, min_max_only=TRUE, highlight=NULL,
+                     drawSize=1, speckleSize=1) {
 
   if (length(color) != nchan) color <- rep(color, nchan)
+
+  if (tfrom0) {
+    org_start <- start
+    start <- 0
+  }
 
   for (j in 1:nchan) {
 
@@ -151,6 +225,20 @@ waveplot <- function(sig, bit, t, nchan=1, color='black', tgbool=FALSE,
         graphics::abline(v=lines[[k]], col=focusTierColor[k],
                        lty=focusTierLineType[k])
       }
+    }
+
+    if (as.numeric(pitch_plotOnWave) == j) {
+      pitch_overlay(pt, min(sig[,j]), max(sig[,j]), start, org_start, tfrom0,
+                    pitch_freqRange, pitch_plotType, pitch_scale, pitch_color,
+                    ind, drawSize, speckleSize, pitch_axisLabel, min_max_only,
+                    pitch_highlight, intensity_plotOnWave == j)
+    }
+
+    if (as.numeric(intensity_plotOnWave) == j) {
+      intensity_overlay(it, min(sig[,j]), max(sig[,j]), start, org_start,
+                        tfrom0, intensity_range, intensity_color, ind, drawSize,
+                        intensity_axisLabel, min_max_only, intensity_highlight,
+                        pitch_plotOnWave == j)
     }
 
     if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)
