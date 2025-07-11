@@ -1,6 +1,6 @@
 Package: praatpicture
 Title: 'Praat Picture' Style Plots of Acoustic Data
-Version: 1.4.4
+Version: 1.5.0
 Authors@R: 
     person("Rasmus", "Puggaard-Rode", 
     email = "r.puggaard@phonetik.uni-muenchen.de", 
@@ -10,7 +10,7 @@ Description: Quickly and easily generate plots of acoustic data aligned with tra
 License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.2.3
 Imports: 
     av (>= 0.9.0),
     bslib (>= 0.6.1),
@@ -22,7 +22,6 @@ Imports:
     gsignal (>= 0.3.5),
     ipa (>= 0.1.0),
     phonTools (>= 0.2.2.2),
-    reticulate,
     rPraat (>= 1.3.2.1),
     rstudioapi (>= 0.15.0),
     shiny (>= 1.8.1.1),
