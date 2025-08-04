@@ -106,16 +106,16 @@ or \code{v} for vertical lines, or \code{a},\code{b} for the intercept and slope
 line otherwise. Alternatively a nested list can be passed if more (sets of)
 lines should be drawn. Default is \code{NULL}.}
 
-\item{draw_rectangle}{Use for drawing rectangles. Should be a vector or
+\item{draw_rectangle}{Use for drawing rectangles. Should be a named
 list containing arguments to pass on to \link[graphics:rect]{graphics::rect}. Can also be
 multiple nested lists, if more rectangles should be drawn.}
 
 \item{draw_arrow}{Use for drawing arrows on plot components. Should be a
-vector or list containing arguments to pass on to \link[graphics:arrows]{graphics::arrows}.
+named list containing arguments to pass on to \link[graphics:arrows]{graphics::arrows}.
 Can also be multiple nested lists, if more rectangles should be drawn.}
 
 \item{annotate}{Use for annotating plot components. Should be a
-vector or list containing arguments to pass on to\link[graphics:text]{graphics::text}.
+named list containing arguments to pass on to\link[graphics:text]{graphics::text}.
 Can also be multiple nested lists, if more annotations should be added.}
 
 \item{...}{Further global plotting arguments passed on to \code{par()}.}

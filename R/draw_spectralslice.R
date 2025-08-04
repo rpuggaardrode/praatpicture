@@ -61,14 +61,14 @@
 #' or `v` for vertical lines, or `a`,`b` for the intercept and slope of the
 #' line otherwise. Alternatively a nested list can be passed if more (sets of)
 #' lines should be drawn. Default is `NULL`.
-#' @param draw_rectangle Use for drawing rectangles. Should be a vector or
+#' @param draw_rectangle Use for drawing rectangles. Should be a named
 #' list containing arguments to pass on to [graphics::rect]. Can also be
 #' multiple nested lists, if more rectangles should be drawn.
 #' @param draw_arrow Use for drawing arrows on plot components. Should be a
-#' vector or list containing arguments to pass on to [graphics::arrows].
+#' named list containing arguments to pass on to [graphics::arrows].
 #' Can also be multiple nested lists, if more rectangles should be drawn.
 #' @param annotate Use for annotating plot components. Should be a
-#' vector or list containing arguments to pass on to[graphics::text].
+#' named list containing arguments to pass on to[graphics::text].
 #' Can also be multiple nested lists, if more annotations should be added.
 #' @param ... Further global plotting arguments passed on to `par()`.
 #'
