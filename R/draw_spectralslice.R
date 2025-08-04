@@ -1,0 +1,231 @@
+#' Draw spectral slice
+#'
+#' Generate and plot spectral slice from window around a specified time point
+#' of a sound file.
+#'
+#' @param sound String giving the file name of a sound file with the .wav
+#' extension.
+#' @param time Time (in seconds) specifying the center of the window from which
+#' to estimate spectrum.
+#' @param channel Numeric giving the channel that should be used to
+#' generate the spectrogram. Default is `1`.
+#' @param freqRange Vector of two integers giving the frequency range to be
+#' used for plotting spectrograms. Default is `NULL`, in which case the whole
+#' spectrum is plotted using the Nyquist frequency for the upper limit.
+#' @param log Logical; should the frequency range be log scaled? Default is
+#' `FALSE`.
+#' @param method String specifying the spectral estimation. Default is `fft`
+#' (for the fast discrete Fourier transform). The only other option is
+#' `multitaper`, in which case [multitaper::spec.mtm] is used to generate the
+#' spectrum.
+#' @param multitaper_args Optional named list of arguments passed on to
+#' [multitaper::spec.mtm] if `method='multitaper'`.
+#' @param windowLength Window length in seconds for generating spectra.
+#' Default is `0.005`.
+#' @param windowShape String giving the name of the window shape to be
+#' applied to the signal when generating spectrograms. Default is `Gaussian`;
+#' other options are `square`, `Hamming`, `Bartlett`, `Hanning`, `Blackman`, or
+#' `Kaiser`.Note that the Gaussian window function provided by the `phonTools`
+#' package and used for this function does not have the same properties as the
+#' Gaussian window function used for spectral estimation in Praat.
+#' @param dynamicRange Numeric giving the desired dynamic range in units of
+#' dB/Hz. In practice this sets the y-axis limits of the plot; the upper limit
+#' corresponds to the maximum sound pressure level in the spectrum, and the
+#' lower limit corresponds to the `dynamicRange` relative to the upper limit.
+#' @param color String giving the name of the color to be used for plotting
+#' the spectrum. Default is `'black'`.
+#' @param lineWidth Number giving the line width to use for plotting
+#' the spectrum. Default is `1`.
+#' @param freq_axisLabel String giving the name of the label to print along the
+#' x-axis. Default is `Frequency (Hz)`.
+#' @param energy_axisLabel String giving the name of the label to print along
+#' the y-axis. Default is `Sound pressure level (dB/Hz)`.
+#' @param mainTitle String giving a title to print at the top of the plot.
+#' The default is an empty string, i.e. no title.
+#' @param mainTitleAlignment Number indicating the vertical alignment of the
+#' plot title, where `0` (default) indicates left-alignment, `1` indicates
+#' right-alignment, `0.5` indicates central alignment, etc, following the
+#' conventions of the `adj` argument of [graphics::mtext].
+#' @param highlight Named list giving parameters for differential highlighting
+#' of part of the plot based on the frequency domain. This list should contain
+#' information about which parts of the plot to highlight, done with the
+#' `start` and `end` arguments which must be numbers or numeric vectors.
+#' Further contains the optional arguments `color`
+#' (a string), `drawSize` (numeric), and `background`
+#' (a string specifying a background color).
+#' @param draw_lines Use for drawing straight lines. Takes
+#' an argument of type `list` which should contain arguments to pass on to
+#' [graphics::abline]. Should have a named argument `h` for horizontal lines,
+#' or `v` for vertical lines, or `a`,`b` for the intercept and slope of the
+#' line otherwise. Alternatively a nested list can be passed if more (sets of)
+#' lines should be drawn. Default is `NULL`.
+#' @param draw_rectangle Use for drawing rectangles. Should be a vector or
+#' list containing arguments to pass on to [graphics::rect]. Can also be
+#' multiple nested lists, if more rectangles should be drawn.
+#' @param draw_arrow Use for drawing arrows on plot components. Should be a
+#' vector or list containing arguments to pass on to [graphics::arrows].
+#' Can also be multiple nested lists, if more rectangles should be drawn.
+#' @param annotate Use for annotating plot components. Should be a
+#' vector or list containing arguments to pass on to[graphics::text].
+#' Can also be multiple nested lists, if more annotations should be added.
+#' @param ... Further global plotting arguments passed on to `par()`.
+#'
+#' @return No return value, produces a figure.
+#' @export
+#'
+#' @examples
+#' datapath <- system.file('extdata', package='praatpicture')
+#' soundFile <- paste0(datapath, '/1.wav')
+#' draw_spectralslice(soundFile, time = 0.75)
+draw_spectralslice <- function(sound, time,
+                               channel = 1, freqRange = NULL, log = FALSE,
+                               method = 'fft', multitaper_args = NULL,
+                               windowLength = 0.005, windowShape = 'Gaussian',
+                               dynamicRange = 60,
+                               color = 'black', lineWidth = 1,
+                               freq_axisLabel = 'Frequency (Hz)',
+                               energy_axisLabel = 'Sound pressure level (dB/Hz)',
+                               mainTitle = '', mainTitleAlignment = 0,
+                               highlight = NULL, draw_lines = NULL,
+                               draw_rectangle = NULL, draw_arrow = NULL,
+                               annotate = NULL, ...) {
+
+  p <- graphics::par(no.readonly=TRUE)
+  on.exit(graphics::par(p))
+
+  if (!method %in% c('fft', 'multitaper')) stop(
+    'method should be either fft or multitaper')
+
+  legal_ws <- c('square', 'Hamming', 'Bartlett', 'Hanning', 'Gaussian',
+                'Blackman', 'Kaiser')
+  if (!windowShape %in% legal_ws) {
+    stop('Possible window shapes are square, Hamming, Bartlett, Hanning, ',
+         'Gaussian, Kaiser, or Blackman.')
+  }
+  if (windowShape == 'square') {
+    ws <- 'rectangular'
+  } else if (windowShape == 'Hanning') {
+    ws <- 'hann'
+  } else {
+    ws <- tolower(windowShape)
+  }
+
+  if (ws == 'kaiser') {
+    winparam <- 3
+  } else if (ws == 'gaussian') {
+    winparam <- 0.4
+  } else {
+    winparam <- -1
+  }
+
+  log <- ifelse(log, 'x', '')
+
+  start <- time - (windowLength / 2)
+  end <- time + (windowLength / 2)
+
+  snd <- tuneR::readWave(sound, from=start, to=end, units='seconds', toWaveMC=T)
+
+  sr <- snd@samp.rate
+  bit <- snd@bit
+  sig <- snd@.Data[,channel]
+
+  if (is.null(freqRange)) freqRange <- c(0, sr / 2)
+
+  if (method == 'fft') {
+    sig <- sig / (2^(bit - 1) - 1)
+    hz <- seq(0, sr, length.out = (length(sig)*2))
+    hz <- hz[hz <= sr / 2]
+    windowed_sig <- sig * phonTools::windowfunc(length(sig), ws, winparam)
+    padded_sig <- c(rep(0, length(sig)/2), windowed_sig, rep(0, length(sig)/2))
+    spec <- stats::fft(padded_sig)
+    psd <- (Mod(spec)^2) / (length(sig) * sr)
+    psd <- psd[1:length(sig)]
+    spec <- data.frame(hz = hz,
+                       dB = 10 * log10(psd / 0.00002^2))
+  } else {
+    multitaper_args$timeSeries <- sig
+    multitaper_args$plot <- FALSE
+    multitaper_args$deltat <- 1 / sr
+    multitaper_args$log <- 'dB'
+    spec <- do.call(multitaper::spec.mtm, multitaper_args)
+    spec <- data.frame(hz = spec$freq,
+                       dB = 10 * log10(spec$spec / 0.00002))
+  }
+
+  spec <- spec[which(spec$hz > freqRange[1] & spec$hz < freqRange[2]),]
+
+  graphics::par(...)
+
+  if (!is.null(highlight)) {
+    highlight_f <- c()
+    highlight_p <- c()
+    for (int in 1:length(highlight$start)) {
+      freqs <- which(spec$hz > highlight$start[int] &
+                       spec$hz < highlight$end[int])
+      extrema <- zoo::na.approx(c(NA, NA, spec$dB),
+                                c(highlight$start[int], highlight$end[int],
+                                  spec$hz))[1:2]
+      highlight_f <- c(highlight_f, highlight$start[int],
+                       spec$hz[freqs], highlight$end[int],
+                       max(spec$hz[freqs] + 0.0001))
+      highlight_p <- c(highlight_p, extrema[1], spec$dB[freqs],
+                       extrema[2], NA)
+    }
+    if (!'color' %in% names(highlight)) highlight$color <- color
+  }
+
+  powerAxisLim <- c(max(spec$dB) - dynamicRange, max(spec$dB))
+
+  plot(spec$hz, spec$dB, type = 'l', xlab = freq_axisLabel,
+       ylab = energy_axisLabel, log = log, ylim = powerAxisLim,
+       col = color, lwd = lineWidth)
+  graphics::mtext(mainTitle, side=3, line=2, adj=mainTitleAlignment)
+
+  if (!is.null(highlight)) {
+    if ('background' %in% names(highlight)) {
+      graphics::rect(highlight$start,
+                     powerAxisLim[1] - powerAxisLim[2] * 2,
+                     highlight$end,
+                     powerAxisLim[2] + powerAxisLim[2] * 2,
+                     col = highlight$background, border = NA)
+    }
+    graphics::lines(highlight_f, highlight_p, col=highlight$color,
+                    lwd=highlight$drawSize)
+  }
+
+  if (!is.null(draw_arrow)) {
+    if (is.list(draw_arrow[[1]])) {
+      for (i in 1:length(draw_arrow)) do.call(graphics::arrows, draw_arrow[[i]])
+    } else {
+      do.call(graphics::arrows, as.list(draw_arrow))
+    }
+  }
+
+  if (!is.null(draw_rectangle)) {
+    if (is.list(draw_rectangle[[1]])) {
+      for (i in 1:length(draw_rectangle)) do.call(graphics::rect,
+                                                  draw_rectangle[[i]])
+    } else {
+      do.call(graphics::rect, as.list(draw_rectangle))
+    }
+  }
+
+  if (!is.null(draw_lines)) {
+    if (is.list(draw_lines[[1]])) {
+      for (i in 1:length(draw_lines)) do.call(graphics::abline, draw_lines[[i]])
+    } else {
+      do.call(graphics::abline, as.list(draw_lines))
+    }
+  }
+
+  if (!is.null(annotate)) {
+    if (is.list(annotate[[1]])) {
+      for (i in 1:length(annotate)) do.call(graphics::text, annotate[[i]])
+    } else {
+      do.call(graphics::text, as.list(annotate))
+    }
+  }
+
+  graphics::box()
+
+}
