@@ -9,9 +9,15 @@
 #' to estimate spectrum.
 #' @param channel Numeric giving the channel that should be used to
 #' generate the spectrogram. Default is `1`.
-#' @param freqRange Vector of two integers giving the frequency range to be
+#' @param freqRange Vector of two numbers giving the frequency range to be
 #' used for plotting spectrograms. Default is `NULL`, in which case the whole
 #' spectrum is plotted using the Nyquist frequency for the upper limit.
+#' @param energyRange Either numeric or vector of two numbers used to specify
+#' the y-axis range in units of dB/Hz. If a single number is passed, this is
+#' interpreted as the desired dynamic range of the y-axis. If a vector of
+#' two numbers is passed, these are used to exactly delimit the y-axis.
+#' Default is `60`, i.e. a dynamic range of 60 dB/Hz relative to the global
+#' maximum.
 #' @param log Logical; should the frequency range be log scaled? Default is
 #' `FALSE`.
 #' @param method String specifying the spectral estimation. Default is `fft`
@@ -28,10 +34,6 @@
 #' `Kaiser`.Note that the Gaussian window function provided by the `phonTools`
 #' package and used for this function does not have the same properties as the
 #' Gaussian window function used for spectral estimation in Praat.
-#' @param dynamicRange Numeric giving the desired dynamic range in units of
-#' dB/Hz. In practice this sets the y-axis limits of the plot; the upper limit
-#' corresponds to the maximum sound pressure level in the spectrum, and the
-#' lower limit corresponds to the `dynamicRange` relative to the upper limit.
 #' @param color String giving the name of the color to be used for plotting
 #' the spectrum. Default is `'black'`.
 #' @param lineWidth Number giving the line width to use for plotting
@@ -78,10 +80,10 @@
 #' soundFile <- paste0(datapath, '/1.wav')
 #' draw_spectralslice(soundFile, time = 0.75)
 draw_spectralslice <- function(sound, time,
-                               channel = 1, freqRange = NULL, log = FALSE,
-                               method = 'fft', multitaper_args = NULL,
+                               channel = 1, freqRange = NULL, energyRange = 60,
+                               log = FALSE, method = 'fft',
+                               multitaper_args = NULL,
                                windowLength = 0.005, windowShape = 'Gaussian',
-                               dynamicRange = 60,
                                color = 'black', lineWidth = 1,
                                freq_axisLabel = 'Frequency (Hz)',
                                energy_axisLabel = 'Sound pressure level (dB/Hz)',
@@ -174,19 +176,21 @@ draw_spectralslice <- function(sound, time,
     if (!'color' %in% names(highlight)) highlight$color <- color
   }
 
-  powerAxisLim <- c(max(spec$dB) - dynamicRange, max(spec$dB))
+  if (length(energyRange) == 1) {
+    energyRange <- c(max(spec$dB) - energyRange, max(spec$dB))
+  }
 
   plot(spec$hz, spec$dB, type = 'l', xlab = freq_axisLabel,
-       ylab = energy_axisLabel, log = log, ylim = powerAxisLim,
+       ylab = energy_axisLabel, log = log, ylim = energyRange,
        col = color, lwd = lineWidth)
   graphics::mtext(mainTitle, side=3, line=2, adj=mainTitleAlignment)
 
   if (!is.null(highlight)) {
     if ('background' %in% names(highlight)) {
       graphics::rect(highlight$start,
-                     powerAxisLim[1] - powerAxisLim[2] * 2,
+                     energyRange[1] - energyRange[2] * 2,
                      highlight$end,
-                     powerAxisLim[2] + powerAxisLim[2] * 2,
+                     energyRange[2] + energyRange[2] * 2,
                      col = highlight$background, border = NA)
     }
     graphics::lines(highlight_f, highlight_p, col=highlight$color,

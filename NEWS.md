@@ -1,3 +1,9 @@
+# praatpicture 1.6.1
+* The `dynamicRange` argument of `draw_spectralslice()` was swapped for a more
+general `energyRange` argument. By default this is a single numeric `60` which 
+is interpreted as a dynamic range of 60 dB/Hz, but if a vector of two numbers is
+passed, it is interpreted as a concrete y-axis range.
+
 # praatpicture 1.6.0
 * Added a new stand-alone function `draw_spectralslice()` for plotting spectral 
 slices from a (window around a) time point of a sound file. The function is 

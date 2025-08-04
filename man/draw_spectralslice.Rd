@@ -9,12 +9,12 @@ draw_spectralslice(
   time,
   channel = 1,
   freqRange = NULL,
+  energyRange = 60,
   log = FALSE,
   method = "fft",
   multitaper_args = NULL,
   windowLength = 0.005,
   windowShape = "Gaussian",
-  dynamicRange = 60,
   color = "black",
   lineWidth = 1,
   freq_axisLabel = "Frequency (Hz)",
@@ -39,9 +39,16 @@ to estimate spectrum.}
 \item{channel}{Numeric giving the channel that should be used to
 generate the spectrogram. Default is \code{1}.}
 
-\item{freqRange}{Vector of two integers giving the frequency range to be
+\item{freqRange}{Vector of two numbers giving the frequency range to be
 used for plotting spectrograms. Default is \code{NULL}, in which case the whole
 spectrum is plotted using the Nyquist frequency for the upper limit.}
+
+\item{energyRange}{Either numeric or vector of two numbers used to specify
+the y-axis range in units of dB/Hz. If a single number is passed, this is
+interpreted as the desired dynamic range of the y-axis. If a vector of
+two numbers is passed, these are used to exactly delimit the y-axis.
+Default is \code{60}, i.e. a dynamic range of 60 dB/Hz relative to the global
+maximum.}
 
 \item{log}{Logical; should the frequency range be log scaled? Default is
 \code{FALSE}.}
@@ -63,11 +70,6 @@ other options are \code{square}, \code{Hamming}, \code{Bartlett}, \code{Hanning}
 \code{Kaiser}.Note that the Gaussian window function provided by the \code{phonTools}
 package and used for this function does not have the same properties as the
 Gaussian window function used for spectral estimation in Praat.}
-
-\item{dynamicRange}{Numeric giving the desired dynamic range in units of
-dB/Hz. In practice this sets the y-axis limits of the plot; the upper limit
-corresponds to the maximum sound pressure level in the spectrum, and the
-lower limit corresponds to the \code{dynamicRange} relative to the upper limit.}
 
 \item{color}{String giving the name of the color to be used for plotting
 the spectrum. Default is \code{'black'}.}
