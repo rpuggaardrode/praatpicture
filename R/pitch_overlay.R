@@ -163,8 +163,6 @@ pitch_overlay <- function(pt, bottomRange, topRange, start, org_start=0,
   graphics::mtext(axisLabel, side=4, line=pline[1], cex=0.8, las=3,
                   col=color[1])
 
-  print(freqRange)
-
   if (min_max_only[ind]) {
     graphics::mtext(freqRange[1], side=4, line=pline[2],
                     at=bottomRange, padj=0, las=2, cex=0.7,

@@ -52,6 +52,9 @@
 #' `left` and `right`. If more or less than two channels are available,
 #' channels are named `Cn`, where `n` is the number of the channel. Alternatvely,
 #' a vector of strings can be provided with channel names. Default is `FALSE`.
+#' @param wave_energyRange Numeric vector of length 2 giving the desired energy
+#' range (y-axis range) of waveform(s). Default is `NULL`, in which case the
+#' y-axis range is set to the lowest and highest value for each wave.
 #' @param wave_axisDigits Numeric giving the number of digits to print for
 #' values along the y-axis of the waveform. Default is `3`. If `0` is passed,
 #' the y-axis is suppressed. Note that this only applies when
@@ -359,7 +362,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          start_end_only=TRUE, min_max_only=TRUE,
                          drawSize = 1, speckleSize = 1,
                          wave_channels='all', wave_channelNames=FALSE,
-                         wave_axisDigits=3,
+                         wave_energyRange=NULL, wave_axisDigits=3,
                          wave_color='black', wave_lineWidth=1,
                          wave_highlight=NULL,
                          tg_obj=NULL, tg_file=NULL, tg_tiers='all',
@@ -794,7 +797,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
   for (i in 1:nframe) {
     if (frames[i] == 'sound') {
       ind <- which(frames == 'sound')
-      waveplot(sig, bit, t, start, tfrom0, nchan, wave_color,
+      waveplot(sig, bit, t, start, tfrom0, nchan, wave_energyRange, wave_color,
                pitch_plotOnWave, pt, pitch_plotType, pitch_scale,
                pitch_freqRange, pitch_axisLabel, pitch_color, pitch_highlight,
                intensity_plotOnWave, it,

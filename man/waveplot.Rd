@@ -11,6 +11,7 @@ waveplot(
   start,
   tfrom0 = TRUE,
   nchan = 1,
+  energyRange = NULL,
   color = "black",
   pitch_plotOnWave = FALSE,
   pt = NULL,
@@ -62,6 +63,10 @@ waveplot(
 original time? Default is \code{TRUE}.}
 
 \item{nchan}{Numeric; how many channels will be plotted? Default is \code{1}.}
+
+\item{energyRange}{Numeric vector of length 2 giving the desired energy
+range (y-axis range) of waveform(s). Default is \code{NULL}, in which case the
+y-axis range is set to the lowest and highest value for each wave.}
 
 \item{color}{String giving the name of the color to be used for plotting
 the waveform. Default is \code{'black'}. Alternatively, a vector of colors, if

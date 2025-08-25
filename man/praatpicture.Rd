@@ -20,6 +20,7 @@ praatpicture(
   speckleSize = 1,
   wave_channels = "all",
   wave_channelNames = FALSE,
+  wave_energyRange = NULL,
   wave_axisDigits = 3,
   wave_color = "black",
   wave_lineWidth = 1,
@@ -151,6 +152,10 @@ available. Alternatively, if two channels are available, they will be named
 \code{left} and \code{right}. If more or less than two channels are available,
 channels are named \code{Cn}, where \code{n} is the number of the channel. Alternatvely,
 a vector of strings can be provided with channel names. Default is \code{FALSE}.}
+
+\item{wave_energyRange}{Numeric vector of length 2 giving the desired energy
+range (y-axis range) of waveform(s). Default is \code{NULL}, in which case the
+y-axis range is set to the lowest and highest value for each wave.}
 
 \item{wave_axisDigits}{Numeric giving the number of digits to print for
 values along the y-axis of the waveform. Default is \code{3}. If \code{0} is passed,

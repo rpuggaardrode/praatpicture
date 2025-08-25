@@ -1,3 +1,9 @@
+# praatpicture 1.6.2
+* `praatpicture()` has a new argument `wave_energyRange` for controlling the
+y-axis range of waveform(s). The default behavior of determining the range
+dynamically from the minima and maxima of each wave is not changed. 
+* Some leftover debugging code was removed from `pitch_overlay()`.
+
 # praatpicture 1.6.1
 * The `dynamicRange` argument of `draw_spectralslice()` was swapped for a more
 general `energyRange` argument. By default this is a single numeric `60` which 

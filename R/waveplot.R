@@ -11,6 +11,9 @@
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
 #' original time? Default is `TRUE`.
 #' @param nchan Numeric; how many channels will be plotted? Default is `1`.
+#' @param energyRange Numeric vector of length 2 giving the desired energy
+#' range (y-axis range) of waveform(s). Default is `NULL`, in which case the
+#' y-axis range is set to the lowest and highest value for each wave.
 #' @param color String giving the name of the color to be used for plotting
 #' the waveform. Default is `'black'`. Alternatively, a vector of colors, if
 #' different channels should be plotted with different colors.
@@ -133,7 +136,8 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' soundFile <- paste0(datapath, '/1.wav')
 #' praatpicture(soundFile, frames='sound')
-waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1, color='black',
+waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
+                     energyRange=NULL, color='black',
                      pitch_plotOnWave=FALSE, pt=NULL,
                      pitch_plotType='draw', pitch_scale='hz',
                      pitch_freqRange=NULL, pitch_axisLabel=NULL,
@@ -158,26 +162,34 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1, color='black',
     start <- 0
   }
 
+  if (is.null(energyRange)) {
+    reset_energyRange <- TRUE
+  } else {
+    reset_energyRange <- FALSE
+  }
+
   for (j in 1:nchan) {
 
     sig[,j] <- sig[,j] / (2^(bit - 1) - 1)
+
+    if (reset_energyRange) energyRange <- c(min(sig[,j]), max(sig[,j]))
 
     if (!min_max_only[ind]) {
       if (j == 1 & ind == 1) {
         yax <- 's'
       } else {
-        ytix <- grDevices::axisTicks(c(min(sig[,j]), max(sig[,j])), log=F)
+        ytix <- grDevices::axisTicks(energyRange, log=F)
         ytix <- ytix[-length(ytix)]
         yax <- 'n'
       }
     } else {
       yax <- 'n'
-      ytix <- c(min(sig[,j]), 0, max(sig[,j]))
+      ytix <- c(energyRange[1], 0, energyRange[2])
       if (axisDigits == 0) {
         ytixLabs <- rep('', 3)
       } else {
-        ytixLabs <- c(round(min(sig[,j]), axisDigits), 0,
-                      round(max(sig[,j]), axisDigits))
+        ytixLabs <- c(round(energyRange[1], axisDigits), 0,
+                      round(energyRange[2], axisDigits))
       }
     }
 
@@ -200,14 +212,14 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1, color='black',
     }
 
     plot(t[-1], sig[,j], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
-         col=color[j], lwd=lineWidth)
+         col=color[j], lwd=lineWidth, ylim=energyRange)
 
     if (!is.null(highlight)) {
       if ('background' %in% names(highlight)) {
         graphics::rect(highlight$start,
-                       -abs(min(sig[,j]) * 2),
+                       -abs(energyRange[1] * 2),
                        highlight$end,
-                       max(sig[,j]) * 2,
+                       energyRange[2] * 2,
                        col = highlight$background, border = NA)
       }
       graphics::lines(highlight_t,
@@ -228,14 +240,14 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1, color='black',
     }
 
     if (as.numeric(pitch_plotOnWave) == j) {
-      pitch_overlay(pt, min(sig[,j]), max(sig[,j]), start, org_start, tfrom0,
+      pitch_overlay(pt, energyRange[1], energyRange[2], start, org_start, tfrom0,
                     pitch_freqRange, pitch_plotType, pitch_scale, pitch_color,
                     ind, drawSize, speckleSize, pitch_axisLabel, min_max_only,
                     pitch_highlight, intensity_plotOnWave == j)
     }
 
     if (as.numeric(intensity_plotOnWave) == j) {
-      intensity_overlay(it, min(sig[,j]), max(sig[,j]), start, org_start,
+      intensity_overlay(it, energyRange[1], energyRange[2], start, org_start,
                         tfrom0, intensity_range, intensity_color, ind, drawSize,
                         intensity_axisLabel, min_max_only, intensity_highlight,
                         pitch_plotOnWave == j)
