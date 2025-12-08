@@ -64,9 +64,13 @@ original time? Default is \code{TRUE}.}
 
 \item{nchan}{Numeric; how many channels will be plotted? Default is \code{1}.}
 
-\item{energyRange}{Numeric vector of length 2 giving the desired energy
+\item{energyRange}{Numeric vector giving the desired energy
 range (y-axis range) of waveform(s). Default is \code{NULL}, in which case the
-y-axis range is set to the lowest and highest value for each wave.}
+y-axis range is set to the lowest and highest value for each wave.
+If a vector of two values is passed for a multi-wave plot, these are
+recycled for each wave. Separate ranges can be set for each waveform by
+passing a vector of a length corresponding to twice the number of waves
+plotted.}
 
 \item{color}{String giving the name of the color to be used for plotting
 the waveform. Default is \code{'black'}. Alternatively, a vector of colors, if

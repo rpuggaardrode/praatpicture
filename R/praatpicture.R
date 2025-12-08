@@ -52,9 +52,13 @@
 #' `left` and `right`. If more or less than two channels are available,
 #' channels are named `Cn`, where `n` is the number of the channel. Alternatvely,
 #' a vector of strings can be provided with channel names. Default is `FALSE`.
-#' @param wave_energyRange Numeric vector of length 2 giving the desired energy
+#' @param wave_energyRange Numeric vector giving the desired energy
 #' range (y-axis range) of waveform(s). Default is `NULL`, in which case the
 #' y-axis range is set to the lowest and highest value for each wave.
+#' If a vector of two values is passed for a multi-wave plot, these are
+#' recycled for each wave. Separate ranges can be set for each waveform by
+#' passing a vector of a length corresponding to twice the number of waves
+#' plotted.
 #' @param wave_axisDigits Numeric giving the number of digits to print for
 #' values along the y-axis of the waveform. Default is `3`. If `0` is passed,
 #' the y-axis is suppressed. Note that this only applies when
@@ -123,8 +127,17 @@
 #' @param spec_channel Numeric giving the channel that should be used to
 #' generate the spectrogram. Default is `1`. Generating spectrograms from
 #' multiple channels is not currently possible with `praatpicture`.
+#' @param spec_scale String giving the frequency scale to use for plotting
+#' spectrograms. Default is `hz`. Alternatives are `erb` (for the equivalent
+#' rectangular bandwidth scale), `mel` (for the Mel scale, using 1000 Hz
+#' as the corner frequency, following Fant 1968), or `logarithmic` (for
+#' log Hz).
 #' @param spec_freqRange Vector of two integers giving the frequency range to be
-#' used for plotting spectrograms. Default is `c(0,5000)`.
+#' used for plotting spectrograms. Default is `NULL`, in which case suitable
+#' ranges are chosen based on the frequency scale. For `hz`, the default is
+#' `c(0,5000)`; for `erb`, the default is `c(0.8,42)`; for `mel`, the default is
+#' `c(30,4400)`. The latter two correspond roughly to the human auditory
+#' frequency response.
 #' @param spec_windowLength Window length in seconds for generating spectrograms.
 #' Default is `0.005`.
 #' @param spec_dynamicRange Dynamic range in dB for generating spectrograms. The
@@ -147,7 +160,8 @@
 #' plotting the highest visible amplitude. Vectors with more than two color
 #' names can be used for plotting values in between in different colors.
 #' @param spec_axisLabel String giving the name of the label to print along the
-#' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
+#' y-axis when plotting a spectrogram. Default is `NULL`, in which case the
+#' axis label will depend on the scale.
 #' @param spec_highlight Named list giving parameters for differential
 #' highlighting of the spectrogram based on the time domain. This list
 #' should contain information about which parts of the plot to highlight, either
@@ -371,11 +385,12 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          tg_alignment='central', tg_edgeLabels='keep',
                          tg_specialChar=FALSE,
                          tg_color='black', tg_highlight=NULL,
-                         spec_channel=NULL, spec_freqRange=c(0,5000),
+                         spec_channel=NULL, spec_scale='hz',
+                         spec_freqRange=NULL,
                          spec_windowLength=0.005, spec_dynamicRange=50,
                          spec_timeStep=1000, spec_windowShape='Gaussian',
                          spec_colors=c('white', 'black'),
-                         spec_axisLabel='Frequency (Hz)',
+                         spec_axisLabel=NULL,
                          spec_highlight=NULL,
                          pitch_timeStep=NULL, pitch_floor=75, pitch_ceiling=600,
                          pitch_plotType='draw', pitch_scale='hz',
@@ -413,9 +428,14 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     stop('Currently available frames are sound, TextGrid, spectrogram, formant, ',
          'pitch, and intensity')
   }
+  if (spec_scale == 'log') spec_scale <- 'logarithmic'
+  legal_spec_scales <- c('hz', 'logarithmic', 'erb', 'mel')
+  if (!spec_scale %in% legal_spec_scales) {
+    stop('Possible spectrogram scales are hz, logarithmic, erb, and mel')
+  }
   if (pitch_scale == 'log') pitch_scale <- 'logarithmic'
-  legal_scales <- c('hz', 'logarithmic', 'semitones', 'erb', 'mel')
-  if (!pitch_scale %in% legal_scales) {
+  legal_pitch_scales <- c('hz', 'logarithmic', 'semitones', 'erb', 'mel')
+  if (!pitch_scale %in% legal_pitch_scales) {
     stop('Possible pitch scales are hz, logarithmic, semitones, erb, and mel')
   }
   if (!any(pitch_plotType %in% c('draw', 'speckle'))) {
@@ -624,6 +644,26 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
   intensity_highlight <- findStartEndVals(intensity_highlight)
   spec_highlight <- findStartEndVals(spec_highlight)
 
+  if ('spectrogram' %in% frames) {
+    if (is.null(spec_freqRange)) {
+      if (spec_scale == 'erb') {
+        spec_freqRange <- c(0.8,42)
+      } else if (spec_scale == 'mel') {
+        spec_freqRange <- c(30,4400)
+      } else if (spec_scale == 'logarithmic') {
+        spec_freqRange <- c(50,5000)
+      } else {
+        spec_freqRange <- c(0,5000)
+      }
+    }
+    if (is.null(spec_axisLabel)) {
+      if (spec_scale == 'hz') spec_axisLabel <- 'Frequency (Hz)'
+      if (spec_scale == 'logarithmic') spec_axisLabel <- 'Frequency (log Hz)'
+      if (spec_scale == 'mel') spec_axisLabel <- 'Frequency (mel)'
+      if (spec_scale == 'erb') spec_axisLabel <- 'Frequency (ERB)'
+    }
+  }
+
   if ('pitch' %in% frames | pitch_plotOnSpec | pitch_plotOnWave) {
     if (is.null(pitch_freqRange)) {
       if (pitch_scale == 'erb') {
@@ -770,7 +810,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     t <- tseq
   }
 
-  if (nchan > 1) {
+  if (nchan > 1 & 'sound' %in% frames) {
     nf <- nframe + length(tg_tiers) - 1
     wavind <- which(frames=='sound')
     if ('TextGrid' %in% frames) {
@@ -812,7 +852,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,
-               max(tseq)-start, tfrom0,
+               max(tseq)-start, tfrom0, spec_scale,
                spec_freqRange, spec_windowLength, spec_dynamicRange,
                spec_timeStep, spec_windowShape, spec_colors,
                pitch_plotOnSpec, pt, pitch_plotType, pitch_scale,

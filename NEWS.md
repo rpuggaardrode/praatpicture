@@ -1,3 +1,19 @@
+# praatpicture 1.7.0
+* Added the `spec_scale` argument to `praatpicture()`, and the `scale` argument
+to `draw_spectralslice()`. This allows for using different frequency scales
+in addition to (linear) Hertz, viz. `erb`, `mel`, and `log`. For this reason,
+the `spec_freqRange` and `spec_axisLabel` arguments of `praatpicture()` and
+equivalent arguments of `draw_spectralslice()` now have dynamic defaults
+based on the value of `spec_scale` or `scale`. 
+* Fixed error that made it impossible to plot derived signal data for 
+multi-channel sound files without plotting the waveform. This fixes
+[https://github.com/rpuggaardrode/praatpicture/issues/13#issue-3651921917].
+* It is now possible to plot only the first formant. Fixes 
+[https://github.com/rpuggaardrode/praatpicture/issues/12].
+* The energy range of waveforms can now be specified on a per-channel basis
+for multi-channel files. Thanks to James Kirby for the suggestion! 
+[https://github.com/rpuggaardrode/praatpicture/issues/11].
+
 # praatpicture 1.6.2
 * `praatpicture()` has a new argument `wave_energyRange` for controlling the
 y-axis range of waveform(s). The default behavior of determining the range

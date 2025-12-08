@@ -115,12 +115,20 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if (!is.null(highlight)) {
     highlight_t <- 0
-    highlight_f <- array(rep(NA, nf), dim = c(nf,1))
+    if (nf > 1) {
+      highlight_f <- array(rep(NA, nf), dim = c(nf,1))
+    } else {
+      highlight_f <- NA
+    }
     highlight_i <- c()
     for (int in 1:length(highlight$start)) {
       times <- which(fm$t > highlight$start[int] & fm$t < highlight$end[int])
       highlight_t <- c(highlight_t, fm$t[times], max(fm$t[times] + 0.0001))
-      highlight_f <- cbind(highlight_f, fm$frequencyArray[,times], rep(NA, nf))
+      if (nf > 1) {
+        highlight_f <- cbind(highlight_f, fm$frequencyArray[,times], rep(NA, nf))
+      } else {
+        highlight_f <- c(highlight_f, fm$frequencyArray[times], NA)
+      }
       highlight_i <- c(highlight_i, db[times], 0)
     }
     if (any(highlight$start < start)) {
@@ -149,23 +157,36 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
   freql <- s[s %% 1000 == 0]
 
   if ('draw' %in% plotType) {
-    plot(fm$t, fm$frequencyArray[1,], xlim=c(start, end+start),
-         xaxt='n', ylim=freqRange, yaxt=yax, type='l', col=color[1],
-         lwd=drawSize)
-    for (i in 2:nf) {
-      graphics::lines(fm$t, fm$frequencyArray[i,], col=color[i], lwd=drawSize)
+    if (nf > 1) {
+      plot(fm$t, fm$frequencyArray[1,], xlim=c(start, end+start),
+           xaxt='n', ylim=freqRange, yaxt=yax, type='l', col=color[1],
+           lwd=drawSize)
+
+      for (i in 2:nf) {
+        graphics::lines(fm$t, fm$frequencyArray[i,], col=color[i], lwd=drawSize)
+      }
+    } else {
+      plot(fm$t, fm$frequencyArray, xlim=c(start, end+start),
+           xaxt='n', ylim=freqRange, yaxt=yax, type='l', col=color[1],
+           lwd=drawSize)
     }
     if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
     if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                           tick=F)
 
     if ('speckle' %in% plotType) {
-      graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
-                       col=color[1], cex=speckleSize)
-      for (i in 2:nf) {
-        graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
-                         col=color[i], cex=speckleSize)
+      if (nf > 1) {
+        graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
+                         col=color[1], cex=speckleSize)
+        for (i in 2:nf) {
+          graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
+                           col=color[i], cex=speckleSize)
+        }
+      } else {
+        graphics::points(fm$t[-subdr], fm$frequencyArray[-subdr], pch=20,
+                         col=color[1], cex=speckleSize)
       }
+
     }
 
     if (!is.null(highlight)) {
@@ -176,18 +197,29 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                        freqRange[2] + freqRange[2] * 2,
                        col = highlight$background, border = NA)
       }
-      graphics::lines(highlight_t, highlight_f[1,], col=highlight$color[1],
-                      lwd=highlight$drawSize)
-      for (i in 2:nf) {
-        graphics::lines(highlight_t, highlight_f[i,],
-                        col=highlight$color[i], lwd=highlight$drawSize)
-      }
-      if ('speckle' %in% plotType) {
-        graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
-                         col=highlight$color[1], cex=highlight$speckleSize)
+      if (nf > 1) {
+        graphics::lines(highlight_t, highlight_f[1,], col=highlight$color[1],
+                        lwd=highlight$drawSize)
         for (i in 2:nf) {
-          graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
-                           col=highlight$color[i], cex=highlight$speckleSize)
+          graphics::lines(highlight_t, highlight_f[i,],
+                          col=highlight$color[i], lwd=highlight$drawSize)
+        }
+      } else {
+        graphics::lines(highlight_t, highlight_f, col=highlight$color[1],
+                        lwd=highlight$drawSize)
+      }
+
+      if ('speckle' %in% plotType) {
+        if (nf > 1) {
+          graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
+                           col=highlight$color[1], cex=highlight$speckleSize)
+          for (i in 2:nf) {
+            graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
+                             col=highlight$color[i], cex=highlight$speckleSize)
+          }
+        } else {
+          graphics::points(highlight_t[-hsubdr], highlight_f[-hsubdr], pch=20,
+                           col=highlight$color[1], cex=highlight$speckleSize)
         }
       }
     }
@@ -204,13 +236,20 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   if (length(plotType) == 1) {
     if (plotType == 'speckle') {
-      plot(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
-           xlim=c(start, end+start), xaxt='n',
-           ylim=freqRange, yaxt=yax, col=color[1], cex=speckleSize)
-      for (i in 2:nf) {
-        graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
-                         col=color[i], cex=speckleSize)
+      if (nf > 1) {
+        plot(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
+             xlim=c(start, end+start), xaxt='n',
+             ylim=freqRange, yaxt=yax, col=color[1], cex=speckleSize)
+        for (i in 2:nf) {
+          graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
+                           col=color[i], cex=speckleSize)
+        }
+      } else {
+        plot(fm$t[-subdr], fm$frequencyArray[-subdr], pch=20,
+             xlim=c(start, end+start), xaxt='n',
+             ylim=freqRange, yaxt=yax, col=color[1], cex=speckleSize)
       }
+
       if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
       if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                             tick=F)
@@ -223,12 +262,18 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                          freqRange[2] + freqRange[2] * 2,
                          col = highlight$background, border = NA)
         }
-        graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
-                         col=highlight$color[1], cex=highlight$speckleSize)
-        for (i in 2:nf) {
-          graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
-                           col=highlight$color[i], cex=highlight$speckleSize)
+        if (nf > 1) {
+          graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
+                           col=highlight$color[1], cex=highlight$speckleSize)
+          for (i in 2:nf) {
+            graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
+                             col=highlight$color[i], cex=highlight$speckleSize)
+          }
+        } else {
+          graphics::points(highlight_t[-hsubdr], highlight_f[-hsubdr], pch=20,
+                           col=highlight$color[1], cex=highlight$speckleSize)
         }
+
       }
 
       if (tgbool) {

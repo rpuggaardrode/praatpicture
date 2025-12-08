@@ -11,7 +11,8 @@ specplot(
   start,
   end,
   tfrom0 = TRUE,
-  freqRange = c(0, 5000),
+  scale = "hz",
+  freqRange = NULL,
   windowLength = 0.005,
   dynamicRange = 60,
   timeStep = 1000,
@@ -44,7 +45,7 @@ specplot(
   ind = NULL,
   min_max_only = TRUE,
   highlight = NULL,
-  axisLabel = "Frequency (Hz)",
+  axisLabel = NULL,
   drawSize = 1,
   speckleSize = 1
 )
@@ -63,8 +64,18 @@ specplot(
 \item{tfrom0}{Logical; should time on the x-axis run from 0 or from the
 original time? Default is \code{TRUE}.}
 
+\item{scale}{String giving the frequency scale to use for plotting
+spectrograms. Default is \code{hz}. Alternatives are \code{erb} (for the equivalent
+rectangular bandwidth scale), \code{mel} (for the Mel scale, using 1000 Hz
+as the corner frequency, following Fant 1968), or \code{logarithmic} (for
+log Hz).}
+
 \item{freqRange}{Vector of two integers giving the frequency range to be
-used for plotting spectrograms. Default is \code{c(0,5000)}.}
+used for plotting spectrograms. Default is \code{NULL}, in which case suitable
+ranges are chosen based on the frequency scale. For \code{hz}, the default is
+\code{c(0,5000)}; for \code{erb}, the default is \code{c(0.8,42)}; for \code{mel}, the default is
+\code{c(30,4400)}. The latter two correspond roughly to the human auditory
+frequency response.}
 
 \item{windowLength}{Window length in seconds for generating spectrograms.
 Default is \code{0.005}.}
@@ -224,7 +235,8 @@ information in a plotted TextGrid. Further contains the argument
 \code{colors} (vector of strings, see \code{colors}).}
 
 \item{axisLabel}{String giving the name of the label to print along the
-y-axis when plotting a spectrogram. Default is \code{Frequency (Hz)}.}
+y-axis when plotting a spectrogram. Default is \code{NULL}, in which case the
+axis label will depend on the scale.}
 
 \item{drawSize}{Number indicating the line width of plot components where
 the \verb{_plotType} is \code{'draw'} (i.e., pitch, formants, or intensity rendered as

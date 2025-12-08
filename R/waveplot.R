@@ -11,9 +11,13 @@
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
 #' original time? Default is `TRUE`.
 #' @param nchan Numeric; how many channels will be plotted? Default is `1`.
-#' @param energyRange Numeric vector of length 2 giving the desired energy
+#' @param energyRange Numeric vector giving the desired energy
 #' range (y-axis range) of waveform(s). Default is `NULL`, in which case the
 #' y-axis range is set to the lowest and highest value for each wave.
+#' If a vector of two values is passed for a multi-wave plot, these are
+#' recycled for each wave. Separate ranges can be set for each waveform by
+#' passing a vector of a length corresponding to twice the number of waves
+#' plotted.
 #' @param color String giving the name of the color to be used for plotting
 #' the waveform. Default is `'black'`. Alternatively, a vector of colors, if
 #' different channels should be plotted with different colors.
@@ -162,34 +166,34 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
     start <- 0
   }
 
-  if (is.null(energyRange)) {
-    reset_energyRange <- TRUE
-  } else {
-    reset_energyRange <- FALSE
-  }
-
   for (j in 1:nchan) {
 
     sig[,j] <- sig[,j] / (2^(bit - 1) - 1)
 
-    if (reset_energyRange) energyRange <- c(min(sig[,j]), max(sig[,j]))
+    if (is.null(energyRange)) {
+      currentEnergyRange <- c(min(sig[,j]), max(sig[,j]))
+    } else if (length(energyRange) > 2) {
+      currentEnergyRange <- c(energyRange[j*2-1], energyRange[j*2])
+    } else {
+      currentEnergyRange <- energyRange
+    }
 
     if (!min_max_only[ind]) {
       if (j == 1 & ind == 1) {
         yax <- 's'
       } else {
-        ytix <- grDevices::axisTicks(energyRange, log=F)
+        ytix <- grDevices::axisTicks(currentEnergyRange, log=F)
         ytix <- ytix[-length(ytix)]
         yax <- 'n'
       }
     } else {
       yax <- 'n'
-      ytix <- c(energyRange[1], 0, energyRange[2])
+      ytix <- c(currentEnergyRange[1], 0, currentEnergyRange[2])
       if (axisDigits == 0) {
         ytixLabs <- rep('', 3)
       } else {
-        ytixLabs <- c(round(energyRange[1], axisDigits), 0,
-                      round(energyRange[2], axisDigits))
+        ytixLabs <- c(round(currentEnergyRange[1], axisDigits), 0,
+                      round(currentEnergyRange[2], axisDigits))
       }
     }
 
@@ -212,14 +216,14 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
     }
 
     plot(t[-1], sig[,j], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
-         col=color[j], lwd=lineWidth, ylim=energyRange)
+         col=color[j], lwd=lineWidth, ylim=currentEnergyRange)
 
     if (!is.null(highlight)) {
       if ('background' %in% names(highlight)) {
         graphics::rect(highlight$start,
-                       -abs(energyRange[1] * 2),
+                       -abs(currentEnergyRange[1] * 2),
                        highlight$end,
-                       energyRange[2] * 2,
+                       currentEnergyRange[2] * 2,
                        col = highlight$background, border = NA)
       }
       graphics::lines(highlight_t,
@@ -240,17 +244,18 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
     }
 
     if (as.numeric(pitch_plotOnWave) == j) {
-      pitch_overlay(pt, energyRange[1], energyRange[2], start, org_start, tfrom0,
-                    pitch_freqRange, pitch_plotType, pitch_scale, pitch_color,
-                    ind, drawSize, speckleSize, pitch_axisLabel, min_max_only,
-                    pitch_highlight, intensity_plotOnWave == j)
+      pitch_overlay(pt, currentEnergyRange[1], currentEnergyRange[2], start,
+                    org_start, tfrom0, pitch_freqRange, pitch_plotType,
+                    pitch_scale, pitch_color, ind, drawSize, speckleSize,
+                    pitch_axisLabel, min_max_only, pitch_highlight,
+                    intensity_plotOnWave == j)
     }
 
     if (as.numeric(intensity_plotOnWave) == j) {
-      intensity_overlay(it, energyRange[1], energyRange[2], start, org_start,
-                        tfrom0, intensity_range, intensity_color, ind, drawSize,
-                        intensity_axisLabel, min_max_only, intensity_highlight,
-                        pitch_plotOnWave == j)
+      intensity_overlay(it, currentEnergyRange[1], currentEnergyRange[2], start,
+                        org_start, tfrom0, intensity_range, intensity_color,
+                        ind, drawSize, intensity_axisLabel, min_max_only,
+                        intensity_highlight, pitch_plotOnWave == j)
     }
 
     if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)

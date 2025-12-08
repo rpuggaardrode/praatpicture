@@ -11,8 +11,17 @@
 #' @param end End time (in seconds) of desired plotted area.
 #' @param tfrom0 Logical; should time on the x-axis run from 0 or from the
 #' original time? Default is `TRUE`.
+#' @param scale String giving the frequency scale to use for plotting
+#' spectrograms. Default is `hz`. Alternatives are `erb` (for the equivalent
+#' rectangular bandwidth scale), `mel` (for the Mel scale, using 1000 Hz
+#' as the corner frequency, following Fant 1968), or `logarithmic` (for
+#' log Hz).
 #' @param freqRange Vector of two integers giving the frequency range to be
-#' used for plotting spectrograms. Default is `c(0,5000)`.
+#' used for plotting spectrograms. Default is `NULL`, in which case suitable
+#' ranges are chosen based on the frequency scale. For `hz`, the default is
+#' `c(0,5000)`; for `erb`, the default is `c(0.8,42)`; for `mel`, the default is
+#' `c(30,4400)`. The latter two correspond roughly to the human auditory
+#' frequency response.
 #' @param windowLength Window length in seconds for generating spectrograms.
 #' Default is `0.005`.
 #' @param dynamicRange Dynamic range in dB for generating spectrograms. The
@@ -139,7 +148,8 @@
 #' information in a plotted TextGrid. Further contains the argument
 #' `colors` (vector of strings, see `colors`).
 #' @param axisLabel String giving the name of the label to print along the
-#' y-axis when plotting a spectrogram. Default is `Frequency (Hz)`.
+#' y-axis when plotting a spectrogram. Default is `NULL`, in which case the
+#' axis label will depend on the scale.
 #' @param drawSize Number indicating the line width of plot components where
 #' the `_plotType` is `'draw'` (i.e., pitch, formants, or intensity rendered as
 #' line plots). Default is `1`. Controls the `lwd` argument of
@@ -157,9 +167,10 @@
 #' datapath <- system.file('extdata', package='praatpicture')
 #' soundFile <- paste0(datapath, '/1.wav')
 #' praatpicture(soundFile, frames='spectrogram')
-specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
-                     windowLength=0.005, dynamicRange=60, timeStep=1000,
-                     windowShape='Gaussian', colors=c('white', 'black'),
+specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
+                     freqRange=NULL, windowLength=0.005, dynamicRange=60,
+                     timeStep=1000, windowShape='Gaussian',
+                     colors=c('white', 'black'),
                      pitch_plotOnSpec=FALSE, pt=NULL,
                      pitch_plotType='draw', pitch_scale='hz',
                      pitch_freqRange=NULL, pitch_axisLabel=NULL,
@@ -173,7 +184,13 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                      tgbool=FALSE, lines=NULL, focusTierColor='black',
                      focusTierLineType='dotted', ind=NULL,
                      min_max_only=TRUE, highlight=NULL,
-                     axisLabel='Frequency (Hz)', drawSize=1, speckleSize=1) {
+                     axisLabel=NULL, drawSize=1, speckleSize=1) {
+
+  if (scale == 'logarithmic') {
+    logsc <- 'y'
+  } else {
+    logsc <- ''
+  }
 
   wl <- windowLength*1000
   ts <- -timeStep
@@ -215,22 +232,35 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
                                  dynamicrange=dynamicRange,
                                  windowparameter=0.4)
 
+  if (scale %in% c('hz', 'log')) {
+    hzFreqRange <- freqRange
+  } else if (scale == 'erb') {
+    hzFreqRange <- soundgen::ERBToHz(freqRange)
+    if (formant_plotOnSpec) fm$frequencyArray <-
+        soundgen::HzToERB(fm$frequencyArray)
+  } else {
+    hzFreqRange <- 1000 * (2^(freqRange / 1000)-1)
+    if (formant_plotOnSpec) fm$frequencyArray <-
+        1000 / log(2) * log(1 + fm$frequencyArray / 1000)
+  }
+
   freqdom <- as.numeric(unlist(dimnames(spec$spectrogram)[2]))
-  within_freqran <- which(freqdom < freqRange[2] & freqdom > freqRange[1])
+  within_freqran <- which(freqdom < hzFreqRange[2] & freqdom > hzFreqRange[1])
   spec$spectrogram <- spec$spectrogram[,within_freqran]
 
   time_s <- as.numeric(rownames(spec$spectrogram))/1000
   if (!tfrom0) time_s <- time_s + start
   rownames(spec$spectrogram) <- time_s
 
-  if (grDevices::dev.capabilities()$rasterImage == 'yes') {
+  if (grDevices::dev.capabilities()$rasterImage == 'yes' &
+      scale == 'hz') {
     useRaster <- TRUE
   } else {
     useRaster <- FALSE
   }
 
   plot(NULL, xaxt='n', xlim=c(start, end+start),
-       ylim=freqRange, yaxs='i', yaxt=yax)
+       ylim=freqRange, yaxs='i', yaxt=yax, log = logsc)
   if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
   if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
                                         tick=F)
@@ -246,7 +276,10 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
 
   specDims <- dim(spec$spectrogram)
   xVals <- seq(min(time_s), max(time_s), length.out=specDims[1])
-  yVals <- seq(freqRange[1], freqRange[2], length.out=specDims[2])
+  yVals <- seq(hzFreqRange[1], hzFreqRange[2], length.out=specDims[2])
+
+  if (scale == 'mel') yVals <- emuR::mel(yVals)
+  if (scale == 'erb') yVals <- soundgen::HzToERB(yVals)
 
   graphics::image(x=xVals, y=yVals, z=spec$spectrogram,
                   col=fillCol, useRaster=useRaster, add=TRUE)
@@ -287,7 +320,11 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
       times <- which(fm$t > formant_highlight$start &
                        fm$t < formant_highlight$end)
       highlight_t <- fm$t[times]
-      highlight_f <- fm$frequencyArray[,times]
+      if (nf > 1) {
+        highlight_f <- fm$frequencyArray[,times]
+      } else {
+        highlight_f <- fm$frequencyArray[times]
+      }
       highlight_i <- db[times]
       if (formant_dynamicRange != 0) {
         hsubdr <- which(highlight_i < max(db)-formant_dynamicRange)
@@ -316,76 +353,121 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, freqRange=c(0,5000),
     }
 
     if ('draw' %in% formant_plotType) {
-      if (length(formant_color) == nf*2) {
-        graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[nf+1],
-                         lwd=drawSize+2)
-      }
-      graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[1],
-                      lwd=drawSize)
-      for (i in 2:nf) {
+      if (nf > 1) {
         if (length(formant_color) == nf*2) {
-          graphics::lines(fm$t, fm$frequencyArray[i,], lwd=drawSize+2,
-                          col=formant_color[nf+i])
+          graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[nf+1],
+                          lwd=drawSize+2)
         }
-        graphics::lines(fm$t, fm$frequencyArray[i,], col=formant_color[i],
+        graphics::lines(fm$t, fm$frequencyArray[1,], col=formant_color[1],
+                        lwd=drawSize)
+        for (i in 2:nf) {
+          if (length(formant_color) == nf*2) {
+            graphics::lines(fm$t, fm$frequencyArray[i,], lwd=drawSize+2,
+                            col=formant_color[nf+i])
+          }
+          graphics::lines(fm$t, fm$frequencyArray[i,], col=formant_color[i],
+                          lwd=drawSize)
+        }
+      } else {
+        if (length(formant_color) == 2) {
+          graphics::lines(fm$t, fm$frequencyArray, col=formant_color[2],
+                          lwd=drawSize+2)
+        }
+        graphics::lines(fm$t, fm$frequencyArray, col=formant_color[1],
                         lwd=drawSize)
       }
+
       if (!is.null(formant_highlight)) {
-        if (length(formant_highlight$color) == nf*2) {
-          graphics::lines(highlight_t, highlight_f[1,],
-                          col=formant_highlight$color[nf+1],
-                          lwd=formant_highlight$drawSize+2)
-        }
-        graphics::lines(highlight_t, highlight_f[1,],
-                        col=formant_highlight$color[1],
-                        lwd=formant_highlight$drawSize)
-        for (i in 2:nf) {
+        if (nf > 1) {
           if (length(formant_highlight$color) == nf*2) {
-            graphics::lines(highlight_t, highlight_f[i,],
-                            lwd=formant_highlight$drawSize+2,
-                            col=formant_highlight$color[nf+i])
+            graphics::lines(highlight_t, highlight_f[1,],
+                            col=formant_highlight$color[nf+1],
+                            lwd=formant_highlight$drawSize+2)
           }
-          graphics::lines(highlight_t, highlight_f[i,],
-                          col=formant_highlight$color[i],
+          graphics::lines(highlight_t, highlight_f[1,],
+                          col=formant_highlight$color[1],
+                          lwd=formant_highlight$drawSize)
+          for (i in 2:nf) {
+            if (length(formant_highlight$color) == nf*2) {
+              graphics::lines(highlight_t, highlight_f[i,],
+                              lwd=formant_highlight$drawSize+2,
+                              col=formant_highlight$color[nf+i])
+            }
+            graphics::lines(highlight_t, highlight_f[i,],
+                            col=formant_highlight$color[i],
+                            lwd=formant_highlight$drawSize)
+          }
+        } else {
+          if (length(formant_highlight$color) == 2) {
+            graphics::lines(highlight_t, highlight_f,
+                            col=formant_highlight$color[2],
+                            lwd=formant_highlight$drawSize+2)
+          }
+          graphics::lines(highlight_t, highlight_f,
+                          col=formant_highlight$color[1],
                           lwd=formant_highlight$drawSize)
         }
+
       }
     }
     if ('speckle' %in% formant_plotType) {
-      if (length(formant_color) == nf*2) {
-        graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
-                         cex=speckleSize, lwd=3,
-                         col=formant_color[nf+1])
-      }
-      graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
-                       col=formant_color[1], cex=speckleSize)
-      for (i in 2:nf) {
+      if (nf > 1) {
         if (length(formant_color) == nf*2) {
-          graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
-                           lwd=3, col=formant_color[nf+i], cex=speckleSize)
+          graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
+                           cex=speckleSize, lwd=3,
+                           col=formant_color[nf+1])
         }
-        graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
-                         col=formant_color[i], cex=speckleSize)
-      }
-      if (!is.null(formant_highlight)) {
-        if (length(formant_highlight$color) == nf*2) {
-          graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr],
-                          col=formant_highlight$color[nf+1], pch=20,
-                          lwd=3, cex=formant_highlight$speckleSize)
-        }
-        graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr],
-                        col=formant_highlight$color[1], pch=20,
-                        cex=formant_highlight$speckleSize)
+        graphics::points(fm$t[-subdr], fm$frequencyArray[1,-subdr], pch=20,
+                         col=formant_color[1], cex=speckleSize)
         for (i in 2:nf) {
-          if (length(formant_highlight$color) == nf*2) {
-            graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr],
-                             col=formant_highlight$color[nf+i], pch=20,
-                            lwd=3, cex=formant_highlight$speckleSize)
+          if (length(formant_color) == nf*2) {
+            graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
+                             lwd=3, col=formant_color[nf+i], cex=speckleSize)
           }
-          graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr],
-                          col=formant_highlight$color[i], pch=20,
-                          cex=formant_highlight$speckleSize)
+          graphics::points(fm$t[-subdr], fm$frequencyArray[i,-subdr], pch=20,
+                           col=formant_color[i], cex=speckleSize)
         }
+      } else {
+        if (length(formant_color) == 2) {
+          graphics::points(fm$t[-subdr], fm$frequencyArray[-subdr], pch=20,
+                           cex=speckleSize, lwd=3,
+                           col=formant_color[2])
+        }
+        graphics::points(fm$t[-subdr], fm$frequencyArray[-subdr], pch=20,
+                         col=formant_color[1], cex=speckleSize)
+      }
+
+      if (!is.null(formant_highlight)) {
+        if (nf > 1) {
+          if (length(formant_highlight$color) == nf*2) {
+            graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr],
+                             col=formant_highlight$color[nf+1], pch=20,
+                             lwd=3, cex=formant_highlight$speckleSize)
+          }
+          graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr],
+                           col=formant_highlight$color[1], pch=20,
+                           cex=formant_highlight$speckleSize)
+          for (i in 2:nf) {
+            if (length(formant_highlight$color) == nf*2) {
+              graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr],
+                               col=formant_highlight$color[nf+i], pch=20,
+                               lwd=3, cex=formant_highlight$speckleSize)
+            }
+            graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr],
+                             col=formant_highlight$color[i], pch=20,
+                             cex=formant_highlight$speckleSize)
+          }
+        } else {
+          if (length(formant_highlight$color) == 2) {
+            graphics::points(highlight_t[-hsubdr], highlight_f[-hsubdr],
+                             col=formant_highlight$color[2], pch=20,
+                             lwd=3, cex=formant_highlight$speckleSize)
+          }
+          graphics::points(highlight_t[-hsubdr], highlight_f[-hsubdr],
+                           col=formant_highlight$color[1], pch=20,
+                           cex=formant_highlight$speckleSize)
+        }
+
       }
 
     }

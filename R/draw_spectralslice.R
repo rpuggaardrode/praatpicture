@@ -18,8 +18,11 @@
 #' two numbers is passed, these are used to exactly delimit the y-axis.
 #' Default is `60`, i.e. a dynamic range of 60 dB/Hz relative to the global
 #' maximum.
-#' @param log Logical; should the frequency range be log scaled? Default is
-#' `FALSE`.
+#' @param scale String giving the frequency scale to use. Default is `hz`.
+#' Alternatives are `erb` (for the equivalent
+#' rectangular bandwidth scale), `mel` (for the Mel scale, using 1000 Hz
+#' as the corner frequency, following Fant 1968), or `logarithmic` (for
+#' log Hz).
 #' @param method String specifying the spectral estimation. Default is `fft`
 #' (for the fast discrete Fourier transform). The only other option is
 #' `multitaper`, in which case [multitaper::spec.mtm] is used to generate the
@@ -39,7 +42,8 @@
 #' @param lineWidth Number giving the line width to use for plotting
 #' the spectrum. Default is `1`.
 #' @param freq_axisLabel String giving the name of the label to print along the
-#' x-axis. Default is `Frequency (Hz)`.
+#' y-axis when plotting a spectrogram. Default is `NULL`, in which case the
+#' axis label will depend on the scale.
 #' @param energy_axisLabel String giving the name of the label to print along
 #' the y-axis. Default is `Sound pressure level (dB/Hz)`.
 #' @param mainTitle String giving a title to print at the top of the plot.
@@ -81,11 +85,11 @@
 #' draw_spectralslice(soundFile, time = 0.75)
 draw_spectralslice <- function(sound, time,
                                channel = 1, freqRange = NULL, energyRange = 60,
-                               log = FALSE, method = 'fft',
+                               scale = 'hz', method = 'fft',
                                multitaper_args = NULL,
                                windowLength = 0.005, windowShape = 'Gaussian',
                                color = 'black', lineWidth = 1,
-                               freq_axisLabel = 'Frequency (Hz)',
+                               freq_axisLabel = NULL,
                                energy_axisLabel = 'Sound pressure level (dB/Hz)',
                                mainTitle = '', mainTitleAlignment = 0,
                                highlight = NULL, draw_lines = NULL,
@@ -97,6 +101,18 @@ draw_spectralslice <- function(sound, time,
 
   if (!method %in% c('fft', 'multitaper')) stop(
     'method should be either fft or multitaper')
+
+  if (scale == 'log') scale <- 'logarithmic'
+  legal_scales <- c('hz', 'logarithmic', 'erb', 'mel')
+  if (!scale %in% legal_scales) {
+    stop('Possible scales are hz, logarithmic, erb, and mel')
+  }
+  if (is.null(freq_axisLabel)) {
+    if (scale == 'hz') freq_axisLabel <- 'Frequency (Hz)'
+    if (scale == 'logarithmic') freq_axisLabel <- 'Frequency (log Hz)'
+    if (scale == 'mel') freq_axisLabel <- 'Frequency (mel)'
+    if (scale == 'erb') freq_axisLabel <- 'Frequency (ERB)'
+  }
 
   legal_ws <- c('square', 'Hamming', 'Bartlett', 'Hanning', 'Gaussian',
                 'Blackman', 'Kaiser')
@@ -120,7 +136,7 @@ draw_spectralslice <- function(sound, time,
     winparam <- -1
   }
 
-  log <- ifelse(log, 'x', '')
+  log <- ifelse(scale == 'logarithmic', 'x', '')
 
   start <- time - (windowLength / 2)
   end <- time + (windowLength / 2)
@@ -131,7 +147,17 @@ draw_spectralslice <- function(sound, time,
   bit <- snd@bit
   sig <- snd@.Data[,channel]
 
-  if (is.null(freqRange)) freqRange <- c(0, sr / 2)
+  if (scale == 'erb') {
+    maxFreq <- soundgen::HzToERB(sr/2)
+  } else if (scale == 'mel') {
+    maxFreq <- 1000 / log(2) * log(1 + (sr/2) / 1000)
+  } else {
+    maxFreq <- sr / 2
+  }
+
+  if (is.null(freqRange)) {
+    freqRange <- c(0, maxFreq)
+  }
 
   if (method == 'fft') {
     sig <- sig / (2^(bit - 1) - 1)
@@ -154,7 +180,15 @@ draw_spectralslice <- function(sound, time,
                        dB = 10 * log10(spec$spec / 0.00002))
   }
 
-  spec <- spec[which(spec$hz > freqRange[1] & spec$hz < freqRange[2]),]
+  if (scale == 'erb') {
+    spec$freq <- soundgen::HzToERB(spec$hz)
+  } else if (scale == 'mel') {
+    spec$freq <- 1000 / log(2) * log(1 + spec$hz / 1000)
+  } else {
+    spec$freq <- spec$hz
+  }
+
+  spec <- spec[which(spec$freq > freqRange[1] & spec$freq < freqRange[2]),]
 
   graphics::par(...)
 
@@ -162,14 +196,14 @@ draw_spectralslice <- function(sound, time,
     highlight_f <- c()
     highlight_p <- c()
     for (int in 1:length(highlight$start)) {
-      freqs <- which(spec$hz > highlight$start[int] &
-                       spec$hz < highlight$end[int])
+      freqs <- which(spec$freq > highlight$start[int] &
+                       spec$freq < highlight$end[int])
       extrema <- zoo::na.approx(c(NA, NA, spec$dB),
                                 c(highlight$start[int], highlight$end[int],
                                   spec$hz))[1:2]
       highlight_f <- c(highlight_f, highlight$start[int],
-                       spec$hz[freqs], highlight$end[int],
-                       max(spec$hz[freqs] + 0.0001))
+                       spec$freq[freqs], highlight$end[int],
+                       max(spec$freq[freqs] + 0.0001))
       highlight_p <- c(highlight_p, extrema[1], spec$dB[freqs],
                        extrema[2], NA)
     }
@@ -180,7 +214,7 @@ draw_spectralslice <- function(sound, time,
     energyRange <- c(max(spec$dB) - energyRange, max(spec$dB))
   }
 
-  plot(spec$hz, spec$dB, type = 'l', xlab = freq_axisLabel,
+  plot(spec$freq, spec$dB, type = 'l', xlab = freq_axisLabel,
        ylab = energy_axisLabel, log = log, ylim = energyRange,
        col = color, lwd = lineWidth)
   graphics::mtext(mainTitle, side=3, line=2, adj=mainTitleAlignment)

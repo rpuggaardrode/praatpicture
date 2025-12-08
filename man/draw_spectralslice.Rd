@@ -10,14 +10,14 @@ draw_spectralslice(
   channel = 1,
   freqRange = NULL,
   energyRange = 60,
-  log = FALSE,
+  scale = "hz",
   method = "fft",
   multitaper_args = NULL,
   windowLength = 0.005,
   windowShape = "Gaussian",
   color = "black",
   lineWidth = 1,
-  freq_axisLabel = "Frequency (Hz)",
+  freq_axisLabel = NULL,
   energy_axisLabel = "Sound pressure level (dB/Hz)",
   mainTitle = "",
   mainTitleAlignment = 0,
@@ -50,8 +50,11 @@ two numbers is passed, these are used to exactly delimit the y-axis.
 Default is \code{60}, i.e. a dynamic range of 60 dB/Hz relative to the global
 maximum.}
 
-\item{log}{Logical; should the frequency range be log scaled? Default is
-\code{FALSE}.}
+\item{scale}{String giving the frequency scale to use. Default is \code{hz}.
+Alternatives are \code{erb} (for the equivalent
+rectangular bandwidth scale), \code{mel} (for the Mel scale, using 1000 Hz
+as the corner frequency, following Fant 1968), or \code{logarithmic} (for
+log Hz).}
 
 \item{method}{String specifying the spectral estimation. Default is \code{fft}
 (for the fast discrete Fourier transform). The only other option is
@@ -78,7 +81,8 @@ the spectrum. Default is \code{'black'}.}
 the spectrum. Default is \code{1}.}
 
 \item{freq_axisLabel}{String giving the name of the label to print along the
-x-axis. Default is \code{Frequency (Hz)}.}
+y-axis when plotting a spectrogram. Default is \code{NULL}, in which case the
+axis label will depend on the scale.}
 
 \item{energy_axisLabel}{String giving the name of the label to print along
 the y-axis. Default is \verb{Sound pressure level (dB/Hz)}.}

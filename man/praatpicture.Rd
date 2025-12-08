@@ -38,13 +38,14 @@ praatpicture(
   tg_color = "black",
   tg_highlight = NULL,
   spec_channel = NULL,
-  spec_freqRange = c(0, 5000),
+  spec_scale = "hz",
+  spec_freqRange = NULL,
   spec_windowLength = 0.005,
   spec_dynamicRange = 50,
   spec_timeStep = 1000,
   spec_windowShape = "Gaussian",
   spec_colors = c("white", "black"),
-  spec_axisLabel = "Frequency (Hz)",
+  spec_axisLabel = NULL,
   spec_highlight = NULL,
   pitch_timeStep = NULL,
   pitch_floor = 75,
@@ -153,9 +154,13 @@ available. Alternatively, if two channels are available, they will be named
 channels are named \code{Cn}, where \code{n} is the number of the channel. Alternatvely,
 a vector of strings can be provided with channel names. Default is \code{FALSE}.}
 
-\item{wave_energyRange}{Numeric vector of length 2 giving the desired energy
+\item{wave_energyRange}{Numeric vector giving the desired energy
 range (y-axis range) of waveform(s). Default is \code{NULL}, in which case the
-y-axis range is set to the lowest and highest value for each wave.}
+y-axis range is set to the lowest and highest value for each wave.
+If a vector of two values is passed for a multi-wave plot, these are
+recycled for each wave. Separate ranges can be set for each waveform by
+passing a vector of a length corresponding to twice the number of waves
+plotted.}
 
 \item{wave_axisDigits}{Numeric giving the number of digits to print for
 values along the y-axis of the waveform. Default is \code{3}. If \code{0} is passed,
@@ -242,8 +247,18 @@ should contain information about which intervals to highlight, using the
 generate the spectrogram. Default is \code{1}. Generating spectrograms from
 multiple channels is not currently possible with \code{praatpicture}.}
 
+\item{spec_scale}{String giving the frequency scale to use for plotting
+spectrograms. Default is \code{hz}. Alternatives are \code{erb} (for the equivalent
+rectangular bandwidth scale), \code{mel} (for the Mel scale, using 1000 Hz
+as the corner frequency, following Fant 1968), or \code{logarithmic} (for
+log Hz).}
+
 \item{spec_freqRange}{Vector of two integers giving the frequency range to be
-used for plotting spectrograms. Default is \code{c(0,5000)}.}
+used for plotting spectrograms. Default is \code{NULL}, in which case suitable
+ranges are chosen based on the frequency scale. For \code{hz}, the default is
+\code{c(0,5000)}; for \code{erb}, the default is \code{c(0.8,42)}; for \code{mel}, the default is
+\code{c(30,4400)}. The latter two correspond roughly to the human auditory
+frequency response.}
 
 \item{spec_windowLength}{Window length in seconds for generating spectrograms.
 Default is \code{0.005}.}
@@ -272,7 +287,8 @@ plotting the highest visible amplitude. Vectors with more than two color
 names can be used for plotting values in between in different colors.}
 
 \item{spec_axisLabel}{String giving the name of the label to print along the
-y-axis when plotting a spectrogram. Default is \code{Frequency (Hz)}.}
+y-axis when plotting a spectrogram. Default is \code{NULL}, in which case the
+axis label will depend on the scale.}
 
 \item{spec_highlight}{Named list giving parameters for differential
 highlighting of the spectrogram based on the time domain. This list
