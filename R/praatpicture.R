@@ -684,10 +684,10 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     }
     if (file.exists(paste0(fn, '.PitchTier'))) {
       ptfn <- paste0(fn, '.PitchTier')
-      pt <- rPraat::pt.read(ptfn)
+      pt <- rPraat::pt.read(ptfn, encoding = 'auto')
     } else if (file.exists(paste0(fn, '.Pitch'))) {
       ptfn <- paste0(fn, '.Pitch')
-      pt <- rPraat::pitch.read(ptfn)
+      pt <- rPraat::pitch.read(ptfn, encoding = 'auto')
       f <- c()
       for (i in 1:length(pt$frame)) f[i] <- pt$frame[[i]]$frequency[1]
       t <- pt$t
@@ -724,7 +724,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
   if ('formant' %in% frames | formant_plotOnSpec) {
     if (file.exists(paste0(fn, '.Formant'))) {
       fmfn <- paste0(fn, '.Formant')
-      fm <- rPraat::formant.read(fmfn)
+      fm <- rPraat::formant.read(fmfn, encoding = 'auto')
       fm <- rPraat::formant.toArray(fm)
       fm$conv2db <- TRUE
       mnf <- dim(fm$frequencyArray)[1]
@@ -779,7 +779,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
   if ('intensity' %in% frames | intensity_plotOnSpec | intensity_plotOnWave) {
     if (file.exists(paste0(fn, '.IntensityTier'))) {
       itfn <- paste0(fn, '.IntensityTier')
-      it <- rPraat::it.read(itfn)
+      it <- rPraat::it.read(itfn, encoding = 'auto')
     } else {
       if (!is.null(intensity_ssff)) {
         wit <- intensity_ssff

@@ -1,3 +1,8 @@
+# praatpicture 1.7.1
+* Fixed bug whereby Praat `.Pitch`, `.PitchTier`, `.Formant`, and 
+`.IntensityTier` files could not be read unless they were saved with UTF-8 
+encoding. 
+
 # praatpicture 1.7.0
 * Added the `spec_scale` argument to `praatpicture()`, and the `scale` argument
 to `draw_spectralslice()`. This allows for using different frequency scales

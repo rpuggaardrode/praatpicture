@@ -1,6 +1,6 @@
 Package: praatpicture
 Title: 'Praat Picture' Style Plots of Acoustic Data
-Version: 1.7.0
+Version: 1.7.1
 Authors@R: 
     person("Rasmus", "Puggaard-Rode", 
     email = "rasmus.puggaard-rode@ling-phil.ox.ac.uk", 
