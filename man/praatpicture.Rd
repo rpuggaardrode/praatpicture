@@ -164,16 +164,18 @@ plotted.}
 
 \item{wave_axisDigits}{Numeric giving the number of digits to print for
 values along the y-axis of the waveform. Default is \code{3}. If \code{0} is passed,
-the y-axis is suppressed. Note that this only applies when
-\code{min_max_only = TRUE}, as otherwise the look of the y-axis is determined
-entirely using \code{grDevices::axisTicks()}.}
+the y-axis is suppressed. Alternatively a vector of numbers, if different
+numbers should be used for different channels. Note that this only
+applies when \code{min_max_only = TRUE}, as otherwise the look of the y-axis is
+determined entirely using \code{grDevices::axisTicks()}.}
 
 \item{wave_color}{String giving the name of the color to be used for plotting
 the waveform. Default is \code{'black'}. Alternatively a vector of strings, if
 different colors should be used for different channels.}
 
 \item{wave_lineWidth}{Number giving the line width to use for plotting
-the waveform. Default is \code{1}.}
+the waveform. Default is \code{1}. Alternatively a vector of numbers, if
+different line widths should be used for different channels.}
 
 \item{wave_highlight}{Named list giving parameters for differential
 highlighting of the waveform based on the time domain. This list

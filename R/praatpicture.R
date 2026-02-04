@@ -61,14 +61,16 @@
 #' plotted.
 #' @param wave_axisDigits Numeric giving the number of digits to print for
 #' values along the y-axis of the waveform. Default is `3`. If `0` is passed,
-#' the y-axis is suppressed. Note that this only applies when
-#' `min_max_only = TRUE`, as otherwise the look of the y-axis is determined
-#' entirely using `grDevices::axisTicks()`.
+#' the y-axis is suppressed. Alternatively a vector of numbers, if different
+#' numbers should be used for different channels. Note that this only
+#' applies when `min_max_only = TRUE`, as otherwise the look of the y-axis is
+#' determined entirely using `grDevices::axisTicks()`.
 #' @param wave_color String giving the name of the color to be used for plotting
 #' the waveform. Default is `'black'`. Alternatively a vector of strings, if
 #' different colors should be used for different channels.
 #' @param wave_lineWidth Number giving the line width to use for plotting
-#' the waveform. Default is `1`.
+#' the waveform. Default is `1`. Alternatively a vector of numbers, if
+#' different line widths should be used for different channels.
 #' @param wave_highlight Named list giving parameters for differential
 #' highlighting of the waveform based on the time domain. This list
 #' should contain information about which parts of the plot to highlight, either

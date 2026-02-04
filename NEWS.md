@@ -1,3 +1,8 @@
+# praatpicture 1.7.2.
+* The line widths and number of axis digits can now be specified on a 
+per-channel basis for multi-channel files. Thanks to Matt Faytak for the
+suggestion!
+
 # praatpicture 1.7.1
 * Fixed bug whereby Praat `.Pitch`, `.PitchTier`, `.Formant`, and 
 `.IntensityTier` files could not be read unless they were saved with UTF-8 

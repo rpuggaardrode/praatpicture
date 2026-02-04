@@ -104,11 +104,13 @@
 #' the y-axis? Default is `FALSE`.
 #' @param axisDigits Numeric giving the number of digits to print for
 #' values along the y-axis of the waveform. Default is `3`. If `0` is passed,
-#' the y-axis is suppressed. Note that this only applies when
-#' `min_max_only = TRUE`, as otherwise the look of the y-axis is determined
-#' entirely using `grDevices::axisTicks()`.
+#' the y-axis is suppressed. Alternatively a vector of numbers, if different
+#' numbers should be used for different channels. Note that this only
+#' applies when `min_max_only = TRUE`, as otherwise the look of the y-axis is
+#' determined entirely using `grDevices::axisTicks()`.
 #' @param lineWidth Number giving the line width to use for plotting
-#' the waveform. Default is `1`.
+#' the waveform. Default is `1`. Alternatively a vector of numbers, if
+#' different line widths should be used for different channels.
 #' @param cn Vector of strings with channel names to be printed on the y-axis
 #' if `channelNames` is `TRUE`.
 #' @param min_max_only Logical; should only minimum and maximum values be given
@@ -160,6 +162,8 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
                      drawSize=1, speckleSize=1) {
 
   if (length(color) != nchan) color <- rep(color, nchan)
+  if (length(lineWidth) != nchan) lineWidth <- rep(lineWidth, nchan)
+  if (length(axisDigits) != nchan) axisDigits <- rep(axisDigits, nchan)
 
   if (tfrom0) {
     org_start <- start
@@ -189,11 +193,11 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
     } else {
       yax <- 'n'
       ytix <- c(currentEnergyRange[1], 0, currentEnergyRange[2])
-      if (axisDigits == 0) {
+      if (axisDigits[j] == 0) {
         ytixLabs <- rep('', 3)
       } else {
-        ytixLabs <- c(round(currentEnergyRange[1], axisDigits), 0,
-                      round(currentEnergyRange[2], axisDigits))
+        ytixLabs <- c(round(currentEnergyRange[1], axisDigits[j]), 0,
+                      round(currentEnergyRange[2], axisDigits[j]))
       }
     }
 
@@ -216,7 +220,7 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
     }
 
     plot(t[-1], sig[,j], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
-         col=color[j], lwd=lineWidth, ylim=currentEnergyRange)
+         col=color[j], lwd=lineWidth[j], ylim=currentEnergyRange)
 
     if (!is.null(highlight)) {
       if ('background' %in% names(highlight)) {
@@ -229,7 +233,7 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
       graphics::lines(highlight_t,
                       highlight_w,
                       col=highlight$color,
-                      lwd=lineWidth)
+                      lwd=lineWidth[j])
     }
 
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)
