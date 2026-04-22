@@ -1,4 +1,12 @@
-# praatpicture 1.7.2.
+# praatpicture 1.8.0
+* Added the option of a moving cursor showing the current position in the
+sound file when using `talking_praatpicture()`.
+* The various `*_highlight` arguments now accept nested lists, so that different
+parts of plots can be highlighted with different parameters. 
+(Thanks to Josie Riverin-Coutlée for pointing out weird behavior in previous
+versions when trying to do this!)
+
+# praatpicture 1.7.2
 * The line widths and number of axis digits can now be specified on a 
 per-channel basis for multi-channel files. Thanks to Matt Faytak for the
 suggestion!
