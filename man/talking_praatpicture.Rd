@@ -8,11 +8,18 @@ talking_praatpicture(
   sound,
   start = 0,
   end = 0,
+  frames = c("sound", "spectrogram", "TextGrid"),
+  draw_lines = list("formant", h = seq(0, 10000, by = 1000), lty = "dotted"),
   audio_start = start,
   audio_end = end,
   width = 1080,
   height = 720,
   pointsize = 25,
+  cursor = FALSE,
+  cursor_frameRate = 50,
+  cursor_color = "black",
+  cursor_lwd = 2,
+  verbose = TRUE,
   outputFile = "praatvid.mp4",
   useViewer = TRUE,
   ...
@@ -26,6 +33,27 @@ extension.}
 
 \item{end}{End time (in seconds) of desired plotted area. Default is \code{0}
 (= the entire file).}
+
+\item{frames}{String or vector of strings giving the frames that the plot
+should consist of. Default is \code{sound}, \code{spectrogram}, \code{TextGrid}. This
+requires a file with the extension \code{.TextGrid} and the same base name as the
+sound file. Other options are \code{pitch}, \code{formant}, and \code{intensity}. See
+details for more information.}
+
+\item{draw_lines}{Use for drawing straight lines on plot components. Takes
+an argument of type \code{list} which should contain a) a string giving the plot
+component to draw straight lines on, and b) arguments to pass on to
+\link[graphics:abline]{graphics::abline}. Should have a named argument \code{h} for horizontal lines,
+or \code{v} for vertical lines, or \code{a},\code{b} for the intercept and slope of the
+line otherwise. Alternatively a nested list can be passed if more (sets of)
+lines should be drawn. If multiple audio
+channels are plotted and lines should be added to one of these,
+use the channel identifier instead of a string giving the frame to draw on.
+The default value is \code{list('formant', h=seq(0,10000,by=1000), lty='dotted')}.
+According to Praat defaults, this means that if formants are plotted in a
+separate frame, horizontal dotted lines (\code{lty}) are shown at 1000 Hz
+intervals. To override this behavior, simply pass \code{draw_lines=NULL}.
+The argument is ignored if \code{cursor = TRUE}.}
 
 \item{audio_start}{Start time (in seconds) of embedded audio. By default
 it is the same as \code{start}, i.e. the embedded audio is the portion of the
@@ -43,6 +71,21 @@ pixels; default is \code{720}.}
 
 \item{pointsize}{Number; which point size should be used for text in the
 animation? Default is \code{25}. See \code{\link[grDevices:png]{grDevices::png()}} for more details.}
+
+\item{cursor}{Logical; should a moving cursor show the current position in
+the sound file? Default is \code{FALSE}.}
+
+\item{cursor_frameRate}{Number giving the desired number of frames per second
+for moving cursor. Default is \code{50}.}
+
+\item{cursor_color}{String giving the color of the moving cursor. Default is
+\code{black}.}
+
+\item{cursor_lwd}{Number giving the line width of the moving cursor. Default
+is \code{2}.}
+
+\item{verbose}{Logical; should status messages be printed in the console as
+figures are being generated? Default is \code{TRUE}.}
 
 \item{outputFile}{String giving the desired file name. Default is
 \code{praatvid.mp4}.}
