@@ -146,7 +146,8 @@
 #' done with the `start` and `end` arguments which must be numbers or numeric
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the argument
-#' `colors` (vector of strings, see `colors`).
+#' `colors` (vector of strings, see `colors`). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when plotting a spectrogram. Default is `NULL`, in which case the
 #' axis label will depend on the scale.
@@ -285,15 +286,73 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
                   col=fillCol, useRaster=useRaster, add=TRUE)
 
   if (!is.null(highlight)) {
-    hlFillCol <- grDevices::colorRampPalette(highlight$colors)
-    hlFillCol <- hlFillCol(length(levels) - 1)
-    for (int in 1:length(highlight$start)) {
-      times <- which(xVals > highlight$start[int] & xVals < highlight$end[int])
-      highlight_t <- xVals[times]
-      highlight_spec <- spec$spectrogram[times,]
-      graphics::image(x=highlight_t, y=yVals, z=highlight_spec,
-                      col=hlFillCol, useRaster=useRaster, add=TRUE)
+    if (any(sapply(highlight, is.list))) {
+      highlightLoopDepth <- sum(sapply(highlight, is.list))
+    } else {
+      highlightLoopDepth <- 1
     }
+    for (i in 1:highlightLoopDepth) {
+      if (any(sapply(highlight, is.list))) {
+        thisHL <- highlight[[i]]
+      } else {
+        thisHL <- highlight
+      }
+      hlFillCol <- grDevices::colorRampPalette(thisHL$colors)
+      hlFillCol <- hlFillCol(length(levels) - 1)
+      for (int in 1:length(thisHL$start)) {
+        times <- which(xVals > thisHL$start[int] & xVals < thisHL$end[int])
+        highlight_t <- xVals[times]
+        highlight_spec <- spec$spectrogram[times,]
+        graphics::image(x=highlight_t, y=yVals, z=highlight_spec,
+                        col=hlFillCol, useRaster=useRaster, add=TRUE)
+      }
+    }
+  }
+
+  create_fmtHighlighting <- function(highlight, fm, nf, dynamicRange, color,
+                                     drawSize, speckleSize) {
+    hl_t <- 0
+    if (nf > 1) {
+      hl_f <- array(rep(NA, nf), dim = c(nf,1))
+    } else {
+      hl_f <- NA
+    }
+    hl_i <- c()
+    for (int in 1:length(highlight$start)) {
+      times <- which(fm$t > highlight$start[int] & fm$t < highlight$end[int])
+      hl_t <- c(hl_t, fm$t[times], max(fm$t[times] + 0.0001))
+      if (nf > 1) {
+        hl_f <- cbind(hl_f, fm$frequencyArray[,times], rep(NA, nf))
+      } else {
+        hl_f <- c(hl_f, fm$frequencyArray[times], NA)
+      }
+      hl_i <- c(hl_i, db[times], 0)
+    }
+    if (any(highlight$start < start)) {
+      highlight$start[which(highlight$start < start)] <- start
+    }
+    if (any(highlight$end > end)) {
+      highlight$end[which(highlight$end > end)] <- end
+    }
+    if (dynamicRange != 0) {
+      hsubdr <- which(hl_i < max(db)-dynamicRange)
+      if (length(hsubdr) == 0) hsubdr <- 1
+    } else {
+      hsubdr <- 1
+    }
+
+    if (!'color' %in% names(highlight)) highlight$color <- color
+    if (!'drawSize' %in% names(highlight)) highlight$drawSize <- drawSize
+    if (!'speckleSize' %in% names(highlight)) highlight$speckleSize <-
+      speckleSize
+    if (length(highlight$color) == 1) highlight$color <-
+        rep(highlight$color, nf)
+    if (length(highlight$color) == 2 & nf > 2) highlight$color <- c(
+      rep(highlight$color[1], nf),
+        rep(highlight$color[2], nf))
+    if (length(highlight$color) == nf+1) highlight$color <- c(
+      highlight$color, rep(highlight$color[nf+1], nf-1))
+    return(list(params = highlight, hl_t = hl_t, hl_f = hl_f, subdr = hsubdr))
   }
 
   if (formant_plotOnSpec) {
@@ -314,42 +373,6 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
       if (length(subdr) == 0) subdr <- 1
     } else {
       subdr <- 1
-    }
-
-    if (!is.null(formant_highlight)) {
-      times <- which(fm$t > formant_highlight$start &
-                       fm$t < formant_highlight$end)
-      highlight_t <- fm$t[times]
-      if (nf > 1) {
-        highlight_f <- fm$frequencyArray[,times]
-      } else {
-        highlight_f <- fm$frequencyArray[times]
-      }
-      highlight_i <- db[times]
-      if (formant_dynamicRange != 0) {
-        hsubdr <- which(highlight_i < max(db)-formant_dynamicRange)
-        if (length(hsubdr) == 0) hsubdr <- 1
-      } else {
-        hsubdr <- 1
-      }
-
-      if (!'color' %in% names(formant_highlight)) formant_highlight$color <-
-        formant_color
-      if (!'drawSize' %in% names(formant_highlight)) {
-        formant_highlight$drawSize <- drawSize
-      }
-      if (!'speckleSize' %in% names(formant_highlight)) {
-        formant_highlight$speckleSize <- speckleSize
-      }
-      if (length(formant_highlight$color) == 1) formant_highlight$color <-
-        rep(formant_highlight$color, nf)
-      if (length(formant_highlight$color) == 2 & nf > 2) {
-        formant_highlight$color <- c(
-          rep(formant_highlight$color[1], nf),
-          rep(formant_highlight$color[2], nf))
-      }
-      if (length(formant_highlight$color) == nf+1) formant_highlight$color <- c(
-        formant_highlight$color, rep(formant_highlight$color[nf+1], nf-1))
     }
 
     if ('draw' %in% formant_plotType) {
@@ -378,36 +401,51 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
       }
 
       if (!is.null(formant_highlight)) {
-        if (nf > 1) {
-          if (length(formant_highlight$color) == nf*2) {
-            graphics::lines(highlight_t, highlight_f[1,],
-                            col=formant_highlight$color[nf+1],
-                            lwd=formant_highlight$drawSize+2)
-          }
-          graphics::lines(highlight_t, highlight_f[1,],
-                          col=formant_highlight$color[1],
-                          lwd=formant_highlight$drawSize)
-          for (i in 2:nf) {
-            if (length(formant_highlight$color) == nf*2) {
-              graphics::lines(highlight_t, highlight_f[i,],
-                              lwd=formant_highlight$drawSize+2,
-                              col=formant_highlight$color[nf+i])
-            }
-            graphics::lines(highlight_t, highlight_f[i,],
-                            col=formant_highlight$color[i],
-                            lwd=formant_highlight$drawSize)
-          }
+        if (any(sapply(formant_highlight, is.list))) {
+          highlightLoopDepth <- sum(sapply(formant_highlight, is.list))
         } else {
-          if (length(formant_highlight$color) == 2) {
-            graphics::lines(highlight_t, highlight_f,
-                            col=formant_highlight$color[2],
-                            lwd=formant_highlight$drawSize+2)
-          }
-          graphics::lines(highlight_t, highlight_f,
-                          col=formant_highlight$color[1],
-                          lwd=formant_highlight$drawSize)
+          highlightLoopDepth <- 1
         }
-
+        for (i in 1:highlightLoopDepth) {
+          if (any(sapply(formant_highlight, is.list))) {
+            thisHL <- create_fmtHighlighting(formant_highlight[[i]], fm, nf,
+                                          formant_dynamicRange, formant_color,
+                                          drawSize, speckleSize)
+          } else {
+            thisHL <- create_fmtHighlighting(formant_highlight, fm, nf,
+                                          formant_dynamicRange, formant_color,
+                                          drawSize, speckleSize)
+          }
+          if (nf > 1) {
+            if (length(thisHL$params$color) == nf*2) {
+              graphics::lines(thisHL$hl_t, thisHL$hl_f[1,],
+                              col=thisHL$params$color[nf+1],
+                              lwd=thisHL$params$drawSize+2)
+            }
+            graphics::lines(thisHL$hl_t, thisHL$hl_f[1,],
+                            col=thisHL$params$color[1],
+                            lwd=thisHL$params$drawSize)
+            for (j in 2:nf) {
+              if (length(thisHL$params$color) == nf*2) {
+                graphics::lines(thisHL$hl_t, thisHL$hl_f[j,],
+                                lwd=thisHL$params$drawSize+2,
+                                col=thisHL$params$color[nf+j])
+              }
+              graphics::lines(thisHL$hl_t, thisHL$hl_f[j,],
+                              col=thisHL$params$color[j],
+                              lwd=thisHL$params$drawSize)
+            }
+          } else {
+            if (length(thisHL$params$color) == 2) {
+              graphics::lines(thisHL$hl_t, thisHL$hl_f,
+                              col=thisHL$params$color[2],
+                              lwd=thisHL$params$drawSize+2)
+            }
+            graphics::lines(thisHL$hl_t, thisHL$hl_f,
+                            col=thisHL$params$color[1],
+                            lwd=thisHL$params$drawSize)
+          }
+        }
       }
     }
     if ('speckle' %in% formant_plotType) {
@@ -438,36 +476,57 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
       }
 
       if (!is.null(formant_highlight)) {
-        if (nf > 1) {
-          if (length(formant_highlight$color) == nf*2) {
-            graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr],
-                             col=formant_highlight$color[nf+1], pch=20,
-                             lwd=3, cex=formant_highlight$speckleSize)
-          }
-          graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr],
-                           col=formant_highlight$color[1], pch=20,
-                           cex=formant_highlight$speckleSize)
-          for (i in 2:nf) {
-            if (length(formant_highlight$color) == nf*2) {
-              graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr],
-                               col=formant_highlight$color[nf+i], pch=20,
-                               lwd=3, cex=formant_highlight$speckleSize)
-            }
-            graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr],
-                             col=formant_highlight$color[i], pch=20,
-                             cex=formant_highlight$speckleSize)
-          }
+        if (any(sapply(formant_highlight, is.list))) {
+          highlightLoopDepth <- sum(sapply(formant_highlight, is.list))
         } else {
-          if (length(formant_highlight$color) == 2) {
-            graphics::points(highlight_t[-hsubdr], highlight_f[-hsubdr],
-                             col=formant_highlight$color[2], pch=20,
-                             lwd=3, cex=formant_highlight$speckleSize)
-          }
-          graphics::points(highlight_t[-hsubdr], highlight_f[-hsubdr],
-                           col=formant_highlight$color[1], pch=20,
-                           cex=formant_highlight$speckleSize)
+          highlightLoopDepth <- 1
         }
-
+        for (i in 1:highlightLoopDepth) {
+          if (any(sapply(formant_highlight, is.list))) {
+            thisHL <- create_fmtHighlighting(formant_highlight[[i]], fm, nf,
+                                          formant_dynamicRange, formant_color,
+                                          drawSize, speckleSize)
+          } else {
+            thisHL <- create_fmtHighlighting(formant_highlight, fm, nf,
+                                          formant_dynamicRange, formant_color,
+                                          drawSize, speckleSize)
+          }
+          if (nf > 1) {
+            if (length(thisHL$params$color) == nf*2) {
+              graphics::points(thisHL$hl_t[-thisHL$subdr],
+                               thisHL$hl_f[1,-thisHL$subdr],
+                               col=thisHL$params$color[nf+1], pch=20,
+                               lwd=3, cex=thisHL$params$speckleSize)
+            }
+            graphics::points(thisHL$hl_t[-thisHL$subdr],
+                             thisHL$hl_f[1,-thisHL$subdr],
+                             col=thisHL$params$color[1], pch=20,
+                             cex=thisHL$params$speckleSize)
+            for (j in 2:nf) {
+              if (length(thisHL$params$color) == nf*2) {
+                graphics::points(thisHL$hl_t[-thisHL$subdr],
+                                 thisHL$hl_f[j,-thisHL$subdr],
+                                 col=thisHL$params$color[nf+j], pch=20,
+                                 lwd=3, cex=thisHL$params$speckleSize)
+              }
+              graphics::points(thisHL$hl_t[-thisHL$subdr],
+                               thisHL$hl_f[j,-thisHL$subdr],
+                               col=thisHL$params$color[j], pch=20,
+                               cex=thisHL$params$speckleSize)
+            }
+          } else {
+            if (length(thisHL$params$color) == 2) {
+              graphics::points(thisHL$hl_t[-thisHL$subdr],
+                               thisHL$hl_f[-thisHL$subdr],
+                               col=thisHL$params$color[2], pch=20,
+                               lwd=3, cex=thisHL$params$speckleSize)
+            }
+            graphics::points(thisHL$hl_t[-thisHL$subdr],
+                             thisHL$hl_f[-thisHL$subdr],
+                             col=thisHL$params$color[1], pch=20,
+                             cex=thisHL$params$speckleSize)
+          }
+        }
       }
 
     }

@@ -41,7 +41,8 @@
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `color`) and
 #' `drawSize` (integer), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param pitch_overlay Logical; is pitch also overlaid on the same
 #' plot frame? Default is `FALSE`.
 #'
@@ -66,33 +67,32 @@ intensity_overlay <- function(it, bottomRange, topRange, start, org_start=0,
   multiplier <- sRan / iRan
   it$i <- bottomRange + (it$i - range[1]) * multiplier
 
-  if (!is.null(highlight)) {
-    highlight_t <- c()
-    highlight_i <- c()
+  create_highlighting <- function(highlight, it) {
+    hl_t <- c()
+    hl_i <- c()
     for (int in 1:length(highlight$start)) {
-      times <- which(it$t > highlight$start[int] &
-                       it$t < highlight$end[int])
+      times <- which(it$t > highlight$start[int] & it$t < highlight$end[int])
       if (highlight$start[int] < start) {
         extrema <- zoo::na.approx(c(NA, it$i),
                                   c(highlight$end[int], it$t))
-        highlight_t <- c(highlight_t,
-                         it$t[times], highlight$end[int],
-                         max(it$t[times] + 0.0001))
-        highlight_i <- c(highlight_i, it$i[times], extrema[1], NA)
+        hl_t <- c(hl_t, it$t[times], highlight$end[int],
+                  max(it$t[times] + 0.0001))
+        hl_i <- c(hl_i, it$i[times], extrema[1], NA)
       } else {
         extrema <- zoo::na.approx(c(NA, NA, it$i),
-                                  c(highlight$start[int],
-                                    highlight$end[int],
+                                  c(highlight$start[int], highlight$end[int],
                                     it$t))[1:2]
-        highlight_t <- c(highlight_t, highlight$start[int],
-                         it$t[times], highlight$end[int],
-                         max(it$t[times] + 0.0001))
-        highlight_i <- c(highlight_i, extrema[1], it$i[times],
-                         extrema[2], NA)
+        hl_t <- c(hl_t, highlight$start[int], it$t[times], highlight$end[int],
+                  max(it$t[times] + 0.0001))
+        hl_i <- c(hl_i, extrema[1], it$i[times], extrema[2], NA)
       }
+    }
+    if (any(highlight$start < start)) {
+      highlight$start[which(highlight$start < start)] <- start
     }
     if (!'color' %in% names(highlight)) highlight$color <- color
     if (!'drawSize' %in% names(highlight)) highlight$drawSize <- drawSize
+    return(list(params = highlight, hl_t = hl_t, hl_i = hl_i))
   }
 
   if (length(color) == 2) graphics::lines(it$t, it$i,
@@ -100,14 +100,26 @@ intensity_overlay <- function(it, bottomRange, topRange, start, org_start=0,
                                                     col=color[2])
   graphics::lines(it$t, it$i, col=color[1], lwd=drawSize)
   if (!is.null(highlight)) {
-    if (length(highlight$color) == 2) {
-      graphics::lines(highlight_t, highlight_i,
-                      lwd=highlight$drawSize+2,
-                      col=highlight$color[2])
+    if (any(sapply(highlight, is.list))) {
+      highlightLoopDepth <- sum(sapply(highlight, is.list))
+    } else {
+      highlightLoopDepth <- 1
     }
-    graphics::lines(highlight_t, highlight_i,
-                    col=highlight$color,
-                    lwd=highlight$drawSize)
+    for (i in 1:highlightLoopDepth) {
+      if (any(sapply(highlight, is.list))) {
+        thisHL <- create_highlighting(highlight[[i]], it)
+      } else {
+        thisHL <- create_highlighting(highlight, it)
+      }
+      if (length(thisHL$params$color) == 2) {
+        graphics::lines(thisHL$hl_t, thisHL$hl_i,
+                        lwd=thisHL$params$drawSize+2,
+                        col=thisHL$params$color[2])
+      }
+      graphics::lines(thisHL$hl_t, thisHL$hl_i,
+                      col=thisHL$params$color,
+                      lwd=thisHL$params$drawSize)
+    }
   }
 
   iline <- c(3.5,1)

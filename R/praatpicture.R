@@ -78,7 +78,8 @@
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the argument
 #' `color` (string, see `wave_color`), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param tg_file Path of file to be used for plotting TextGrid. Default is
 #' `NULL`, in which case the function searches for a TextGrid sharing the same
 #' base name as `sound` with the `.TextGrid` extension.
@@ -125,7 +126,8 @@
 #' should contain information about which intervals to highlight, using the
 #' `tier` and `label`. Further contains the argument
 #' `color`, and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param spec_channel Numeric giving the channel that should be used to
 #' generate the spectrogram. Default is `1`. Generating spectrograms from
 #' multiple channels is not currently possible with `praatpicture`.
@@ -170,7 +172,8 @@
 #' done with the `start` and `end` arguments which must be numbers or numeric
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the argument
-#' `colors` (vector of strings, see `spec_colors`).
+#' `colors` (vector of strings, see `spec_colors`). Can be nested lists to
+#' highlight different parts of a figure in different ways.
 #' @param pitch_timeStep Measurement interval in seconds for tracking pitch.
 #' Default is `NULL`, in which case the measurement interval is equal to
 #' 0.75 / `pitch_floor`.
@@ -215,7 +218,8 @@
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `pitch_color`),
 #' `drawSize` or `speckleSize` (both numeric), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param formant_timeStep Measurement interval in seconds for tracking formants.
 #' Default is `NULL`, in which case the measurement interval is equal to
 #' `formant_windowLength` / 4.
@@ -260,7 +264,8 @@
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `formant_color`),
 #' `drawSize` or `speckleSize` (both numeric), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param intensity_timeStep Measurement interval in seconds for tracking
 #' intensity. Default is `NULL`, in which case the measurement interval is
 #' equal to 0.8 * `intensity_minPitch`.
@@ -292,7 +297,8 @@
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `intensity_color`) and
 #' `drawSize` (integer), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param time_axisLabel String giving the name of the label to print along
 #' the x-axis. Default is `NULL`, in which case `Time (s)` is printed if
 #' `tUnit = 's'` and `Time (ms)` is printed if `tUnit = 'ms'`.
@@ -303,7 +309,8 @@
 #' using the `tier` and `label` arguments to highlight based on information in
 #' a plotted TextGrid. Further contains the optional arguments `color`
 #' (a string), `drawSize` and `speckleSize` (both numeric), and `background`
-#' (a string specifying a background color). This argument is
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways. This argument is
 #' used to highlight all plot components, use the `*_highlight` arguments for
 #' highlighting individuals plot components.
 #' @param draw_lines Use for drawing straight lines on plot components. Takes
@@ -630,21 +637,71 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     if (is.null(formant_highlight)) formant_highlight <- highlight
     if (is.null(intensity_highlight)) intensity_highlight <- highlight
     if (is.null(spec_highlight)) {
-      spec_highlight <- highlight
-      spec_highlight$colors <- spec_colors
-      if ('color' %in% names(highlight)) spec_highlight$colors <-
+      if (any(sapply(highlight, is.list))) {
+        spec_highlight <- list()
+        for (i in 1:length(highlight)) {
+          spec_highlight[[i]] <- highlight[[i]]
+          spec_highlight[[i]]$colors <- spec_colors
+          if ('color' %in% names(highlight[[i]])) {
+            spec_highlight[[i]]$colors <-
+              c(spec_highlight[[i]]$colors[1], highlight[[i]]$color)
+          }
+          if ('background' %in% names(highlight[[i]])) {
+            spec_highlight[[i]]$colors <-
+              c(highlight[[i]]$background, spec_highlight[[i]]$colors[2])
+          }
+        }
+      } else {
+        spec_highlight <- highlight
+        spec_highlight$colors <- spec_colors
+        if ('color' %in% names(highlight)) spec_highlight$colors <-
           c(spec_highlight$colors[1], highlight$color)
-      if ('background' %in% names(highlight)) spec_highlight$colors <-
+        if ('background' %in% names(highlight)) spec_highlight$colors <-
           c(highlight$background, spec_highlight$colors[2])
+      }
     }
     if (is.null(tg_highlight)) tg_highlight <- highlight
   }
 
-  wave_highlight <- findStartEndVals(wave_highlight)
-  pitch_highlight <- findStartEndVals(pitch_highlight)
-  formant_highlight <- findStartEndVals(formant_highlight)
-  intensity_highlight <- findStartEndVals(intensity_highlight)
-  spec_highlight <- findStartEndVals(spec_highlight)
+  if (any(sapply(wave_highlight, is.list))) {
+    for (i in 1:length(wave_highlight)) {
+      wave_highlight[[i]] <- findStartEndVals(wave_highlight[[i]])
+    }
+  } else {
+    wave_highlight <- findStartEndVals(wave_highlight)
+  }
+
+  if (any(sapply(pitch_highlight, is.list))) {
+    for (i in 1:length(pitch_highlight)) {
+      pitch_highlight[[i]] <- findStartEndVals(pitch_highlight[[i]])
+    }
+  } else {
+    pitch_highlight <- findStartEndVals(pitch_highlight)
+  }
+
+  if (any(sapply(formant_highlight, is.list))) {
+    for (i in 1:length(formant_highlight)) {
+      formant_highlight[[i]] <- findStartEndVals(formant_highlight[[i]])
+    }
+  } else {
+    formant_highlight <- findStartEndVals(formant_highlight)
+  }
+
+  if (any(sapply(intensity_highlight, is.list))) {
+    for (i in 1:length(intensity_highlight)) {
+      intensity_highlight[[i]] <- findStartEndVals(intensity_highlight[[i]])
+    }
+  } else {
+    intensity_highlight <- findStartEndVals(intensity_highlight)
+  }
+
+  if (any(sapply(spec_highlight, is.list))) {
+    for (i in 1:length(spec_highlight)) {
+      spec_highlight[[i]] <- findStartEndVals(spec_highlight[[i]])
+    }
+  } else {
+    spec_highlight <- findStartEndVals(spec_highlight)
+  }
 
   if ('spectrogram' %in% frames) {
     if (is.null(spec_freqRange)) {

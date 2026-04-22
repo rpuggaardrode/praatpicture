@@ -37,7 +37,8 @@
 #' should contain information about which intervals to highlight, using the
 #' `tier` and `label`. Further contains the argument
 #' `color`, and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -133,29 +134,41 @@ tgplot <- function(tg, t, sr, start, end, tiers=1, tfrom0=TRUE, tierNames=TRUE,
     }
     if (tierNames) graphics::mtext(tname, side=2, las=2, line=0.6, cex=0.8)
     if (!is.null(highlight)) {
-      if ('tier' %in% names(highlight)) {
-        if (tier == highlight$tier | tg[[tier]]$name == highlight$tier) {
-          match <- which(grepl(highlight$label, lab))
-          lab_highlight <- lab[match]
-          t1_highlight <- t1[match]
-          t2_highlight <- t2[match]
-          if ('background' %in% names(highlight)) {
-            graphics::rect(t1_highlight,
-                           -10,
-                           t2_highlight,
-                           10,
-                           col = highlight$background, border = NA)
+      if (any(sapply(highlight, is.list))) {
+        highlightLoopDepth <- sum(sapply(highlight, is.list))
+      } else {
+        highlightLoopDepth <- 1
+      }
+      for (j in 1:highlightLoopDepth) {
+        if (any(sapply(highlight, is.list))) {
+          thisHL <- highlight[[j]]
+        } else {
+          thisHL <- highlight
+        }
+        if ('tier' %in% names(thisHL)) {
+          if (tier == thisHL$tier | tg[[tier]]$name == thisHL$tier) {
+            match <- which(grepl(thisHL$label, lab))
+            lab_highlight <- lab[match]
+            t1_highlight <- t1[match]
+            t2_highlight <- t2[match]
+            if ('background' %in% names(thisHL)) {
+              graphics::rect(t1_highlight,
+                             -10,
+                             t2_highlight,
+                             10,
+                             col = thisHL$background, border = NA)
+            }
+            if (alignment[[i]]=='central') graphics::text(
+              t1_highlight+(t2_highlight-t1_highlight)/2, 5, lab_highlight,
+              col=thisHL$color, adj=c(0.5,0.5))
+            if (alignment[[i]]=='left') graphics::text(
+              t1_highlight, 5, lab_highlight, pos=4, col=thisHL$color,
+              adj=c(0.5,0.5))
+            if (alignment[[i]]=='right') graphics::text(
+              t2_highlight, 5, lab_highlight, pos=2, col=thisHL$color,
+              adj=c(0.5, 0.5))
+            graphics::abline(v=line_vec)
           }
-          if (alignment[[i]]=='central') graphics::text(
-            t1_highlight+(t2_highlight-t1_highlight)/2, 5, lab_highlight,
-            col=highlight$color, adj=c(0.5,0.5))
-          if (alignment[[i]]=='left') graphics::text(
-            t1_highlight, 5, lab_highlight, pos=4, col=highlight$color,
-            adj=c(0.5,0.5))
-          if (alignment[[i]]=='right') graphics::text(
-            t2_highlight, 5, lab_highlight, pos=2, col=highlight$color,
-            adj=c(0.5, 0.5))
-          graphics::abline(v=line_vec)
         }
       }
     }

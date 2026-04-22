@@ -74,7 +74,8 @@ vectors, or using the \code{tier} and \code{label} arguments to highlight based 
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{color}) and
 \code{drawSize} (integer), and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{axisLabel}{String giving the name of the label to print along
 the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}

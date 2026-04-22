@@ -66,7 +66,8 @@ highlighting of TextGrid intervals. This list
 should contain information about which intervals to highlight, using the
 \code{tier} and \code{label}. Further contains the argument
 \code{color}, and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

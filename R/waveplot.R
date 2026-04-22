@@ -124,7 +124,8 @@
 #' vectors, or using the `tier` and `label` arguments to highlight based on
 #' information in a plotted TextGrid. Further contains the argument
 #' `color` (string, see `color`), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param drawSize Number indicating the line width of plot components where
 #' the `_plotType` is `'draw'` (i.e., pitch, formants, or intensity rendered as
 #' line plots). Default is `1`. Controls the `lwd` argument of
@@ -201,14 +202,14 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
       }
     }
 
-    if (!is.null(highlight)) {
-      highlight_t <- c()
-      highlight_w <- c()
+    create_highlighting <- function(highlight, sig, t) {
+      hl_t <- c()
+      hl_w <- c()
       for (int in 1:length(highlight$start)) {
         times <- which(t > highlight$start[int] & t < highlight$end[int])
-        highlight_t <- c(highlight_t, t[times[-length(times)]+1],
-                         max(t[times] + 0.0001))
-        highlight_w <- c(highlight_w, sig[times[-length(times)],j], NA)
+        hl_t <- c(hl_t, t[times[-length(times)]+1],
+                  max(t[times] + 0.0001))
+        hl_w <- c(hl_w, sig[times[-length(times)],j], NA)
       }
       if (any(highlight$start < t[1])) {
         highlight$start[which(highlight$start < t[1])] <- t[1]
@@ -217,23 +218,36 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
         highlight$end[which(highlight$end > max(t))] <- max(t)
       }
       if (!'color' %in% names(highlight)) highlight$color <- color
+      return(list(params = highlight, hl_t = hl_t, hl_w = hl_w))
     }
 
     plot(t[-1], sig[,j], type='l', xlab='', xaxt='n', ylab='', yaxt=yax,
          col=color[j], lwd=lineWidth[j], ylim=currentEnergyRange)
 
     if (!is.null(highlight)) {
-      if ('background' %in% names(highlight)) {
-        graphics::rect(highlight$start,
-                       -abs(currentEnergyRange[1] * 2),
-                       highlight$end,
-                       currentEnergyRange[2] * 2,
-                       col = highlight$background, border = NA)
+      if (any(sapply(highlight, is.list))) {
+        highlightLoopDepth <- sum(sapply(highlight, is.list))
+      } else {
+        highlightLoopDepth <- 1
       }
-      graphics::lines(highlight_t,
-                      highlight_w,
-                      col=highlight$color,
-                      lwd=lineWidth[j])
+      for (i in 1:highlightLoopDepth) {
+        if (any(sapply(highlight, is.list))) {
+          thisHL <- create_highlighting(highlight[[i]], sig, t)
+        } else {
+          thisHL <- create_highlighting(highlight, sig, t)
+        }
+        if ('background' %in% names(thisHL$params)) {
+          graphics::rect(thisHL$params$start,
+                         -abs(currentEnergyRange[1] * 2),
+                         thisHL$params$end,
+                         currentEnergyRange[2] * 2,
+                         col = thisHL$params$background, border = NA)
+        }
+        graphics::lines(thisHL$hl_t,
+                        thisHL$hl_w,
+                        col=thisHL$params$color,
+                        lwd=lineWidth[j])
+      }
     }
 
     if (yax == 'n' & !min_max_only[ind]) graphics::axis(2, at=ytix)

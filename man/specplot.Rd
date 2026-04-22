@@ -232,7 +232,8 @@ should contain information about which parts of the plot to highlight, either
 done with the \code{start} and \code{end} arguments which must be numbers or numeric
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the argument
-\code{colors} (vector of strings, see \code{colors}).}
+\code{colors} (vector of strings, see \code{colors}). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when plotting a spectrogram. Default is \code{NULL}, in which case the

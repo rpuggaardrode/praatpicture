@@ -54,7 +54,8 @@
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `color`),
 #' `drawSize` or `speckleSize` (both numeric), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param intensity_overlay Logical; is intensity also overlaid on the same
 #' plot frame? Default is `FALSE`.
 #'
@@ -84,58 +85,68 @@ pitch_overlay <- function(pt, bottomRange, topRange, start, org_start=0,
   multiplier <- sRan / pRan
   pt$f <- bottomRange + (pt$f - pfr[1]) * multiplier
 
-  if (!is.null(highlight)) {
-    highlight_tSpeckle <- c()
-    highlight_fSpeckle <- c()
-    highlight_tDraw <- c()
-    highlight_fDraw <- c()
+  create_highlighting <- function(highlight, pt) {
+    tSpeckle <- c()
+    fSpeckle <- c()
+    tDraw <- c()
+    fDraw <- c()
     for (int in 1:length(highlight$start)) {
-      times <- which(pt$t > highlight$start[int] &
-                       pt$t < highlight$end[int])
-      highlight_tSpeckle <- c(highlight_tSpeckle, pt$t[times],
-                              max(pt$t[times] + 0.0001))
-      highlight_fSpeckle <- c(highlight_fSpeckle, pt$f[times], NA)
+      times <- which(pt$t > highlight$start[int] & pt$t < highlight$end[int])
+      tSpeckle <- c(tSpeckle, pt$t[times], max(pt$t[times] + 0.0001))
+      fSpeckle <- c(fSpeckle, pt$f[times], NA)
       if (highlight$start[int] < start) {
         extrema <- zoo::na.approx(c(NA, pt$f),
                                   c(highlight$end[int], pt$t))
-        highlight_tDraw <- c(highlight_tDraw,
-                             pt$t[times], highlight$end[int],
-                             max(pt$t[times] + 0.0001))
-        highlight_fDraw <- c(highlight_fDraw, pt$f[times], extrema[1], NA)
+        tDraw <- c(tDraw, pt$t[times], highlight$end[int],
+                   max(pt$t[times] + 0.0001))
+        fDraw <- c(fDraw, pt$f[times], extrema[1], NA)
       } else {
         extrema <- zoo::na.approx(c(NA, NA, pt$f),
-                                  c(highlight$start[int],
-                                    highlight$end[int],
+                                  c(highlight$start[int], highlight$end[int],
                                     pt$t))[1:2]
-        highlight_tDraw <- c(highlight_tDraw, highlight$start[int],
-                             pt$t[times], highlight$end[int],
-                             max(pt$t[times] + 0.0001))
-        highlight_fDraw <- c(highlight_fDraw, extrema[1], pt$f[times],
-                             extrema[2], NA)
+        tDraw <- c(tDraw, highlight$start[int], pt$t[times], highlight$end[int],
+                   max(pt$t[times] + 0.0001))
+        fDraw <- c(fDraw, extrema[1], pt$f[times], extrema[2], NA)
+      }
+      if (any(highlight$start < start)) {
+        highlight$start[which(highlight$start < start)] <- start
       }
     }
-
-    if (!'color' %in% names(highlight)) highlight$color <-
-      color
-    if (!'drawSize' %in% names(highlight)) highlight$drawSize <-
-      drawSize
+    if (!'color' %in% names(highlight)) highlight$color <- color
+    if (!'drawSize' %in% names(highlight)) highlight$drawSize <- drawSize
     if (!'speckleSize' %in% names(highlight)) highlight$speckleSize <-
       speckleSize
+
+    return(list(params = highlight, tSpeckle = tSpeckle, fSpeckle = fSpeckle,
+                tDraw = tDraw, fDraw = fDraw))
   }
+
 
   if ('draw' %in% plotType) {
     if (length(color) == 2) graphics::lines(pt$t, pt$f,
                                             lwd=drawSize+2, col=color[2])
     graphics::lines(pt$t, pt$f, lwd=drawSize, col=color[1])
     if (!is.null(highlight)) {
-      if (length(highlight$color) == 2) {
-        graphics::lines(highlight_tDraw, highlight_fDraw,
-                        lwd=highlight$drawSize+2,
-                        col=highlight$color[2])
+      if (any(sapply(highlight, is.list))) {
+        highlightLoopDepth <- sum(sapply(highlight, is.list))
+      } else {
+        highlightLoopDepth <- 1
       }
-      graphics::lines(highlight_tDraw, highlight_fDraw,
-                      col=highlight$color[1],
-                      lwd=highlight$drawSize)
+      for (i in 1:highlightLoopDepth) {
+        if (any(sapply(highlight, is.list))) {
+          thisHL <- create_highlighting(highlight[[i]], pt)
+        } else {
+          thisHL <- create_highlighting(highlight, pt)
+        }
+        if (length(thisHL$params$color) == 2) {
+          graphics::lines(thisHL$tDraw, thisHL$fDraw,
+                          lwd=thisHL$params$drawSize+2,
+                          col=thisHL$params$color[2])
+        }
+        graphics::lines(thisHL$tDraw, thisHL$fDraw,
+                        col=thisHL$params$color[1],
+                        lwd=thisHL$params$drawSize)
+      }
     }
   }
   if ('speckle' %in% plotType) {
@@ -145,15 +156,27 @@ pitch_overlay <- function(pt, bottomRange, topRange, start, org_start=0,
     graphics::points(pt$t, pt$f, pch=20, col=color[1],
                      cex=speckleSize)
     if (!is.null(highlight)) {
-      if (length(highlight$color == 2)) {
-        graphics::points(highlight_tSpeckle, highlight_fSpeckle,
-                         lwd=3, pch=20,
-                         col=highlight$color[2],
-                         cex=highlight$speckleSize)
+      if (any(sapply(highlight, is.list))) {
+        highlightLoopDepth <- sum(sapply(highlight, is.list))
+      } else {
+        highlightLoopDepth <- 1
       }
-      graphics::points(highlight_tSpeckle, highlight_fSpeckle, pch=20,
-                       col=highlight$color[1],
-                       cex=highlight$speckleSize)
+      for (i in 1:highlightLoopDepth) {
+        if (any(sapply(highlight, is.list))) {
+          thisHL <- create_highlighting(highlight[[i]], pt)
+        } else {
+          thisHL <- create_highlighting(highlight, pt)
+        }
+        if (length(highlight$color == 2)) {
+          graphics::points(thisHL$tSpeckle, thisHL$fSpeckle,
+                           lwd=3, pch=20,
+                           col=thisHL$params$color[2],
+                           cex=thisHL$params$speckleSize)
+        }
+        graphics::points(thisHL$tSpeckle, thisHL$fSpeckle, pch=20,
+                         col=thisHL$params$color[1],
+                         cex=thisHL$params$speckleSize)
+      }
     }
   }
 

@@ -54,7 +54,8 @@
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `color`),
 #' `drawSize` or `speckleSize` (both numeric), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when printing a pitch track. Default is `NULL`, in which case the
 #' axis label will depend on the scale.
@@ -105,32 +106,28 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     start <- 0
   }
 
-  if (!is.null(highlight)) {
-    highlight_tSpeckle <- c()
-    highlight_fSpeckle <- c()
-    highlight_tDraw <- c()
-    highlight_fDraw <- c()
+  create_highlighting <- function(highlight, pt) {
+    tSpeckle <- c()
+    fSpeckle <- c()
+    tDraw <- c()
+    fDraw <- c()
     for (int in 1:length(highlight$start)) {
       times <- which(pt$t > highlight$start[int] & pt$t < highlight$end[int])
-      highlight_tSpeckle <- c(highlight_tSpeckle, pt$t[times],
-                              max(pt$t[times] + 0.0001))
-      highlight_fSpeckle <- c(highlight_fSpeckle, pt$f[times], NA)
+      tSpeckle <- c(tSpeckle, pt$t[times], max(pt$t[times] + 0.0001))
+      fSpeckle <- c(fSpeckle, pt$f[times], NA)
       if (highlight$start[int] < start) {
         extrema <- zoo::na.approx(c(NA, pt$f),
                                   c(highlight$end[int], pt$t))
-        highlight_tDraw <- c(highlight_tDraw,
-                         pt$t[times], highlight$end[int],
-                         max(pt$t[times] + 0.0001))
-        highlight_fDraw <- c(highlight_fDraw, pt$f[times], extrema[1], NA)
+        tDraw <- c(tDraw, pt$t[times], highlight$end[int],
+                   max(pt$t[times] + 0.0001))
+        fDraw <- c(fDraw, pt$f[times], extrema[1], NA)
       } else {
         extrema <- zoo::na.approx(c(NA, NA, pt$f),
                                   c(highlight$start[int], highlight$end[int],
                                     pt$t))[1:2]
-        highlight_tDraw <- c(highlight_tDraw, highlight$start[int],
-                         pt$t[times], highlight$end[int],
-                         max(pt$t[times] + 0.0001))
-        highlight_fDraw <- c(highlight_fDraw, extrema[1], pt$f[times],
-                             extrema[2], NA)
+        tDraw <- c(tDraw, highlight$start[int], pt$t[times], highlight$end[int],
+                   max(pt$t[times] + 0.0001))
+        fDraw <- c(fDraw, extrema[1], pt$f[times], extrema[2], NA)
       }
       if (any(highlight$start < start)) {
         highlight$start[which(highlight$start < start)] <- start
@@ -144,6 +141,9 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     if (!'drawSize' %in% names(highlight)) highlight$drawSize <- drawSize
     if (!'speckleSize' %in% names(highlight)) highlight$speckleSize <-
       speckleSize
+
+    return(list(params = highlight, tSpeckle = tSpeckle, fSpeckle = fSpeckle,
+                tDraw = tDraw, fDraw = fDraw))
   }
 
   if ('draw' %in% plotType) {
@@ -160,18 +160,32 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     }
 
     if (!is.null(highlight)) {
-      if ('background' %in% names(highlight)) {
-        graphics::rect(highlight$start,
-                       freqRange[1] - freqRange[2] * 2,
-                       highlight$end,
-                       freqRange[2] + freqRange[2] * 2,
-                       col = highlight$background, border = NA)
+      if (any(sapply(highlight, is.list))) {
+        highlightLoopDepth <- sum(sapply(highlight, is.list))
+      } else {
+        highlightLoopDepth <- 1
       }
-      graphics::lines(highlight_tDraw, highlight_fDraw, col=highlight$color,
-                      lwd=highlight$drawSize)
-      if ('speckle' %in% plotType) {
-        graphics::points(highlight_tSpeckle, highlight_fSpeckle, pch=20,
-                         col=highlight$color, cex=highlight$speckleSize)
+      for (i in 1:highlightLoopDepth) {
+        if (any(sapply(highlight, is.list))) {
+          thisHL <- create_highlighting(highlight[[i]], pt)
+        } else {
+          thisHL <- create_highlighting(highlight, pt)
+        }
+        if ('background' %in% names(thisHL$params)) {
+          graphics::rect(thisHL$params$start,
+                         freqRange[1] - freqRange[2] * 2,
+                         thisHL$params$end,
+                         freqRange[2] + freqRange[2] * 2,
+                         col = thisHL$params$background, border = NA)
+        }
+        graphics::lines(thisHL$tDraw, thisHL$fDraw,
+                        col=thisHL$params$color,
+                        lwd=thisHL$params$drawSize)
+        if ('speckle' %in% plotType) {
+          graphics::points(thisHL$tSpeckle, thisHL$fSpeckle, pch=20,
+                           col=thisHL$params$color,
+                           cex=thisHL$params$speckleSize)
+        }
       }
     }
 
@@ -194,19 +208,31 @@ pitchplot <- function(pt, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                                             tick=F)
 
       if (!is.null(highlight)) {
-        if ('background' %in% names(highlight)) {
-          graphics::rect(highlight$start,
-                         freqRange[1] - freqRange[2] * 2,
-                         highlight$end,
-                         freqRange[2] + freqRange[2] * 2,
-                         col = highlight$background, border = NA)
+        if (any(sapply(highlight, is.list))) {
+          highlightLoopDepth <- sum(sapply(highlight, is.list))
+        } else {
+          highlightLoopDepth <- 1
         }
-        graphics::points(highlight_tSpeckle, highlight_fSpeckle,
-                         col=highlight$color, pch=20,
-                        cex=highlight$speckleSize)
-        if ('draw' %in% plotType) {
-          graphics::lines(highlight_tDraw, highlight_fDraw, col=highlight$color,
-                           lwd=highlight$drawSize)
+        for (i in 1:highlightLoopDepth) {
+          if (any(sapply(highlight, is.list))) {
+            thisHL <- create_highlighting(highlight[[i]], pt)
+          } else {
+            thisHL <- create_highlighting(highlight, pt)
+          }
+          if ('background' %in% names(thisHL$params)) {
+            graphics::rect(thisHL$params$start,
+                           freqRange[1] - freqRange[2] * 2,
+                           thisHL$params$end,
+                           freqRange[2] + freqRange[2] * 2,
+                           col = thisHL$params$background, border = NA)
+          }
+          graphics::points(thisHL$tSpeckle, thisHL$fSpeckle,
+                           col=thisHL$params$color, pch=20,
+                           cex=thisHL$params$speckleSize)
+          if ('draw' %in% plotType) {
+            graphics::lines(thisHL$tDraw, thisHL$fDraw, col=thisHL$params$color,
+                            lwd=thisHL$params$drawSize)
+          }
         }
       }
 

@@ -184,7 +184,8 @@ done with the \code{start} and \code{end} arguments which must be numbers or num
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the argument
 \code{color} (string, see \code{wave_color}), and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{tg_obj}{A TextGrid object returned by the \code{\link[=make_TextGrid]{make_TextGrid()}} function.}
 
@@ -243,7 +244,8 @@ highlighting of TextGrid intervals. This list
 should contain information about which intervals to highlight, using the
 \code{tier} and \code{label}. Further contains the argument
 \code{color}, and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{spec_channel}{Numeric giving the channel that should be used to
 generate the spectrogram. Default is \code{1}. Generating spectrograms from
@@ -298,7 +300,8 @@ should contain information about which parts of the plot to highlight, either
 done with the \code{start} and \code{end} arguments which must be numbers or numeric
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the argument
-\code{colors} (vector of strings, see \code{spec_colors}).}
+\code{colors} (vector of strings, see \code{spec_colors}). Can be nested lists to
+highlight different parts of a figure in different ways.}
 
 \item{pitch_timeStep}{Measurement interval in seconds for tracking pitch.
 Default is \code{NULL}, in which case the measurement interval is equal to
@@ -356,7 +359,8 @@ vectors, or using the \code{tier} and \code{label} arguments to highlight based 
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{pitch_color}),
 \code{drawSize} or \code{speckleSize} (both numeric), and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{formant_timeStep}{Measurement interval in seconds for tracking formants.
 Default is \code{NULL}, in which case the measurement interval is equal to
@@ -413,7 +417,8 @@ vectors, or using the \code{tier} and \code{label} arguments to highlight based 
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{formant_color}),
 \code{drawSize} or \code{speckleSize} (both numeric), and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{intensity_timeStep}{Measurement interval in seconds for tracking
 intensity. Default is \code{NULL}, in which case the measurement interval is
@@ -454,7 +459,8 @@ vectors, or using the \code{tier} and \code{label} arguments to highlight based 
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{intensity_color}) and
 \code{drawSize} (integer), and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{time_axisLabel}{String giving the name of the label to print along
 the x-axis. Default is \code{NULL}, in which case \code{Time (s)} is printed if
@@ -467,7 +473,8 @@ information about which parts of the plot to highlight, either done with the
 using the \code{tier} and \code{label} arguments to highlight based on information in
 a plotted TextGrid. Further contains the optional arguments \code{color}
 (a string), \code{drawSize} and \code{speckleSize} (both numeric), and \code{background}
-(a string specifying a background color). This argument is
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways. This argument is
 used to highlight all plot components, use the \verb{*_highlight} arguments for
 highlighting individuals plot components.}
 

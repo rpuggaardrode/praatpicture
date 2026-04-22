@@ -54,7 +54,8 @@
 #' information in a plotted TextGrid. Further contains the optional arguments
 #' `color` (string or vector of strings, see `color`),
 #' `drawSize` or `speckleSize` (both numeric), and `background`
-#' (a string specifying a background color).
+#' (a string specifying a background color). Can be nested lists to highlight
+#' different parts of a figure in different ways.
 #' @param axisLabel String giving the name of the label to print along the
 #' y-axis when plotting formants. Default is `Frequency (Hz)`.
 #' @param drawSize Number indicating the line width if
@@ -113,23 +114,23 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     subdr <- 1
   }
 
-  if (!is.null(highlight)) {
-    highlight_t <- 0
+  create_highlighting <- function(highlight, fm, nf, dynamicRange) {
+    hl_t <- 0
     if (nf > 1) {
-      highlight_f <- array(rep(NA, nf), dim = c(nf,1))
+      hl_f <- array(rep(NA, nf), dim = c(nf,1))
     } else {
-      highlight_f <- NA
+      hl_f <- NA
     }
-    highlight_i <- c()
+    hl_i <- c()
     for (int in 1:length(highlight$start)) {
       times <- which(fm$t > highlight$start[int] & fm$t < highlight$end[int])
-      highlight_t <- c(highlight_t, fm$t[times], max(fm$t[times] + 0.0001))
+      hl_t <- c(hl_t, fm$t[times], max(fm$t[times] + 0.0001))
       if (nf > 1) {
-        highlight_f <- cbind(highlight_f, fm$frequencyArray[,times], rep(NA, nf))
+        hl_f <- cbind(hl_f, fm$frequencyArray[,times], rep(NA, nf))
       } else {
-        highlight_f <- c(highlight_f, fm$frequencyArray[times], NA)
+        hl_f <- c(hl_f, fm$frequencyArray[times], NA)
       }
-      highlight_i <- c(highlight_i, db[times], 0)
+      hl_i <- c(hl_i, db[times], 0)
     }
     if (any(highlight$start < start)) {
       highlight$start[which(highlight$start < start)] <- start
@@ -139,7 +140,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     }
 
     if (dynamicRange != 0) {
-      hsubdr <- which(highlight_i < max(db)-dynamicRange)
+      hsubdr <- which(hl_i < max(db)-dynamicRange)
       if (length(hsubdr) == 0) hsubdr <- 1
     } else {
       hsubdr <- 1
@@ -151,6 +152,7 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       speckleSize
     if (length(highlight$color) == 1) highlight$color <-
       rep(highlight$color, nf)
+    return(list(params = highlight, hl_t = hl_t, hl_f = hl_f, subdr = hsubdr))
   }
 
   s <- freqRange[1]:freqRange[2]
@@ -190,36 +192,56 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     }
 
     if (!is.null(highlight)) {
-      if ('background' %in% names(highlight)) {
-        graphics::rect(highlight$start,
-                       freqRange[1] - freqRange[2] * 2,
-                       highlight$end,
-                       freqRange[2] + freqRange[2] * 2,
-                       col = highlight$background, border = NA)
-      }
-      if (nf > 1) {
-        graphics::lines(highlight_t, highlight_f[1,], col=highlight$color[1],
-                        lwd=highlight$drawSize)
-        for (i in 2:nf) {
-          graphics::lines(highlight_t, highlight_f[i,],
-                          col=highlight$color[i], lwd=highlight$drawSize)
-        }
+      if (any(sapply(highlight, is.list))) {
+        highlightLoopDepth <- sum(sapply(highlight, is.list))
       } else {
-        graphics::lines(highlight_t, highlight_f, col=highlight$color[1],
-                        lwd=highlight$drawSize)
+        highlightLoopDepth <- 1
       }
-
-      if ('speckle' %in% plotType) {
+      for (i in 1:highlightLoopDepth) {
+        if (any(sapply(highlight, is.list))) {
+          thisHL <- create_highlighting(highlight[[i]], fm, nf, dynamicRange)
+        } else {
+          thisHL <- create_highlighting(highlight, fm, nf, dynamicRange)
+        }
+        if ('background' %in% names(thisHL$params)) {
+          graphics::rect(thisHL$params$start,
+                         freqRange[1] - freqRange[2] * 2,
+                         thisHL$params$end,
+                         freqRange[2] + freqRange[2] * 2,
+                         col = thisHL$params$background, border = NA)
+        }
         if (nf > 1) {
-          graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
-                           col=highlight$color[1], cex=highlight$speckleSize)
-          for (i in 2:nf) {
-            graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
-                             col=highlight$color[i], cex=highlight$speckleSize)
+          graphics::lines(thisHL$hl_t, thisHL$hl_f[1,],
+                          col=thisHL$params$color[1],
+                          lwd=thisHL$params$drawSize)
+          for (j in 2:nf) {
+            graphics::lines(thisHL$hl_t, thisHL$hl_f[j,],
+                            col=thisHL$params$color[j],
+                            lwd=thisHL$params$drawSize)
           }
         } else {
-          graphics::points(highlight_t[-hsubdr], highlight_f[-hsubdr], pch=20,
-                           col=highlight$color[1], cex=highlight$speckleSize)
+          graphics::lines(thisHL$hl_t, thisHL$hl_f, col=thisHL$params$color[1],
+                          lwd=thisHL$params$drawSize)
+        }
+
+        if ('speckle' %in% plotType) {
+          if (nf > 1) {
+            graphics::points(thisHL$hl_t[-thisHL$subdr],
+                             thisHL$hl_f[1,-thisHL$subdr],
+                             pch=20, col=thisHL$params$color[1],
+                             cex=thisHL$params$speckleSize)
+            for (j in 2:nf) {
+              graphics::points(thisHL$hl_t[-thisHL$subdr],
+                               thisHL$hl_f[j,-thisHL$subdr],
+                               pch=20, col=thisHL$params$color[j],
+                               cex=thisHL$params$speckleSize)
+            }
+          } else {
+            graphics::points(thisHL$hl_t[-thisHL$subdr],
+                             thisHL$hl_f[-thisHL$subdr], pch=20,
+                             col=thisHL$params$color[1],
+                             cex=thisHL$params$speckleSize)
+          }
         }
       }
     }
@@ -255,24 +277,43 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                                             tick=F)
 
       if (!is.null(highlight)) {
-        if ('background' %in% names(highlight)) {
-          graphics::rect(highlight$start,
-                         freqRange[1] - freqRange[2] * 2,
-                         highlight$end,
-                         freqRange[2] + freqRange[2] * 2,
-                         col = highlight$background, border = NA)
-        }
-        if (nf > 1) {
-          graphics::points(highlight_t[-hsubdr], highlight_f[1,-hsubdr], pch=20,
-                           col=highlight$color[1], cex=highlight$speckleSize)
-          for (i in 2:nf) {
-            graphics::points(highlight_t[-hsubdr], highlight_f[i,-hsubdr], pch=20,
-                             col=highlight$color[i], cex=highlight$speckleSize)
-          }
+        if (any(sapply(highlight, is.list))) {
+          highlightLoopDepth <- sum(sapply(highlight, is.list))
         } else {
-          graphics::points(highlight_t[-hsubdr], highlight_f[-hsubdr], pch=20,
-                           col=highlight$color[1], cex=highlight$speckleSize)
+          highlightLoopDepth <- 1
         }
+        for (i in 1:highlightLoopDepth) {
+          if (any(sapply(highlight, is.list))) {
+            thisHL <- create_highlighting(highlight[[i]], fm, nf, dynamicRange)
+          } else {
+            thisHL <- create_highlighting(highlight, fm, nf, dynamicRange)
+          }
+          if ('background' %in% names(thisHL$params)) {
+            graphics::rect(thisHL$params$start,
+                           freqRange[1] - freqRange[2] * 2,
+                           thisHL$params$end,
+                           freqRange[2] + freqRange[2] * 2,
+                           col = thisHL$params$background, border = NA)
+          }
+          if (nf > 1) {
+            graphics::points(thisHL$hl_t[-thisHL$subdr],
+                             thisHL$hl_f[1,-thisHL$subdr],
+                             pch=20, col=thisHL$params$color[1],
+                             cex=thisHL$params$speckleSize)
+            for (j in 2:nf) {
+              graphics::points(thisHL$hl_t[-thisHL$subdr],
+                               thisHL$hl_f[j,-thisHL$subdr],
+                               pch=20, col=thisHL$params$color[j],
+                               cex=thisHL$params$speckleSize)
+            }
+          } else {
+            graphics::points(thisHL$hl_t[-thisHL$subdr],
+                             thisHL$hl_f[-thisHL$subdr], pch=20,
+                             col=thisHL$params$color[1],
+                             cex=thisHL$params$speckleSize)
+          }
+        }
+
 
       }
 

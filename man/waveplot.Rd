@@ -211,7 +211,8 @@ done with the \code{start} and \code{end} arguments which must be numbers or num
 vectors, or using the \code{tier} and \code{label} arguments to highlight based on
 information in a plotted TextGrid. Further contains the argument
 \code{color} (string, see \code{color}), and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{drawSize}{Number indicating the line width of plot components where
 the \verb{_plotType} is \code{'draw'} (i.e., pitch, formants, or intensity rendered as

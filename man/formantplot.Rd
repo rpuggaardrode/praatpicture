@@ -90,7 +90,8 @@ vectors, or using the \code{tier} and \code{label} arguments to highlight based 
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{color}),
 \code{drawSize} or \code{speckleSize} (both numeric), and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{axisLabel}{String giving the name of the label to print along the
 y-axis when plotting formants. Default is \code{Frequency (Hz)}.}

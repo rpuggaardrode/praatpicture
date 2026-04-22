@@ -70,7 +70,8 @@ vectors, or using the \code{tier} and \code{label} arguments to highlight based 
 information in a plotted TextGrid. Further contains the optional arguments
 \code{color} (string or vector of strings, see \code{color}) and
 \code{drawSize} (integer), and \code{background}
-(a string specifying a background color).}
+(a string specifying a background color). Can be nested lists to highlight
+different parts of a figure in different ways.}
 
 \item{pitch_overlay}{Logical; is pitch also overlaid on the same
 plot frame? Default is \code{FALSE}.}
