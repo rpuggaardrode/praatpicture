@@ -47,7 +47,8 @@ specplot(
   highlight = NULL,
   axisLabel = NULL,
   drawSize = 1,
-  speckleSize = 1
+  speckleSize = 1,
+  suppressAxes = FALSE
 )
 }
 \arguments{
@@ -247,6 +248,9 @@ line plots). Default is \code{1}. Controls the \code{lwd} argument of
 \item{speckleSize}{Number indicating the point size of plot components where
 the \verb{_plotType} is \code{'speckle'} (i.e. pitch or formants rendered as point
 plots). Default is \code{1}. Controls the \code{cex} arguments of \link[graphics:points]{graphics::points}.}
+
+\item{suppressAxes}{Should all axes and the box around plots be suppressed?
+Default is \code{FALSE}. Generally not recommended.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

@@ -148,7 +148,7 @@ draw_spectralslice <- function(sound, time,
   sig <- snd@.Data[,channel]
 
   if (scale == 'erb') {
-    maxFreq <- soundgen::HzToERB(sr/2)
+    maxFreq <- soundgen::HzToOther(sr/2, scale = 'ERB')
   } else if (scale == 'mel') {
     maxFreq <- 1000 / log(2) * log(1 + (sr/2) / 1000)
   } else {
@@ -181,7 +181,7 @@ draw_spectralslice <- function(sound, time,
   }
 
   if (scale == 'erb') {
-    spec$freq <- soundgen::HzToERB(spec$hz)
+    spec$freq <- soundgen::HzToOther(spec$hz, scale = 'ERB')
   } else if (scale == 'mel') {
     spec$freq <- 1000 / log(2) * log(1 + spec$hz / 1000)
   } else {

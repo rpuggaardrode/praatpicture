@@ -19,7 +19,8 @@ intensityplot(
   min_max_only = TRUE,
   highlight = NULL,
   axisLabel = "Intensity (dB)",
-  drawSize = 1
+  drawSize = 1,
+  suppressAxes = FALSE
 )
 }
 \arguments{
@@ -82,6 +83,9 @@ the y-axis when plotting intensity. Default is \code{Intensity (dB)}.}
 
 \item{drawSize}{Number indicating the line width of the intensity contour.
 Default is \code{1}. Controls the \code{lwd} argument of \link[graphics:lines]{graphics::lines}.}
+
+\item{suppressAxes}{Should all axes and the box around plots be suppressed?
+Default is \code{FALSE}. Generally not recommended.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

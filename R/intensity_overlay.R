@@ -45,6 +45,8 @@
 #' different parts of a figure in different ways.
 #' @param pitch_overlay Logical; is pitch also overlaid on the same
 #' plot frame? Default is `FALSE`.
+#' @param suppressAxes Should all axes and the box around plots be suppressed?
+#' Default is `FALSE`. Generally not recommended.
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -60,7 +62,7 @@ intensity_overlay <- function(it, bottomRange, topRange, start, org_start=0,
                               tfrom0=TRUE, range=NULL, color='black', ind=NULL,
                               drawSize=1, axisLabel='Intensity (dB)',
                               min_max_only=TRUE, highlight=NULL,
-                              pitch_overlay=FALSE) {
+                              pitch_overlay=FALSE, suppressAxes=FALSE) {
   if (tfrom0) it$t <- it$t - org_start
   sRan <- topRange - bottomRange
   iRan <- range[2] - range[1]
@@ -125,20 +127,23 @@ intensity_overlay <- function(it, bottomRange, topRange, start, org_start=0,
   iline <- c(3.5,1)
   if (pitch_overlay) iline <- c(3.5,3.5)
 
-  graphics::mtext(axisLabel, side=4, line=iline[1], cex=0.8, las=3,
-                  col=color[1])
+  if (!suppressAxes) {
+    graphics::mtext(axisLabel, side=4, line=iline[1], cex=0.8, las=3,
+                    col=color[1])
 
-  if (min_max_only[ind]) {
-    graphics::mtext(round(range[1], 0),
-                    side=4, line=iline[2], at=bottomRange,
-                    padj=0, las=2, cex=0.7, col=color[1])
-    graphics::mtext(round(range[2]),
-                    side=4, line=iline[2], at=topRange,
-                    padj=1, las=2, cex=0.7, col=color[1])
-  } else {
-    rtix <- pretty(range[1]:range[2])
-    graphics::axis(4, at=(rtix-range[1])*multiplier, labels=rtix,
-                   col.ticks=color[1],
-                   col.axis=color[1])
+    if (min_max_only[ind]) {
+      graphics::mtext(round(range[1], 0),
+                      side=4, line=iline[2], at=bottomRange,
+                      padj=0, las=2, cex=0.7, col=color[1])
+      graphics::mtext(round(range[2]),
+                      side=4, line=iline[2], at=topRange,
+                      padj=1, las=2, cex=0.7, col=color[1])
+    } else {
+      rtix <- pretty(range[1]:range[2])
+      graphics::axis(4, at=(rtix-range[1])*multiplier, labels=rtix,
+                     col.ticks=color[1],
+                     col.axis=color[1])
+    }
   }
+
 }

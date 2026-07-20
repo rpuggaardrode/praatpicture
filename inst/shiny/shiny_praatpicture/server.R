@@ -820,7 +820,8 @@ server <- function(input, output, session) {
                                highlight = highlight_args(),
                                draw_arrow = arrow_args(),
                                draw_rectangle = rect_args(),
-                               annotate = annot_args()
+                               annotate = annot_args(),
+                               suppressAxes = input$suppressAxes
     )
     dev.off()
     list(src = outputFile,

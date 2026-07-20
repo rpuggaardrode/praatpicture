@@ -18,7 +18,8 @@ intensity_overlay(
   axisLabel = "Intensity (dB)",
   min_max_only = TRUE,
   highlight = NULL,
-  pitch_overlay = FALSE
+  pitch_overlay = FALSE,
+  suppressAxes = FALSE
 )
 }
 \arguments{
@@ -75,6 +76,9 @@ different parts of a figure in different ways.}
 
 \item{pitch_overlay}{Logical; is pitch also overlaid on the same
 plot frame? Default is \code{FALSE}.}
+
+\item{suppressAxes}{Should all axes and the box around plots be suppressed?
+Default is \code{FALSE}. Generally not recommended.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

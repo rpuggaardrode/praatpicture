@@ -313,6 +313,8 @@
 #' different parts of a figure in different ways. This argument is
 #' used to highlight all plot components, use the `*_highlight` arguments for
 #' highlighting individuals plot components.
+#' @param suppressAxes Should all axes and the box around plots be suppressed?
+#' Default is `FALSE`. Generally not recommended.
 #' @param draw_lines Use for drawing straight lines on plot components. Takes
 #' an argument of type `list` which should contain a) a string giving the plot
 #' component to draw straight lines on, and b) arguments to pass on to
@@ -423,6 +425,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                          intensity_highlight=NULL,
                          time_axisLabel=NULL,
                          highlight=NULL,
+                         suppressAxes=FALSE,
                          draw_lines=list('formant', h=seq(0,10000,by=1000),
                                          lty='dotted'),
                          draw_rectangle=NULL, draw_arrow=NULL, annotate=NULL,
@@ -777,7 +780,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     if (pitch_scale == 'semitones') pt <-
         rPraat::pt.Hz2ST(pt, ref=pitch_semitonesRe)
     if (pitch_scale == 'mel') pt$f <- emuR::mel(pt$f)
-    if (pitch_scale == 'erb') pt$f <- soundgen::HzToERB(pt$f)
+    if (pitch_scale == 'erb') pt$f <- soundgen::HzToOther(pt$f, scale = 'ERB')
   }
 
   if ('formant' %in% frames | formant_plotOnSpec) {
@@ -889,8 +892,14 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     }
   }
 
+  if (suppressAxes) {
+    boxType <- 'n'
+  } else {
+    boxType <- 'o'
+  }
+
   plot_matrix <- rep(1:length(proportion), proportion)
-  graphics::par(mar=c(0,2,0,2), oma=c(5,5,5,5), ...)
+  graphics::par(mar=c(0,2,0,2), oma=c(5,5,5,5), bty=boxType, ...)
   graphics::layout(matrix(plot_matrix, nrow=length(plot_matrix)))
 
   for (i in 1:nframe) {
@@ -907,7 +916,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                line_comp, rect_comp, arr_comp, annot_comp,
                draw_lines, draw_rectangle, draw_arrow, annotate,
                wave_channelNames, wave_axisDigits, wave_lineWidth,
-               cn, min_max_only, wave_highlight, drawSize, speckleSize)
+               cn, min_max_only, wave_highlight, drawSize, speckleSize,
+               suppressAxes)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
       specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,
@@ -922,7 +932,8 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                intensity_highlight,
                tgbool, focus_linevec, tg_focusTierColor,
                tg_focusTierLineType, ind, min_max_only,
-               spec_highlight, spec_axisLabel, drawSize, speckleSize)
+               spec_highlight, spec_axisLabel, drawSize, speckleSize,
+               suppressAxes)
       if ('spectrogram' %in% rect_comp) draw_rectangle('spectrogram',
                                                        draw_rectangle)
       if ('spectrogram' %in% arr_comp) draw_arrow('spectrogram', draw_arrow)
@@ -941,7 +952,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                 pitch_plotType, pitch_scale, pitch_freqRange,
                 pitch_semitonesRe, pitch_color, ind,
                 min_max_only, pitch_highlight, pitch_axisLabel,
-                drawSize, speckleSize)
+                drawSize, speckleSize, suppressAxes)
       if ('pitch' %in% rect_comp) draw_rectangle('pitch', draw_rectangle)
       if ('pitch' %in% arr_comp) draw_arrow('pitch', draw_arrow)
       if ('pitch' %in% annot_comp) make_annot('pitch', annotate)
@@ -953,7 +964,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                   tg_focusTierColor, tg_focusTierLineType,
                   formant_dynamicRange, formant_freqRange, formant_plotType,
                   formant_color, ind, min_max_only, formant_highlight,
-                  formant_axisLabel, drawSize, speckleSize)
+                  formant_axisLabel, drawSize, speckleSize, suppressAxes)
       if ('formant' %in% rect_comp) draw_rectangle('formant', draw_rectangle)
       if ('formant' %in% arr_comp) draw_arrow('formant', draw_arrow)
       if ('formant' %in% annot_comp) make_annot('formant', annotate)
@@ -965,7 +976,7 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                     tg_focusTierColor, tg_focusTierLineType,
                     intensity_range, intensity_color, ind,
                     min_max_only, intensity_highlight,
-                    intensity_axisLabel, drawSize)
+                    intensity_axisLabel, drawSize, suppressAxes)
       if ('intensity' %in% rect_comp) draw_rectangle('intensity',
                                                      draw_rectangle)
       if ('intensity' %in% arr_comp) draw_arrow('intensity', draw_arrow)
@@ -975,26 +986,29 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
     }
   }
 
-  if (!start_end_only) {
-    xtix <- grDevices::axisTicks(c(round(min(t), 3),
-                                   round(max(t), 3)), log=F)
-    if (tUnit == 's') {
-      xtixLab <- xtix
+  if (!suppressAxes) {
+    if (!start_end_only) {
+      xtix <- grDevices::axisTicks(c(round(min(t), 3),
+                                     round(max(t), 3)), log=F)
+      if (tUnit == 's') {
+        xtixLab <- xtix
+      } else {
+        xtixLab <- xtix*1000
+      }
+      graphics::axis(1, at=xtix, labels=xtixLab, ...)
     } else {
-      xtixLab <- xtix*1000
+      xtix <- c(round(min(t), 3), round(max(t), 3), 0)
+      if (tUnit == 's') {
+        xtixLab <- xtix
+      } else {
+        xtixLab <- xtix*1000
+      }
+      graphics::axis(1, at=xtix, labels=xtixLab, ...)
     }
-    graphics::axis(1, at=xtix, labels=xtixLab, ...)
-  } else {
-    xtix <- c(round(min(t), 3), round(max(t), 3), 0)
-    if (tUnit == 's') {
-      xtixLab <- xtix
-    } else {
-      xtixLab <- xtix*1000
-    }
-    graphics::axis(1, at=xtix, labels=xtixLab, ...)
   }
 
-  graphics::mtext(time_axisLabel, side=1, line=3, outer=T, cex=0.8)
+  if (!suppressAxes) graphics::mtext(time_axisLabel, side=1, line=3, outer=T,
+                                     cex=0.8)
   graphics::mtext(mainTitle, side=3, line=2, adj=mainTitleAlignment, outer=T)
 
   graphics::par(p)

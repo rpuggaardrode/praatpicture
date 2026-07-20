@@ -1,3 +1,9 @@
+# praatpicture 1.9.0
+* Added the argument `suppressAxes` to `praatpicture()` and sister functions,
+which suppresses all axes, axis labels, and the box drawn around plots and plot 
+components.
+* Replaced deprecated `soundgen` frequency scale conversion functions.
+
 # praatpicture 1.8.0
 * Added the option of a moving cursor showing the current position in the
 sound file when using `talking_praatpicture()`.

@@ -133,6 +133,8 @@
 #' @param speckleSize Number indicating the point size of plot components where
 #' the `_plotType` is `'speckle'` (i.e. pitch or formants rendered as point
 #' plots). Default is `1`. Controls the `cex` arguments of [graphics::points].
+#' @param suppressAxes Should all axes and the box around plots be suppressed?
+#' Default is `FALSE`. Generally not recommended.
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -160,7 +162,12 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
                      draw_lines=NULL, draw_rectangle=NULL, draw_arrow=NULL,
                      annotate=NULL, channelNames=FALSE, axisDigits=3,
                      lineWidth=1, cn=NULL, min_max_only=TRUE, highlight=NULL,
-                     drawSize=1, speckleSize=1) {
+                     drawSize=1, speckleSize=1, suppressAxes=FALSE) {
+
+  if (suppressAxes) {
+    min_max_only <- TRUE
+    axisDigits <- 0
+  }
 
   if (length(color) != nchan) color <- rep(color, nchan)
   if (length(lineWidth) != nchan) lineWidth <- rep(lineWidth, nchan)
@@ -266,14 +273,15 @@ waveplot <- function(sig, bit, t, start, tfrom0=TRUE, nchan=1,
                     org_start, tfrom0, pitch_freqRange, pitch_plotType,
                     pitch_scale, pitch_color, ind, drawSize, speckleSize,
                     pitch_axisLabel, min_max_only, pitch_highlight,
-                    intensity_plotOnWave == j)
+                    intensity_plotOnWave == j, suppressAxes)
     }
 
     if (as.numeric(intensity_plotOnWave) == j) {
       intensity_overlay(it, currentEnergyRange[1], currentEnergyRange[2], start,
                         org_start, tfrom0, intensity_range, intensity_color,
                         ind, drawSize, intensity_axisLabel, min_max_only,
-                        intensity_highlight, pitch_plotOnWave == j)
+                        intensity_highlight, pitch_plotOnWave == j,
+                        suppressAxes)
     }
 
     if ('sound' %in% rect_comp) draw_rectangle('sound', draw_rectangle)

@@ -64,6 +64,8 @@
 #' @param speckleSize Number indicating the point size of if `_plotType` is
 #' `'speckle'`. Default is `1`. Controls the `cex` arguments of
 #' [graphics::points].
+#' @param suppressAxes Should all axes and the box around plots be suppressed?
+#' Default is `FALSE`. Generally not recommended.
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -79,7 +81,8 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                         dynamicRange=30, freqRange=c(0,5500),
                         plotType='speckle', color='black',
                         ind=NULL, min_max_only=FALSE, highlight=NULL,
-                        axisLabel='Frequency (Hz)', drawSize=1, speckleSize=1) {
+                        axisLabel='Frequency (Hz)', drawSize=1, speckleSize=1,
+                        suppressAxes=FALSE) {
 
   if (!min_max_only[ind]) {
     if (ind == 1) {
@@ -172,9 +175,11 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
            xaxt='n', ylim=freqRange, yaxt=yax, type='l', col=color[1],
            lwd=drawSize)
     }
-    if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
-    if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
-                                          tick=F)
+    if (!suppressAxes) {
+      if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
+      if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
+                                            tick=F)
+    }
 
     if ('speckle' %in% plotType) {
       if (nf > 1) {
@@ -253,7 +258,6 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
       }
     }
 
-    graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
   }
 
   if (length(plotType) == 1) {
@@ -272,9 +276,11 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
              ylim=freqRange, yaxt=yax, col=color[1], cex=speckleSize)
       }
 
-      if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
-      if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
-                                            tick=F)
+      if (!suppressAxes) {
+        if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
+        if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
+                                              tick=F)
+      }
 
       if (!is.null(highlight)) {
         if (any(sapply(highlight, is.list))) {
@@ -324,8 +330,9 @@ formantplot <- function(fm, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
         }
       }
 
-      graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
     }
   }
+
+  if (!suppressAxes) graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
 
 }

@@ -58,6 +58,8 @@
 #' different parts of a figure in different ways.
 #' @param intensity_overlay Logical; is intensity also overlaid on the same
 #' plot frame? Default is `FALSE`.
+#' @param suppressAxes Should all axes and the box around plots be suppressed?
+#' Default is `FALSE`. Generally not recommended.
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -72,7 +74,8 @@ pitch_overlay <- function(pt, bottomRange, topRange, start, org_start=0,
                           tfrom0=TRUE, freqRange=NULL, plotType='draw',
                           scale='hz', color='black', ind=NULL, drawSize=1,
                           speckleSize=1, axisLabel=NULL, min_max_only=TRUE,
-                          highlight=NULL, intensity_overlay=FALSE) {
+                          highlight=NULL, intensity_overlay=FALSE,
+                          suppressAxes=FALSE) {
 
   pfr <- freqRange
   if (tfrom0) pt$t <- pt$t - org_start
@@ -183,19 +186,22 @@ pitch_overlay <- function(pt, bottomRange, topRange, start, org_start=0,
   pline <- c(3.5,1)
   if (intensity_overlay) pline <- c(1,1)
 
-  graphics::mtext(axisLabel, side=4, line=pline[1], cex=0.8, las=3,
-                  col=color[1])
+  if (!suppressAxes) {
+    graphics::mtext(axisLabel, side=4, line=pline[1], cex=0.8, las=3,
+                    col=color[1])
 
-  if (min_max_only[ind]) {
-    graphics::mtext(freqRange[1], side=4, line=pline[2],
-                    at=bottomRange, padj=0, las=2, cex=0.7,
-                    col=color[1])
-    graphics::mtext(freqRange[2], side=4, line=pline[2],
-                    at=topRange, padj=1, las=2, cex=0.7,
-                    col=color[1])
-  } else {
-    rtix <- pretty(pfr[1]:pfr[2])
-    graphics::axis(4, at=(rtix-pfr[1])*multiplier, labels=rtix,
-                   col.ticks=color[1], col.axis=color[1])
+    if (min_max_only[ind]) {
+      graphics::mtext(freqRange[1], side=4, line=pline[2],
+                      at=bottomRange, padj=0, las=2, cex=0.7,
+                      col=color[1])
+      graphics::mtext(freqRange[2], side=4, line=pline[2],
+                      at=topRange, padj=1, las=2, cex=0.7,
+                      col=color[1])
+    } else {
+      rtix <- pretty(pfr[1]:pfr[2])
+      graphics::axis(4, at=(rtix-pfr[1])*multiplier, labels=rtix,
+                     col.ticks=color[1], col.axis=color[1])
+    }
   }
+
 }

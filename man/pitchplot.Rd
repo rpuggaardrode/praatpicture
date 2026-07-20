@@ -23,7 +23,8 @@ pitchplot(
   highlight = NULL,
   axisLabel = NULL,
   drawSize = 1,
-  speckleSize = 1
+  speckleSize = 1,
+  suppressAxes = FALSE
 )
 }
 \arguments{
@@ -106,6 +107,9 @@ axis label will depend on the scale.}
 \item{speckleSize}{Number indicating the point size of if \verb{_plotType} is
 \code{'speckle'}. Default is \code{1}. Controls the \code{cex} arguments of
 \link[graphics:points]{graphics::points}.}
+
+\item{suppressAxes}{Should all axes and the box around plots be suppressed?
+Default is \code{FALSE}. Generally not recommended.}
 }
 \value{
 No return values, called internally by \link{praatpicture} and sibling

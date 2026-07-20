@@ -158,6 +158,8 @@
 #' @param speckleSize Number indicating the point size of plot components where
 #' the `_plotType` is `'speckle'` (i.e. pitch or formants rendered as point
 #' plots). Default is `1`. Controls the `cex` arguments of [graphics::points].
+#' @param suppressAxes Should all axes and the box around plots be suppressed?
+#' Default is `FALSE`. Generally not recommended.
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -185,7 +187,8 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
                      tgbool=FALSE, lines=NULL, focusTierColor='black',
                      focusTierLineType='dotted', ind=NULL,
                      min_max_only=TRUE, highlight=NULL,
-                     axisLabel=NULL, drawSize=1, speckleSize=1) {
+                     axisLabel=NULL, drawSize=1, speckleSize=1,
+                     suppressAxes=FALSE) {
 
   if (scale == 'logarithmic') {
     logsc <- 'y'
@@ -236,9 +239,9 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
   if (scale %in% c('hz', 'log')) {
     hzFreqRange <- freqRange
   } else if (scale == 'erb') {
-    hzFreqRange <- soundgen::ERBToHz(freqRange)
+    hzFreqRange <- soundgen::otherToHz(freqRange, scale = 'ERB')
     if (formant_plotOnSpec) fm$frequencyArray <-
-        soundgen::HzToERB(fm$frequencyArray)
+        soundgen::HzToOther(fm$frequencyArray, scale = 'ERB')
   } else {
     hzFreqRange <- 1000 * (2^(freqRange / 1000)-1)
     if (formant_plotOnSpec) fm$frequencyArray <-
@@ -262,10 +265,12 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
 
   plot(NULL, xaxt='n', xlim=c(start, end+start),
        ylim=freqRange, yaxs='i', yaxt=yax, log = logsc)
-  if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
-  if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
-                                        tick=F)
-  graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
+  if (!suppressAxes) {
+    if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
+    if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
+                                          tick=F)
+    graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
+  }
 
   fillCol <- grDevices::colorRampPalette(colors)
   fillRan <- c(-dynamicRange, 0)
@@ -280,7 +285,7 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
   yVals <- seq(hzFreqRange[1], hzFreqRange[2], length.out=specDims[2])
 
   if (scale == 'mel') yVals <- emuR::mel(yVals)
-  if (scale == 'erb') yVals <- soundgen::HzToERB(yVals)
+  if (scale == 'erb') yVals <- soundgen::HzToOther(yVals, scale = 'ERB')
 
   graphics::image(x=xVals, y=yVals, z=spec$spectrogram,
                   col=fillCol, useRaster=useRaster, add=TRUE)
@@ -536,14 +541,14 @@ specplot <- function(sig, sr, t, start, end, tfrom0=TRUE, scale='hz',
     pitch_overlay(pt, freqRange[1], freqRange[2], start, org_start, tfrom0,
                   pitch_freqRange, pitch_plotType, pitch_scale, pitch_color,
                   ind, drawSize, speckleSize, pitch_axisLabel, min_max_only,
-                  pitch_highlight, intensity_plotOnSpec)
+                  pitch_highlight, intensity_plotOnSpec, suppressAxes)
   }
 
   if (intensity_plotOnSpec) {
     intensity_overlay(it, freqRange[1], freqRange[2], start, org_start,
                       tfrom0, intensity_range, intensity_color, ind, drawSize,
                       intensity_axisLabel, min_max_only, intensity_highlight,
-                      pitch_plotOnSpec)
+                      pitch_plotOnSpec, suppressAxes)
   }
 
   if (tgbool) {

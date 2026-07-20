@@ -83,6 +83,7 @@ praatpicture(
   intensity_highlight = NULL,
   time_axisLabel = NULL,
   highlight = NULL,
+  suppressAxes = FALSE,
   draw_lines = list("formant", h = seq(0, 10000, by = 1000), lty = "dotted"),
   draw_rectangle = NULL,
   draw_arrow = NULL,
@@ -477,6 +478,9 @@ a plotted TextGrid. Further contains the optional arguments \code{color}
 different parts of a figure in different ways. This argument is
 used to highlight all plot components, use the \verb{*_highlight} arguments for
 highlighting individuals plot components.}
+
+\item{suppressAxes}{Should all axes and the box around plots be suppressed?
+Default is \code{FALSE}. Generally not recommended.}
 
 \item{draw_lines}{Use for drawing straight lines on plot components. Takes
 an argument of type \code{list} which should contain a) a string giving the plot

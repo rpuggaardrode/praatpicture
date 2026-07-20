@@ -49,6 +49,8 @@
 #' the y-axis when plotting intensity. Default is `Intensity (dB)`.
 #' @param drawSize Number indicating the line width of the intensity contour.
 #' Default is `1`. Controls the `lwd` argument of [graphics::lines].
+#' @param suppressAxes Should all axes and the box around plots be suppressed?
+#' Default is `FALSE`. Generally not recommended.
 #'
 #' @return No return values, called internally by [praatpicture] and sibling
 #' functions.
@@ -63,7 +65,8 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
                           focusTierColor='black', focusTierLineType='dotted',
                           range=NULL, color='black', ind=NULL, min_max_only=TRUE,
                           highlight=NULL,
-                          axisLabel='Intensity (dB)', drawSize=1) {
+                          axisLabel='Intensity (dB)', drawSize=1,
+                          suppressAxes=FALSE) {
 
   if (!min_max_only[ind]) {
     if (ind == 1) {
@@ -116,9 +119,11 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
 
   plot(it$t, it$i, xlim=c(start, end+start), xaxt='n',
        ylim=range, yaxt=yax, type='l', col=color, lwd=drawSize)
-  if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
-  if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
-                                        tick=F)
+  if (!suppressAxes) {
+    if (!min_max_only[ind] & ind != 1) graphics::axis(2, at=ytix)
+    if (min_max_only[ind]) graphics::axis(2, at=ytix, padj=c(0,1), las=2,
+                                          tick=F)
+  }
 
   if (!is.null(highlight)) {
     if (any(sapply(highlight, is.list))) {
@@ -152,6 +157,6 @@ intensityplot <- function(it, start, end, tfrom0=TRUE, tgbool=FALSE, lines=NULL,
     }
   }
 
-  graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
+  if (!suppressAxes) graphics::mtext(axisLabel, side=2, line=3.5, cex=0.8)
 
 }
