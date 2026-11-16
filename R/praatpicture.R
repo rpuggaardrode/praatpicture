@@ -920,7 +920,14 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                suppressAxes)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
-      specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,
+      spec_sig <- sig[, which(wave_channels %in% spec_channel),
+                      drop = FALSE]
+      if (ncol(spec_sig) > 1) {
+        spec_sig <- rowMeans(spec_sig)
+      } else {
+        spec_sig <- as.numeric(spec_sig)
+      }
+      specplot(spec_sig, sr, t, start,
                max(tseq)-start, tfrom0, spec_scale,
                spec_freqRange, spec_windowLength, spec_dynamicRange,
                spec_timeStep, spec_windowShape, spec_colors,
