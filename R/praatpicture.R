@@ -44,7 +44,7 @@
 #' the `_plotType` is `'speckle'` (i.e. pitch or formants rendered as point
 #' plots). Default is `1`. Controls the `cex` arguments of [graphics::points].
 #' @param wave_channels Vector of numbers or strings giving either numeric
-#' identifiers of audio channels to plot of the names of audio channels to plot.
+#' identifiers of audio channels to plot or the names of audio channels to plot.
 #' Also understands `'all'`, which plots all channels and is the default.
 #' @param wave_channelNames Should names of audio channels be printed
 #' on the y-axis? If `TRUE`, names will be grabbed from the audio metadata if
