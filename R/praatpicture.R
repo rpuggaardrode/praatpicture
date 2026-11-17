@@ -44,7 +44,7 @@
 #' the `_plotType` is `'speckle'` (i.e. pitch or formants rendered as point
 #' plots). Default is `1`. Controls the `cex` arguments of [graphics::points].
 #' @param wave_channels Vector of numbers or strings giving either numeric
-#' identifiers of audio channels to plot of the names of audio channels to plot.
+#' identifiers of audio channels to plot or the names of audio channels to plot.
 #' Also understands `'all'`, which plots all channels and is the default.
 #' @param wave_channelNames Should names of audio channels be printed
 #' on the y-axis? If `TRUE`, names will be grabbed from the audio metadata if
@@ -920,7 +920,14 @@ praatpicture <- function(sound, start=0, end=0, tfrom0=TRUE, tUnit='s',
                suppressAxes)
     } else if (frames[i] == 'spectrogram') {
       ind <- which(frames == 'spectrogram')
-      specplot(sig[,which(wave_channels==spec_channel)], sr, t, start,
+      spec_sig <- sig[, which(wave_channels %in% spec_channel),
+                      drop = FALSE]
+      if (ncol(spec_sig) > 1) {
+        spec_sig <- rowMeans(spec_sig)
+      } else {
+        spec_sig <- as.numeric(spec_sig)
+      }
+      specplot(spec_sig, sr, t, start,
                max(tseq)-start, tfrom0, spec_scale,
                spec_freqRange, spec_windowLength, spec_dynamicRange,
                spec_timeStep, spec_windowShape, spec_colors,
