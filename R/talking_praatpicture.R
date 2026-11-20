@@ -34,6 +34,13 @@
 #' @param audio_end End time (in seconds) of embedded audio. By default it is
 #' the same as `end`, i.e. the embedded audio is the portion of the sound
 #' that is being plotted.
+#' @param audio_channels Number or numeric vector containing the numbers of the 
+#' audio channel(s) that should be included in the embedded audio, or `'all'`, 
+#' which is the default value. This does not affect plotted channels, which are 
+#' controlled by adding the `wave_channels` argument that gets passed onto the
+#' [praatpicture()] call. Selecting one channel results in mono audio. The order 
+#' of audio channels in the original file is preserved and duplicate channels
+#' are ignored.
 #' @param width Number giving the desired width of the resulting animation in
 #' pixels; default is `1080`.
 #' @param height Number giving the desired height of the resulting animation in
@@ -76,29 +83,51 @@ talking_praatpicture <- function(sound, start=0, end=0,
                                                  h=seq(0,10000,by=1000),
                                                  lty='dotted'),
                                  audio_start=start, audio_end=end,
-                                 width=1080, height=720, pointsize=25,
-                                 cursor=FALSE, cursor_frameRate=50,
-                                 cursor_color = 'black', cursor_lwd = 2,
-                                 verbose=TRUE,
+                                 audio_channels='all', width=1080, height=720,
+                                 pointsize=25, cursor=FALSE,
+                                 cursor_frameRate=50, cursor_color = 'black',
+                                 cursor_lwd = 2, verbose=TRUE,
                                  outputFile='praatvid.mp4', useViewer=TRUE,
                                  ...) {
 
   aend <- audio_end
   if (aend == 0) aend <- Inf
-
   if (audio_start != 0 | audio_end != 0) {
-    snd <- tuneR::readWave(sound, from=audio_start, to=aend, units='seconds')
+    snd <- tuneR::readWave(sound, from=audio_start, to=aend,
+                           units='seconds', toWaveMC=T)
     sr <- snd@samp.rate
-    nsamp <- length(snd@left)
+    nsamp <- snd@dim[1]
     dur <- nsamp / sr
-    tuneR::writeWave(snd, filename='tmp.wav', extensible=FALSE)
-    audioFile <- 'tmp.wav'
   } else {
-    audioFile <- sound
     snd <- tuneR::readWave(sound, from=0, units='seconds', toWaveMC=T)
     sr <- snd@samp.rate
     nsamp <- snd@dim[1]
     dur <- nsamp / sr
+  }
+  if (!identical(audio_channels,'all')) {
+    if (!is.numeric(audio_channels) || length(audio_channels) == 0 ||
+        anyNA(audio_channels) || any(!is.finite(audio_channels)) ||
+        any(audio_channels < 1) || 
+        any(audio_channels != floor(audio_channels))) {
+      stop("'audio_channels' must be 'all' or a vector of positive integers.")
+    }
+    audio_channels <- sort(unique(audio_channels))
+    if (any(audio_channels > ncol(snd@.Data))) {
+      stop("'audio_channels' contains a channel number that does not exist .")
+    }
+    if (any(audio_channels > nrow(tuneR::MCnames))) {
+      stop("'audio_channels' exceeds the number of supported channel names.")
+    }
+    snd@.Data <- snd@.Data[, audio_channels, drop=FALSE]
+    colnames(snd@.Data) <- tuneR::MCnames$name[audio_channels]
+  }
+  if (audio_start != 0 | audio_end != 0 |
+      !identical(audio_channels, 'all')) {
+    tuneR::writeWave(snd, filename='tmp.wav',
+                     extensible=ncol(snd@.Data) > 2)
+    audioFile <- 'tmp.wav'
+  } else {
+    audioFile <- sound
   }
 
   if (useViewer) {
@@ -134,7 +163,8 @@ talking_praatpicture <- function(sound, start=0, end=0,
                             framerate=1/dur)
   }
 
-  if (audio_start != start | audio_end != end) unlink('tmp.wav', force=TRUE)
+  if (audio_start != 0 | audio_end != 0 |
+      !identical(audio_channels,'all')) unlink('tmp.wav', force=TRUE)
 
   if (useViewer) {
     writeLines(text='<video width="550" height="400" controls>\n<source src="output.mp4">\n</video>', con=htmlFile)
